@@ -1,0 +1,71 @@
+{
+  "mainText": {
+    "title": "Flutter Temel Riverpod"
+  },
+  "titles": {
+    "login": "Giriş Yap",
+    "home": "Ana Sayfa",
+    "homeDetail": "Ana Sayfa Detay",
+    "authentication": "Kimlik Doğrulama",
+    "settings": "Ayarlar",
+    "settingsDetail": "Ayarlar Detay",
+    "about": "Hakkında",
+    "aboutDetail": "Hakkında Detay",
+    "notFound": "Bulunamadı",
+    "notFoundDetail": "Bulunamadı Detay"
+  },
+  "authentication": {
+    "welcome": {
+      "title": "Base Kurulum",
+      "description": "Kodlama ortamınızı zahmetsizce kurun",
+      "getStarted": "Hadi Başlayalım",
+      "withoutAccount": "Hesabınız yok mu? Buradan kaydolun"
+    }
+  },
+  "general": {
+    "viewAll": "Hepsini Gör",
+    "appIsUsable": "Uygulama kullanılabilir.",
+    "updateRequired": "Güncelleme Gerekli",
+    "maintenanceHeadline": "Bakımdayız"
+  },
+  "home": {
+    "ratingAndReview": "Derecelendirme ve İnceleme"
+  },
+  "homeDetail": {
+    "selectableTitle": {
+      "copyAll": "Tümünü Kopyala",
+      "copyAllShare": "Tümünü Kopyala & Paylaş",
+      "share": "Paylaş"
+    }
+  },
+  "button": {
+    "extension": "Eklenti",
+    "github": "GitHub",
+    "themeChange": "Tema Değiştir",
+    "languageChange": "Dil Değiştir",
+    "openStore": "Markete Git"
+  },
+  "error": {
+    "notFoundPage": "Aradığınız sayfa bulunamadı",
+    "notSupportedPlatform": "Bu platform henüz desteklenmiyor.",
+    "maintenanceBody": "Şuanda hizmet verememekteyiz, lütfen daha sonra tekrar deneyin.",
+    "mustBeUpdated": "Uygulamayı kullanmaya devam edebilmek için güncellemelisiniz.",
+    "locationError": "Lokasyon Hatası",
+    "versionError": "Versiyon Hatası"
+  },
+  "imageManager": {
+    "maxImageSize": "Seçilen resim maksimum boyutu aştı! Kabul edilen maksimum boyut:",
+    "acceptedFormats": "Kabul edilen dosya formatları:",
+    "exceededImageCount": "Boyutu geçen resim sayısı:",
+    "acceptedImageCount": "Kabul edilen maksimum resim sayısı aşıldı! Kabul edilen maksimum resim sayısı:",
+    "maxVideoSize": "Seçilen video maksimum boyutu aştı! Kabul edilen maksimum boyut:"
+  },
+  "permissionDialog": {
+    "needPermission": "İzin Gerekiyor!",
+    "mustGivePermission": "Bu eylem için izin vermelisiniz ...",
+    "close": "Kapat",
+    "givePermission": "İzin Ver",
+    "gallery": "Galeri",
+    "camera": "Kamera"
+  }
+}

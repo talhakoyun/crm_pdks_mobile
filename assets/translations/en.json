@@ -1,0 +1,71 @@
+{
+  "mainText": {
+    "title": "Flutter Base Riverpod"
+  },
+  "titles": {
+    "login": "Login Page",
+    "home": "Home Page",
+    "homeDetail": "Home Page Detail",
+    "authentication": "Authentication",
+    "settings": "Settings",
+    "settingsDetail": "Settings Detail",
+    "about": "About",
+    "aboutDetail": "About Detail",
+    "notFound": "Not Found",
+    "notFoundDetail": "Not Found Detail"
+  },
+  "authentication": {
+    "welcome": {
+      "title": "Base Setup",
+      "description": "Set up your coding environment effortlessly",
+      "getStarted": "Get Started",
+      "withoutAccount": "Don't have an account? Sign up here"
+    }
+  },
+  "general": {
+    "viewAll": "View All",
+    "appIsUsable": "Application available.",
+    "updateRequired": "Update Required",
+    "maintenanceHeadline": "Under Maintenance"
+  },
+  "home": {
+    "ratingAndReview": "Rating and Review"
+  },
+  "homeDetail": {
+    "selectableTitle": {
+      "copyAll": "Copy All",
+      "copyAllShare": "Copy All & Share",
+      "share": "Share"
+    }
+  },
+  "button": {
+    "extension": "Extension",
+    "github": "Github",
+    "themeChange": "Theme Change",
+    "languageChange": "Language Change",
+    "openStore": "Open Store"
+  },
+  "error": {
+    "notFoundPage": "The page you were looking for was not found",
+    "notSupportedPlatform": "That platform is not supported yet.",
+    "maintenanceBody": "The application is under maintenance, please try again later.",
+    "mustBeUpdated": "To continue using the app, you must update it.",
+    "locationError": "Location Error",
+    "versionError": "Version Error"
+  },
+  "imageManager": {
+    "maxImageSize": "The selected image exceeded the maximum size! Maximum accepted size:",
+    "acceptedFormats": "Accepted file formats:",
+    "exceededImageCount": "Number of images exceeding the size:",
+    "acceptedImageCount": "The maximum number of images accepted has been exceeded! Maximum number of images accepted:",
+    "maxVideoSize": "The selected video exceeded the maximum size! Maximum accepted size:"
+  },
+  "permissionDialog": {
+    "needPermission": "Permission Required!",
+    "mustGivePermission": "You must give permission for this action...",
+    "close": "Close",
+    "givePermission": "Allow",
+    "gallery": "Gallery",
+    "camera": "Camera"
+  }
+}
