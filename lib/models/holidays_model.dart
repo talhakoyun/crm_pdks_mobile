@@ -18,7 +18,7 @@ class HolidayListModel {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(Data.fromJson(v));
       });
     }
     message = json['message'];
@@ -26,12 +26,12 @@ class HolidayListModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['message'] = this.message;
-    data['status'] = this.status;
+    data['message'] = message;
+    data['status'] = status;
     return data;
   }
 }
@@ -47,16 +47,17 @@ class Data {
   int? confirm;
   String? confirmText;
 
-  Data(
-      {this.id,
-      this.reason,
-      this.address,
-      this.startDate,
-      this.endDate,
-      this.type,
-      this.typeText,
-      this.confirm,
-      this.confirmText});
+  Data({
+    this.id,
+    this.reason,
+    this.address,
+    this.startDate,
+    this.endDate,
+    this.type,
+    this.typeText,
+    this.confirm,
+    this.confirmText,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -71,16 +72,16 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['reason'] = this.reason;
-    data['address'] = this.address;
-    data['start_date'] = this.startDate;
-    data['end_date'] = this.endDate;
-    data['type'] = this.type;
-    data['type_text'] = this.typeText;
-    data['confirm'] = this.confirm;
-    data['confirm_text'] = this.confirmText;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['reason'] = reason;
+    data['address'] = address;
+    data['start_date'] = startDate;
+    data['end_date'] = endDate;
+    data['type'] = type;
+    data['type_text'] = typeText;
+    data['confirm'] = confirm;
+    data['confirm_text'] = confirmText;
     return data;
   }
 }

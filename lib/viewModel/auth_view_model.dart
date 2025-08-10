@@ -159,7 +159,9 @@ class AuthViewModel extends BaseViewModel {
     IsAvailableModel model,
     BuildContext context,
   ) {
-    registerStatus = Platform.isAndroid ? model.data!.android!.isRegister : model.data!.ios!.isRegister;
+    registerStatus = Platform.isAndroid
+        ? model.data!.android!.isRegister
+        : model.data!.ios!.isRegister;
     getProfile(context, true);
   }
 
@@ -461,11 +463,8 @@ class AuthViewModel extends BaseViewModel {
             context: context!,
             type: DialogType.update,
             message: StringConstants.instance.appMessage,
-            onConfirm:
-                () => UrlLaunch.openUrl(
-                  context,
-                  isAvalibleApp.data.android!.link,
-                ),
+            onConfirm: () =>
+                UrlLaunch.openUrl(context, isAvalibleApp.data.android!.link),
           );
         } else {
           Timer(const Duration(seconds: 2), () {
@@ -488,8 +487,8 @@ class AuthViewModel extends BaseViewModel {
             context: context!,
             type: DialogType.update,
             message: StringConstants.instance.appMessage,
-            onConfirm:
-                () => UrlLaunch.openUrl(context, isAvalibleApp.data.ios!.link),
+            onConfirm: () =>
+                UrlLaunch.openUrl(context, isAvalibleApp.data.ios!.link),
           );
         } else {
           Timer(const Duration(seconds: 3), () {
@@ -549,10 +548,10 @@ class AuthViewModel extends BaseViewModel {
 
   Future<void> profileSetDataShared(ProfileModel profileModel) async {
     await _storeUserData(profileModel.data);
-    // await _storeCompanyData(profileModel.data!.company);
-    // await _storeDepartmentData(profileModel.data!.department);
-    // await _storeShiftData(profileModel.data!.shiftTime);
-    // await _storeSettingsData(profileModel.data!.settings);
+    await _storeCompanyData(profileModel.data!.first.company);
+    await _storeDepartmentData(profileModel.data!.first.department);
+    // await _storeShiftData(profileModel.data!.first.shiftTime);
+    await _storeSettingsData(profileModel.data!.first.settings);
     await profileGetDataShared();
   }
 

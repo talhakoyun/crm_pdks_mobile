@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="crm_pdks_mobile"
+        android:label="CRM Mavihost"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
