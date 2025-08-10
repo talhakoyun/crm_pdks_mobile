@@ -18,11 +18,11 @@ import '../core/init/network/connectivity/network_connectivity.dart';
 import '../core/widget/customize_dialog.dart';
 import '../core/widget/loader.dart';
 import '../helper/database_helper.dart';
+import '../models/base_model.dart';
 import '../models/is_available_model.dart';
-import '../models/login_model.dart';
 import '../models/logout_model.dart';
-import '../models/profile_model.dart';
 import '../models/register_model.dart';
+import '../models/user_model.dart';
 import '../service/auth_service.dart';
 import '../widgets/dialog/snackbar.dart';
 
@@ -288,7 +288,9 @@ class AuthViewModel extends BaseViewModel {
     }
 
     try {
-      LoginModel data = await _authService.login(body: bodyData);
+      BaseModel<List<UserModel>> data = await _authService.login(
+        body: bodyData,
+      );
       Loader.hide();
 
       if (data.status!) {
@@ -309,7 +311,7 @@ class AuthViewModel extends BaseViewModel {
 
   Future<void> _handleSuccessfulLogin(
     BuildContext context,
-    LoginModel data,
+    BaseModel<List<UserModel>> data,
   ) async {
     await setDataShared(data);
     await getProfile(context, false);
@@ -428,7 +430,7 @@ class AuthViewModel extends BaseViewModel {
     var utoken = _storageService.getStringValue(PreferencesKeys.TOKEN);
 
     if (utoken.isNotEmpty) {
-      ProfileModel profileModel = await _authService.profile();
+      BaseModel<List<UserModel>> profileModel = await _authService.profile();
 
       if (profileModel.status == true) {
         user = profileModel.data;
@@ -546,7 +548,9 @@ class AuthViewModel extends BaseViewModel {
     navigation.navigateToPageClear(path: NavigationConstants.LOGIN);
   }
 
-  Future<void> profileSetDataShared(ProfileModel profileModel) async {
+  Future<void> profileSetDataShared(
+    BaseModel<List<UserModel>> profileModel,
+  ) async {
     await _storeUserData(profileModel.data);
     await _storeCompanyData(profileModel.data!.first.company);
     await _storeDepartmentData(profileModel.data!.first.department);
@@ -612,42 +616,6 @@ class AuthViewModel extends BaseViewModel {
     );
   }
 
-  Future<void> _storeShiftData(dynamic shiftData) async {
-    await _storageService.setStringValue(
-      PreferencesKeys.SHIFTNAME,
-      shiftData!.shiftName ?? "",
-    );
-
-    var start = shiftData.shiftTimeDefault!.start ?? "";
-    var end = shiftData.shiftTimeDefault!.end ?? "";
-
-    if (start != null) {
-      await _storageService.setStringValue(PreferencesKeys.STARTDATE, start);
-      await _storageService.setStringValue(
-        PreferencesKeys.STARTTDATE,
-        shiftData.tolerance!.start ?? "",
-      );
-    } else {
-      await _storageService.setStringValue(
-        PreferencesKeys.STARTDATE,
-        "belirtilmedi",
-      );
-    }
-
-    if (end != null) {
-      await _storageService.setStringValue(PreferencesKeys.ENDDATE, end);
-      await _storageService.setStringValue(
-        PreferencesKeys.ENDTDATE,
-        shiftData.tolerance!.end ?? "",
-      );
-    } else {
-      await _storageService.setStringValue(
-        PreferencesKeys.ENDDATE,
-        "belirtilmedi",
-      );
-    }
-  }
-
   Future<void> _storeSettingsData(dynamic settingsData) async {
     await _storageService.setBoolValue(
       PreferencesKeys.OFFLINE,
@@ -663,11 +631,13 @@ class AuthViewModel extends BaseViewModel {
     );
   }
 
-  Future<void> setDataShared(LoginModel loginModel) async {
-    if (loginModel.data != null && loginModel.data!.accessToken != null) {
+  Future<void> setDataShared(BaseModel<List<UserModel>> loginModel) async {
+    if (loginModel.data != null &&
+        loginModel.data!.isNotEmpty &&
+        loginModel.data!.first.accessToken != null) {
       await _storageService.setStringValue(
         PreferencesKeys.TOKEN,
-        loginModel.data!.accessToken ?? "",
+        loginModel.data!.first.accessToken ?? "",
       );
       await _loadUserDataFromStorage();
     }

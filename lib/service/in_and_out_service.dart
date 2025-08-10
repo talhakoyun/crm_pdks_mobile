@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 
 import '../core/constants/string_constants.dart';
 import '../core/init/cache/locale_manager.dart';
+import '../models/base_model.dart';
+
 import '../models/events_model.dart';
 
 class InAndOutService {
@@ -31,7 +33,7 @@ class InAndOutService {
             Uri.parse(strCons.baseUrl + strCons.shiftPing),
             headers: {
               'Accept': 'application/json',
-              'Authorization': 'Bearer $token'
+              'Authorization': 'Bearer $token',
             },
             body: offline == null
                 ? {
@@ -51,7 +53,7 @@ class InAndOutService {
                     "device_id": deviceId.toString(),
                     "device_model": deviceModel.toString(),
                     "note": myNote ?? "",
-                    "offline": "$offline"
+                    "offline": "$offline",
                   },
           )
           .timeout(const Duration(seconds: 10));
@@ -69,7 +71,7 @@ class InAndOutService {
           return {
             "status": data['status'],
             "message": data['message'],
-            "note": data['note']
+            "note": data['note'],
           };
         }
         return {"status": data['status'], "message": data['message']};
@@ -81,14 +83,15 @@ class InAndOutService {
     }
   }
 
-  Future<Map<String, dynamic>> sendQrShift(
-      {required int type,
-      required double longitude,
-      required double latitude,
-      required int zoneId,
-      String? deviceId,
-      String? deviceModel,
-      DateTime? offline}) async {
+  Future<Map<String, dynamic>> sendQrShift({
+    required int type,
+    required double longitude,
+    required double latitude,
+    required int zoneId,
+    String? deviceId,
+    String? deviceModel,
+    DateTime? offline,
+  }) async {
     var client = http.Client();
     try {
       String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
@@ -116,7 +119,7 @@ class InAndOutService {
                     "zone": zoneId.toString(),
                     "device_id": deviceId.toString(),
                     "device_model": deviceModel.toString(),
-                    "offline": "$offline"
+                    "offline": "$offline",
                   },
           )
           .timeout(const Duration(seconds: 10));
@@ -142,25 +145,39 @@ class InAndOutService {
     var client = http.Client();
     try {
       String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
-      var response = await client.get(
-        Uri.parse(strCons.baseUrl + strCons.shiftList),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      ).timeout(const Duration(seconds: 10));
+      var response = await client
+          .get(
+            Uri.parse(strCons.baseUrl + strCons.shiftList),
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         if (data['status']) {
           return eventsModelFromJson(response.body);
         } else {
-          return EventsModel(status: false, message: strCons.errorMessage);
+          return BaseModel(
+            status: false,
+            message: strCons.errorMessage,
+            data: null,
+          );
         }
       } else {
-        return EventsModel(status: false, message: strCons.errorMessage);
+        return BaseModel(
+          status: false,
+          message: strCons.errorMessage,
+          data: null,
+        );
       }
     } catch (e) {
-      return EventsModel(status: false, message: strCons.errorMessage);
+      return BaseModel(
+        status: false,
+        message: strCons.errorMessage,
+        data: null,
+      );
     } finally {
       client.close();
     }

@@ -1,37 +1,13 @@
-class IsAvailableModel {
-  IsAvailableModel({
-    required this.status,
-    required this.data,
-    required this.message,
-  });
+import 'base_model.dart';
 
-  final bool? status;
-  final Data? data;
-  final String? message;
-
-  factory IsAvailableModel.fromJson(Map<String, dynamic> json) {
-    return IsAvailableModel(
-      status: json["status"],
-      data: json["data"] == null ? null : Data.fromJson(json["data"]),
-      message: json["message"],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "status": status,
-    "data": data?.toJson(),
-    "message": message,
-  };
-}
-
-class Data {
-  Data({required this.android, required this.ios});
-
+class AvailabilityModel {
   final OS? android;
   final OS? ios;
 
-  factory Data.fromJson(Map<String, dynamic> json) {
-    return Data(
+  AvailabilityModel({required this.android, required this.ios});
+
+  factory AvailabilityModel.fromJson(Map<String, dynamic> json) {
+    return AvailabilityModel(
       android: json["android"] == null ? null : OS.fromJson(json["android"]),
       ios: json["ios"] == null ? null : OS.fromJson(json["ios"]),
     );
@@ -41,9 +17,20 @@ class Data {
     "android": android?.toJson(),
     "ios": ios?.toJson(),
   };
+
+  @override
+  String toString() {
+    return 'AvailabilityModel(android: $android, ios: $ios)';
+  }
 }
 
 class OS {
+  final bool? usable;
+  final String? message;
+  final int? version;
+  final String? link;
+  final bool? isRegister;
+
   OS({
     required this.usable,
     required this.message,
@@ -51,12 +38,6 @@ class OS {
     required this.link,
     required this.isRegister,
   });
-
-  final bool? usable;
-  final String? message;
-  final int? version;
-  final String? link;
-  final bool? isRegister;
 
   factory OS.fromJson(Map<String, dynamic> json) {
     return OS(
@@ -75,4 +56,11 @@ class OS {
     "link": link,
     "is_register": isRegister,
   };
+
+  @override
+  String toString() {
+    return 'OS(usable: $usable, message: $message, version: $version, link: $link, isRegister: $isRegister)';
+  }
 }
+
+typedef IsAvailableModel = BaseModel<AvailabilityModel>;

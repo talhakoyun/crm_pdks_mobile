@@ -1,53 +1,18 @@
-// ignore_for_file: unnecessary_null_in_if_null_operators
-
 import 'dart:convert';
+import 'base_model.dart';
 
-HolidayListModel holidaysModelFromJson(String str) =>
-    HolidayListModel.fromJson(json.decode(str));
+class HolidayDataModel {
+  final int? id;
+  final String? reason;
+  final String? address;
+  final String? startDate;
+  final String? endDate;
+  final int? type;
+  final String? typeText;
+  final int? confirm;
+  final String? confirmText;
 
-String holidaysModelToJson(HolidayListModel data) => json.encode(data.toJson());
-
-class HolidayListModel {
-  List<Data>? data;
-  String? message;
-  bool? status;
-
-  HolidayListModel({this.data, this.message, this.status});
-
-  HolidayListModel.fromJson(Map<String, dynamic> json) {
-    if (json['data'] != null) {
-      data = <Data>[];
-      json['data'].forEach((v) {
-        data!.add(Data.fromJson(v));
-      });
-    }
-    message = json['message'];
-    status = json['status'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
-    }
-    data['message'] = message;
-    data['status'] = status;
-    return data;
-  }
-}
-
-class Data {
-  int? id;
-  String? reason;
-  String? address;
-  String? startDate;
-  String? endDate;
-  int? type;
-  String? typeText;
-  int? confirm;
-  String? confirmText;
-
-  Data({
+  HolidayDataModel({
     this.id,
     this.reason,
     this.address,
@@ -59,16 +24,24 @@ class Data {
     this.confirmText,
   });
 
-  Data.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    reason = json['reason'];
-    address = json['address'];
-    startDate = json['start_date'];
-    endDate = json['end_date'];
-    type = json['type'];
-    typeText = json['type_text'];
-    confirm = json['confirm'];
-    confirmText = json['confirm_text'];
+  factory HolidayDataModel.fromJson(Map<String, dynamic> json) {
+    return HolidayDataModel(
+      id: json['id'],
+      reason: json['reason'],
+      address: json['address'],
+      startDate: json['start_date'],
+      endDate: json['end_date'],
+      type: json['type'],
+      typeText: json['type_text'],
+      confirm: json['confirm'],
+      confirmText: json['confirm_text'],
+    );
+  }
+
+  static List<HolidayDataModel> fromJsonList(
+    List<Map<String, dynamic>> jsonList,
+  ) {
+    return jsonList.map((json) => HolidayDataModel.fromJson(json)).toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -84,4 +57,31 @@ class Data {
     data['confirm_text'] = confirmText;
     return data;
   }
+
+  bool get isApproved => confirm == 1;
+
+  bool get isRejected => confirm == 0;
+
+  bool get isPending => confirm == null;
+
+  @override
+  String toString() {
+    return 'HolidayDataModel(id: $id, reason: $reason, startDate: $startDate, endDate: $endDate, confirm: $confirm)';
+  }
 }
+
+/// Holiday List response için BaseModel tip tanımı
+/// BaseModel<List<HolidayDataModel>> olarak kullanılır
+typedef HolidayListModel = BaseModel<List<HolidayDataModel>>;
+
+/// JSON string'den HolidayListModel oluşturmak için helper fonksiyon
+HolidayListModel holidaysModelFromJson(String str) {
+  final json = jsonDecode(str);
+  return BaseModel.fromJsonList(
+    json,
+    (jsonList) => HolidayDataModel.fromJsonList(jsonList),
+  );
+}
+
+/// HolidayListModel'i JSON string'e çevirmek için helper fonksiyon
+String holidaysModelToJson(HolidayListModel data) => json.encode(data.toJson());

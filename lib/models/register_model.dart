@@ -1,44 +1,19 @@
 import 'dart:convert';
+import 'base_model.dart';
 
-RegisterModel registerModelFromJson(String str) =>
-    RegisterModel.fromJson(json.decode(str));
+class RegisterDataModel {
+  final String? key;
 
-class RegisterModel {
-  List<Data>? data;
-  bool? status;
-  String? message;
+  RegisterDataModel({this.key});
 
-  RegisterModel({this.data, this.status, this.message});
-
-  RegisterModel.fromJson(Map<String, dynamic> json) {
-    if (json['data'] != null) {
-      data = <Data>[];
-      json['data'].forEach((v) {
-        data!.add(Data.fromJson(v));
-      });
-    }
-    status = json['status'];
-    message = json['message'];
+  factory RegisterDataModel.fromJson(Map<String, dynamic> json) {
+    return RegisterDataModel(key: json['key']);
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
-    }
-    data['status'] = status;
-    data['message'] = message;
-    return data;
-  }
-}
-
-class Data {
-  String? key;
-
-  Data({this.key});
-
-  Data.fromJson(Map<String, dynamic> json) {
-    key = json['key'];
+  static List<RegisterDataModel> fromJsonList(
+    List<Map<String, dynamic>> jsonList,
+  ) {
+    return jsonList.map((json) => RegisterDataModel.fromJson(json)).toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -46,4 +21,19 @@ class Data {
     data['key'] = key;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'RegisterDataModel(key: $key)';
+  }
+}
+
+typedef RegisterModel = BaseModel<List<RegisterDataModel>>;
+
+RegisterModel registerModelFromJson(String str) {
+  final json = jsonDecode(str);
+  return BaseModel.fromJsonList(
+    json,
+    (jsonList) => RegisterDataModel.fromJsonList(jsonList),
+  );
 }

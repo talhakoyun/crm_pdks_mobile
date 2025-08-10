@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/base/view_model/base_view_model.dart';
-import '../core/constants/image_constants.dart';
+
 import '../core/constants/navigation_constants.dart';
 import '../core/constants/string_constants.dart';
 import '../core/extension/context_extension.dart';
@@ -32,12 +32,12 @@ class PermissionViewModel extends BaseViewModel {
     'Babalık İzni',
     'Evlenme İzni',
     'Ölüm İzni',
-    'Doğum İzni'
+    'Doğum İzni',
   ];
   PermissionStatus? permissionStatus;
   final permissionServices = PermissionService();
 
-  List<Data> permissionListItems = [];
+  List<HolidayDataModel> permissionListItems = [];
   HolidayListModel? holidayList;
   PermissionViewModel() {
     permissionStatus = PermissionStatus.loading;
@@ -66,11 +66,12 @@ class PermissionViewModel extends BaseViewModel {
     }
   }
 
-  void getPermission(
-      {required int type,
-      required DateTime startDt,
-      required DateTime endDt,
-      required BuildContext context}) async {
+  void getPermission({
+    required int type,
+    required DateTime startDt,
+    required DateTime endDt,
+    required BuildContext context,
+  }) async {
     CustomLoader.showAlertDialog(context);
     if (type != 0 &&
         holidayReason.text != "" &&
@@ -78,11 +79,12 @@ class PermissionViewModel extends BaseViewModel {
         holidayEndDt.text != "" &&
         holidayStartDt.text.isNotEmpty) {
       var data = await permissionServices.holidayCreate(
-          type: type,
-          startDt: startDt,
-          endDt: endDt,
-          reason: holidayReason.text.trim(),
-          address: holidayAddress.text.trim());
+        type: type,
+        startDt: startDt,
+        endDt: endDt,
+        reason: holidayReason.text.trim(),
+        address: holidayAddress.text.trim(),
+      );
       context.navigationOf.pop();
       if (data['status']) {
         holidayAddress.clear();
@@ -90,8 +92,10 @@ class PermissionViewModel extends BaseViewModel {
         holidayEndDt.clear();
         holidayStartDt.clear();
         holidayType.clear();
-        CustomSnackBar customSnackBar =
-            CustomSnackBar(context, StringConstants.instance.reviewText);
+        CustomSnackBar customSnackBar = CustomSnackBar(
+          context,
+          StringConstants.instance.reviewText,
+        );
         navigation.navigateToPageClear(path: NavigationConstants.HOME);
       } else {
         CustomSnackBar customSnackBar = CustomSnackBar(

@@ -1,61 +1,42 @@
 import 'dart:convert';
+import 'base_model.dart';
 
-EventsModel eventsModelFromJson(String str) =>
-    EventsModel.fromJson(json.decode(str));
-
-String eventsModelToJson(EventsModel data) => json.encode(data.toJson());
-
-class EventsModel {
-  List<Data>? data;
-  String? message;
-  bool? status;
-
-  EventsModel({this.data, this.message, this.status});
-
-  EventsModel.fromJson(Map<String, dynamic> json) {
-    if (json['data'] != null) {
-      data = <Data>[];
-      json['data'].forEach((v) {
-        data!.add(Data.fromJson(v));
-      });
-    }
-    message = json['message'];
-    status = json['status'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
-    }
-    data['message'] = message;
-    data['status'] = status;
-    return data;
-  }
-}
-
-class Data {
-  String? datetime;
-  String? type;
-  String? startTime;
-  String? endTime;
+class EventDataModel {
+  final String? datetime;
+  final String? type;
+  final String? startTime;
+  final String? endTime;
   bool? expanded;
-  List<ZoneList>? zoneList;
+  final List<ZoneListModel>? zoneList;
 
-  Data({this.datetime, this.type, this.startTime, this.endTime,this.expanded, this.zoneList});
+  EventDataModel({
+    this.datetime,
+    this.type,
+    this.startTime,
+    this.endTime,
+    this.expanded,
+    this.zoneList,
+  });
 
-  Data.fromJson(Map<String, dynamic> json) {
-    datetime = json['datetime'];
-    type = json['type'];
-    startTime = json['start_time'];
-    endTime = json['end_time'];
-    expanded = json['expanded'];
-    if (json['zone_list'] != null) {
-      zoneList = <ZoneList>[];
-      json['zone_list'].forEach((v) {
-        zoneList!.add(ZoneList.fromJson(v));
-      });
-    }
+  factory EventDataModel.fromJson(Map<String, dynamic> json) {
+    return EventDataModel(
+      datetime: json['datetime'],
+      type: json['type'],
+      startTime: json['start_time'],
+      endTime: json['end_time'],
+      expanded: json['expanded'],
+      zoneList: json['zone_list'] != null
+          ? List<ZoneListModel>.from(
+              json['zone_list'].map((x) => ZoneListModel.fromJson(x)),
+            )
+          : null,
+    );
+  }
+
+  static List<EventDataModel> fromJsonList(
+    List<Map<String, dynamic>> jsonList,
+  ) {
+    return jsonList.map((json) => EventDataModel.fromJson(json)).toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -70,19 +51,26 @@ class Data {
     }
     return data;
   }
+
+  @override
+  String toString() {
+    return 'EventDataModel(datetime: $datetime, type: $type, startTime: $startTime, endTime: $endTime)';
+  }
 }
 
-class ZoneList {
-  String? zoneName;
-  int? zoneId;
-  String? time;
+class ZoneListModel {
+  final String? zoneName;
+  final int? zoneId;
+  final String? time;
 
-  ZoneList({this.zoneName, this.zoneId, this.time});
+  ZoneListModel({this.zoneName, this.zoneId, this.time});
 
-  ZoneList.fromJson(Map<String, dynamic> json) {
-    zoneName = json['zone_name'];
-    zoneId = json['zone_id'];
-    time = json['time'];
+  factory ZoneListModel.fromJson(Map<String, dynamic> json) {
+    return ZoneListModel(
+      zoneName: json['zone_name'],
+      zoneId: json['zone_id'],
+      time: json['time'],
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -92,4 +80,21 @@ class ZoneList {
     data['time'] = time;
     return data;
   }
+
+  @override
+  String toString() {
+    return 'ZoneListModel(zoneName: $zoneName, zoneId: $zoneId, time: $time)';
+  }
 }
+
+typedef EventsModel = BaseModel<List<EventDataModel>>;
+
+EventsModel eventsModelFromJson(String str) {
+  final json = jsonDecode(str);
+  return BaseModel.fromJsonList(
+    json,
+    (jsonList) => EventDataModel.fromJsonList(jsonList),
+  );
+}
+
+String eventsModelToJson(EventsModel data) => json.encode(data.toJson());

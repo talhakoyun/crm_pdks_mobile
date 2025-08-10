@@ -12,7 +12,7 @@ enum ShiftStatus { loading, loaded, loadingFailed }
 
 class InAndOutListViewModel extends BaseViewModel {
   ShiftStatus? shiftStatus;
-  List<Data> shiftListItems = [];
+  List<EventDataModel> shiftListItems = [];
   EventsModel? eventList;
   final inAndOutService = InAndOutService();
 
