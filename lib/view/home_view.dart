@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 import '../core/base/base_singleton.dart';
@@ -86,52 +88,51 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                                 ? (value.currentPosition != null)
                                       ? Padding(
                                           padding: context.onlyTopPaddingHigh,
-                                          child: Text("data"),
-                                          // child: FlutterMap(
-                                          //   options: MapOptions(
-                                          //     bounds: LatLngBounds(
-                                          //       LatLng(
-                                          //         value.currentPosition!.latitude,
-                                          //         value.currentPosition!.longitude,
-                                          //       ),
-                                          //     ),
-                                          //     boundsOptions: const FitBoundsOptions(
-                                          //         padding: EdgeInsets.all(8.0)),
-                                          //     maxZoom: 18,
-                                          //     zoom: 18,
-                                          //   ),
-                                          //   layers: [
-                                          //     TileLayerOptions(
-                                          //       urlTemplate: strCons.mapUrl,
-                                          //       subdomains: const ['a', 'b', 'c'],
-                                          //     ),
-                                          //     MarkerLayerOptions(
-                                          //       markers:
-                                          //           value.currentPosition != null
-                                          //               ? [
-                                          //                   Marker(
-                                          //                     point: LatLng(
-                                          //                       value
-                                          //                           .currentPosition!
-                                          //                           .latitude,
-                                          //                       value
-                                          //                           .currentPosition!
-                                          //                           .longitude,
-                                          //                     ),
-                                          //                     builder: (context) {
-                                          //                       return Image(
-                                          //                         image: AssetImage(
-                                          //                             ImageConstants
-                                          //                                 .instance
-                                          //                                 .marker),
-                                          //                       );
-                                          //                     },
-                                          //                   )
-                                          //                 ]
-                                          //               : [],
-                                          //     ),
-                                          //   ],
-                                          // ),
+                                          child: FlutterMap(
+                                            options: MapOptions(
+                                              initialCenter: LatLng(
+                                                value.currentPosition!.latitude,
+                                                value
+                                                    .currentPosition!
+                                                    .longitude,
+                                              ),
+                                              initialZoom: 18,
+                                              maxZoom: 18,
+                                            ),
+                                            children: [
+                                              TileLayer(
+                                                urlTemplate: strCons.mapUrl,
+                                                subdomains: const [
+                                                  'a',
+                                                  'b',
+                                                  'c',
+                                                ],
+                                              ),
+                                              MarkerLayer(
+                                                markers:
+                                                    value.currentPosition !=
+                                                        null
+                                                    ? [
+                                                        Marker(
+                                                          point: LatLng(
+                                                            value
+                                                                .currentPosition!
+                                                                .latitude,
+                                                            value
+                                                                .currentPosition!
+                                                                .longitude,
+                                                          ),
+                                                          child: Image(
+                                                            image: AssetImage(
+                                                              imgCons.marker,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ]
+                                                    : [],
+                                              ),
+                                            ],
+                                          ),
                                         )
                                       : Center(
                                           child: Padding(

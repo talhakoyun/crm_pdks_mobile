@@ -1,71 +1,150 @@
 {
-  "mainText": {
-    "title": "Flutter Base Riverpod"
-  },
-  "titles": {
-    "login": "Login Page",
-    "home": "Home Page",
-    "homeDetail": "Home Page Detail",
-    "authentication": "Authentication",
-    "settings": "Settings",
-    "settingsDetail": "Settings Detail",
-    "about": "About",
-    "aboutDetail": "About Detail",
-    "notFound": "Not Found",
-    "notFoundDetail": "Not Found Detail"
-  },
-  "authentication": {
-    "welcome": {
-      "title": "Base Setup",
-      "description": "Set up your coding environment effortlessly",
-      "getStarted": "Get Started",
-      "withoutAccount": "Don't have an account? Sign up here"
-    }
+  "app": {
+    "name": "PDKS",
+    "version": "Application version",
+    "message": "To use the application, you need to update the application to the latest version."
   },
   "general": {
-    "viewAll": "View All",
-    "appIsUsable": "Application available.",
-    "updateRequired": "Update Required",
-    "maintenanceHeadline": "Under Maintenance"
+    "beginning": "Beginning",
+    "choose": "Choose",
+    "description": "Description",
+    "finish": "Finish",
+    "mission": "Mission",
+    "name": "Name - Surname",
+    "send": "Send",
+    "shift": "Shift",
+    "ok": "OK",
+    "date": "Date",
+    "notEmpty": "Please fill in all fields!",
+    "unSpecified": "Unspecified",
+    "unExpectedError": "Something went wrong",
+    "errorMessage": "An unexpected error occurred",
+    "errorMessageContinue": ", Please try again later."
   },
-  "home": {
-    "ratingAndReview": "Rating and Review"
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "passwordConfirm": "Password Confirmation",
+    "phone": "Phone",
+    "welcome": "Welcome!",
+    "welcomeText": "Please enter your information to log in.",
+    "login": "Log In",
+    "signUp": "Sign Up",
+    "signUpText": "Please fill in your information completely to register.",
+    "signUpBtn": "Sign Up",
+    "dontAccount": "Don't have an account?",
+    "newAccount": "Create a new account!",
+    "logout": "Log Out",
+    "exitTitle": "PDKS Users Are Not Recommended to Log Out!!\n ",
+    "exitInfo": "If you click the 'Log Out' button, all your information on this device (your automatic login information, device information, etc.) will be deleted!!"
   },
-  "homeDetail": {
-    "selectableTitle": {
-      "copyAll": "Copy All",
-      "copyAllShare": "Copy All & Share",
-      "share": "Share"
-    }
+  "profile": {
+    "profile": "My Profile",
+    "loading": "Your profile is being updated..."
   },
-  "button": {
-    "extension": "Extension",
-    "github": "Github",
-    "themeChange": "Theme Change",
-    "languageChange": "Language Change",
-    "openStore": "Open Store"
+  "company": {
+    "text": "MaviHost",
+    "splashFooter": " developed by",
+    "outSide": "Out of Institution"
   },
-  "error": {
-    "notFoundPage": "The page you were looking for was not found",
-    "notSupportedPlatform": "That platform is not supported yet.",
-    "maintenanceBody": "The application is under maintenance, please try again later.",
-    "mustBeUpdated": "To continue using the app, you must update it.",
-    "locationError": "Location Error",
-    "versionError": "Version Error"
+  "splash": {
+    "text1": "Personnel Attendance",
+    "text2": "Control System"
   },
-  "imageManager": {
-    "maxImageSize": "The selected image exceeded the maximum size! Maximum accepted size:",
-    "acceptedFormats": "Accepted file formats:",
-    "exceededImageCount": "Number of images exceeding the size:",
-    "acceptedImageCount": "The maximum number of images accepted has been exceeded! Maximum number of images accepted:",
-    "maxVideoSize": "The selected video exceeded the maximum size! Maximum accepted size:"
+  "menu": {
+    "inAndOut": "Shift Movements",
+    "leavelProcedure": "My Leaves"
   },
-  "permissionDialog": {
-    "needPermission": "Permission Required!",
-    "mustGivePermission": "You must give permission for this action...",
-    "close": "Close",
-    "givePermission": "Allow",
-    "gallery": "Gallery",
-    "camera": "Camera"
+  "time": {
+    "in": "Entry Time",
+    "out": "Exit Time",
+    "checkIn": "Check In Time",
+    "checkOut": "Check Out Time",
+    "monthly": "My Monthly Data"
+  },
+  "leave": {
+    "type": "Leave Type",
+    "start": "Leave Start",
+    "reason": "Leave Reason",
+    "address": "Address During Leave",
+    "getPermission": "Take Leave",
+    "noLeave": "You do not have any leave transactions yet."
+  },
+  "inOut": {
+    "in": "You are checking in",
+    "out": "You are checking out",
+    "noInAndOut": "You do not have any shift transactions yet."
+  },
+  "late": {
+    "text": "You are late!!",
+    "description": "Could you explain the reason for being late.."
+  },
+  "early": {
+    "text": "You are leaving early!!",
+    "description": "Could you explain the reason for leaving early.."
+  },
+  "status": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "denied": "Denied"
+  },
+  "buttons": {
+    "cancel": "Transaction Not Completed",
+    "cancel2": "Transaction Cancelled",
+    "approve": "Approve",
+    "cancel_btn": "Cancel",
+    "confirm": "Confirm",
+    "confirm2": "Confirm"
+  },
+  "messages": {
+    "success": "Transaction Successful",
+    "success2": "Your Transaction is Successful",
+    "outSuccess": "Check out transaction successful",
+    "loginSuccess": "Your information has been confirmed.",
+    "review": "Sent for review",
+    "network": "Your internet is off. Transaction cannot be performed at the moment.",
+    "warning1": "Turn on your internet!!"
+  },
+  "errors": {
+    "qr": "QR Code could not be parsed.",
+    "qrError": "You are not allowed to extend the area notification.",
+    "inError": "You have an entry transaction for today.",
+    "outError": "You have an exit transaction for today.",
+    "location": "Please wait for location information to be retrieved.",
+    "locationError": "Your location is not suitable for the transaction.",
+    "loginError": "Email or password cannot be empty",
+    "loginError2": "Please enter the requested information completely.",
+    "emailValid": "Please enter a valid email address.",
+    "passwordValid": "Password length cannot be less than 6 characters!",
+    "registerNameError": "Name - Surname field must consist of at least 5 characters."
+  },
+  "location": {
+    "isEnableAlert": "Phone Location Appears to be Off\nPlease Turn On Your Location",
+    "isNotEnableAlert": "You have denied PDKS location permission.\nPlease allow location access from app settings.",
+    "isMockTitle": "Using fake location violates PDKS rules.",
+    "isMockDescription": "To use the PDKS application, make sure there is no fake location service application on your phone."
+  },
+  "security": {
+    "hack": "You have been detected trying to break the system. Since you violated PDKS rules, we cannot allow you to continue using the application."
+  },
+  "dialog": {
+    "alertDescription": "Description field is required and must consist of at least 5 characters.",
+    "nonAppRedirect": "Non-App Redirect!",
+    "enterTheAddress": "Are you sure you want to enter the address?"
+  },
+  "urls": {
+    "base": "https://cinarceyizcrm.bilmos.com/api/",
+    "login": "auth/login",
+    "logout": "auth/logout",
+    "profile": "user/profile",
+    "permissionList": "holiday/list",
+    "permissionCreate": "holiday/create",
+    "shiftPing": "pdks/ping",
+    "shiftQR": "pdks/zone",
+    "shiftList": "pdks/list",
+    "isAvailable": "isavailable",
+    "register": "auth/register",
+    "refreshToken": "auth/refresh",
+    "map": "https://mt0.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&s=Ga"
   }
 }

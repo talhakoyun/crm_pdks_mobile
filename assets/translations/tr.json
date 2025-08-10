@@ -1,71 +1,150 @@
 {
-  "mainText": {
-    "title": "Flutter Temel Riverpod"
-  },
-  "titles": {
-    "login": "Giriş Yap",
-    "home": "Ana Sayfa",
-    "homeDetail": "Ana Sayfa Detay",
-    "authentication": "Kimlik Doğrulama",
-    "settings": "Ayarlar",
-    "settingsDetail": "Ayarlar Detay",
-    "about": "Hakkında",
-    "aboutDetail": "Hakkında Detay",
-    "notFound": "Bulunamadı",
-    "notFoundDetail": "Bulunamadı Detay"
-  },
-  "authentication": {
-    "welcome": {
-      "title": "Base Kurulum",
-      "description": "Kodlama ortamınızı zahmetsizce kurun",
-      "getStarted": "Hadi Başlayalım",
-      "withoutAccount": "Hesabınız yok mu? Buradan kaydolun"
-    }
+  "app": {
+    "name": "PDKS",
+    "version": "Uygulama versiyonu",
+    "message": "Uygulamayı kullanabilmek için uygulamayı son sürüme güncellemeniz gereklidir."
   },
   "general": {
-    "viewAll": "Hepsini Gör",
-    "appIsUsable": "Uygulama kullanılabilir.",
-    "updateRequired": "Güncelleme Gerekli",
-    "maintenanceHeadline": "Bakımdayız"
+    "beginning": "Başlangıç",
+    "choose": "Seçiniz",
+    "description": "Açıklama",
+    "finish": "Bitiş",
+    "mission": "Görev",
+    "name": "Ad - Soyad",
+    "send": "Gönder",
+    "shift": "Mesai",
+    "ok": "Tamam",
+    "date": "Tarih",
+    "notEmpty": "Lütfen Bütün Alanları Doldurunuz!",
+    "unSpecified": "Belirtilmedi",
+    "unExpectedError": "Bir şeyler ters gitti",
+    "errorMessage": "Beklenmedik bir hata oluştu",
+    "errorMessageContinue": ",Lütfen daha sonra tekrar deneyiniz."
   },
-  "home": {
-    "ratingAndReview": "Derecelendirme ve İnceleme"
+  "auth": {
+    "email": "Email",
+    "password": "Şifre",
+    "passwordConfirm": "Şifre Tekrarı",
+    "phone": "Telefon",
+    "welcome": "Hoşgeldiniz!",
+    "welcomeText": "Giriş yapmak için lütfen bilgilerinizi giriniz.",
+    "login": "Giriş Yap",
+    "signUp": "Kayıt Ol",
+    "signUpText": "Kayıt olmak için lütfen bilgilerinizi eksiksizce giriniz.",
+    "signUpBtn": "Kayıt Ol",
+    "dontAccount": "Hesabınız yok mu?",
+    "newAccount": "Yeni bir hesap oluşturun!",
+    "logout": "Çıkış Yap",
+    "exitTitle": "PDKS Kullanıcılarının Çıkış Yapması Önerilmez!!\n ",
+    "exitInfo": "'Çıkış Yap' butonuna tıklarsanız bu cihazdaki tüm bilgileriniz (otomatik giriş bilgileriniz, cihaz bilgileriniz vb.) silinecektir!!"
   },
-  "homeDetail": {
-    "selectableTitle": {
-      "copyAll": "Tümünü Kopyala",
-      "copyAllShare": "Tümünü Kopyala & Paylaş",
-      "share": "Paylaş"
-    }
+  "profile": {
+    "profile": "Profilim",
+    "loading": "Profiliniz güncelleniyor..."
   },
-  "button": {
-    "extension": "Eklenti",
-    "github": "GitHub",
-    "themeChange": "Tema Değiştir",
-    "languageChange": "Dil Değiştir",
-    "openStore": "Markete Git"
+  "company": {
+    "text": "MaviHost",
+    "splashFooter": " tarafından geliştirilmiştir",
+    "outSide": "Kurum Dışı"
   },
-  "error": {
-    "notFoundPage": "Aradığınız sayfa bulunamadı",
-    "notSupportedPlatform": "Bu platform henüz desteklenmiyor.",
-    "maintenanceBody": "Şuanda hizmet verememekteyiz, lütfen daha sonra tekrar deneyin.",
-    "mustBeUpdated": "Uygulamayı kullanmaya devam edebilmek için güncellemelisiniz.",
-    "locationError": "Lokasyon Hatası",
-    "versionError": "Versiyon Hatası"
+  "splash": {
+    "text1": "Personel Devam",
+    "text2": "Kontrol Sistemi"
   },
-  "imageManager": {
-    "maxImageSize": "Seçilen resim maksimum boyutu aştı! Kabul edilen maksimum boyut:",
-    "acceptedFormats": "Kabul edilen dosya formatları:",
-    "exceededImageCount": "Boyutu geçen resim sayısı:",
-    "acceptedImageCount": "Kabul edilen maksimum resim sayısı aşıldı! Kabul edilen maksimum resim sayısı:",
-    "maxVideoSize": "Seçilen video maksimum boyutu aştı! Kabul edilen maksimum boyut:"
+  "menu": {
+    "inAndOut": "Mesai Hareketleri",
+    "leavelProcedure": "İzinlerim"
   },
-  "permissionDialog": {
-    "needPermission": "İzin Gerekiyor!",
-    "mustGivePermission": "Bu eylem için izin vermelisiniz ...",
-    "close": "Kapat",
-    "givePermission": "İzin Ver",
-    "gallery": "Galeri",
-    "camera": "Kamera"
+  "time": {
+    "in": "Giriş Saati",
+    "out": "Çıkış Saati",
+    "checkIn": "Giriş Saati",
+    "checkOut": "Çıkış Saati",
+    "monthly": "Aylık Verilerim"
+  },
+  "leave": {
+    "type": "İzin Tipi",
+    "start": "İzin Başlangıç",
+    "reason": "İzin Sebebi",
+    "address": "İzindeki Adres",
+    "getPermission": "İzin Al",
+    "noLeave": "Henüz Bir İzin İşleminiz Bulunmamaktadır."
+  },
+  "inOut": {
+    "in": "Giriş Yapıyorsunuz",
+    "out": "Çıkış Yapıyorsunuz",
+    "noInAndOut": "Henüz Bir Mesai İşleminiz Bulunmamaktadır."
+  },
+  "late": {
+    "text": "Geç Kaldınız!!",
+    "description": "Geç kalma sebebinizi açıklar mısınız.."
+  },
+  "early": {
+    "text": "Erken Çıkıyorsunuz !!",
+    "description": "Erken Çıkma Sebebinizi Açıklar mısınız .."
+  },
+  "status": {
+    "pending": "Beklemede",
+    "approved": "Onaylandı",
+    "denied": "Reddedildi"
+  },
+  "buttons": {
+    "cancel": "İşlem Tamamlanmadı",
+    "cancel2": "İşlem İptal Edildi",
+    "approve": "Onayla",
+    "cancel_btn": "İptal",
+    "confirm": "Onayla",
+    "confirm2": "Onayla"
+  },
+  "messages": {
+    "success": "İşlem Başarılı",
+    "success2": "İşleminiz Başarılı",
+    "outSuccess": "Çıkış işlemi başarılı",
+    "loginSuccess": "Bilgileriniz Onaylandı.",
+    "review": "İncelenmek üzere gönderildi",
+    "network": "İnternetiniz Kapalı.Şu anda işlem gerçekleştirilemiyor.",
+    "warning1": "İnternetinizi açınız !!"
+  },
+  "errors": {
+    "qr": "Karekod Ayrıştırılamadı.",
+    "qrError": "Alan esnetme bildiriminize izin verilmemektedir.",
+    "inError": "Bugüne ait giriş işleminiz bulunmaktadır.",
+    "outError": "Bugüne ait çıkış işleminiz bulunmaktadır.",
+    "location": "Lütfen konum bilgilerinin alınmasını bekleyiniz.",
+    "locationError": "Konumunuz işlem için uygun değil.",
+    "loginError": "Email ya da parola boş olamaz",
+    "loginError2": "Lütfen sizden istenilen bilgileri eksiksizce giriniz.",
+    "emailValid": "Lütfen geçerli bir email adresi giriniz.",
+    "passwordValid": "Şifre uzunluğu 6 karakterden az olamaz!",
+    "registerNameError": "Ad - Soyad alanı en az 5 karakterden oluşmalıdır."
+  },
+  "location": {
+    "isEnableAlert": "Telefonun Konumu Kapalı Görünüyor\nLütfen Konumunuzu Açın",
+    "isNotEnableAlert": "PDKS'nin Konum İznini Reddettiniz.\nLütfen Uygulama Ayarlarından Konuma İzin Verin.",
+    "isMockTitle": "Sahte konum kullanmak PDKS kurallarını ihlal eder.",
+    "isMockDescription": "PDKS uygulamasını kullanabilmeniz için telefonunuzda sahte konum hizmeti veren uygulama olmadığından emin olun."
+  },
+  "security": {
+    "hack": "Sistemi Bozmaya Çalıştığınız Tespit Edildi. PDKS Kurallarını İhlal Ettiğiniz İçin Uygulamayı Kullanmaya Devam Etmenize İzin Veremiyoruz."
+  },
+  "dialog": {
+    "alertDescription": "Açıklama alanı zorunludur ve minimum 5 karakterden oluşmalıdır.",
+    "nonAppRedirect": "Uygulama Dışı Yönlendirme!",
+    "enterTheAddress": "Adresine girmek istediğinize emin misiniz?"
+  },
+  "urls": {
+    "base": "https://cinarceyizcrm.bilmos.com/api/",
+    "login": "auth/login",
+    "logout": "auth/logout",
+    "profile": "user/profile",
+    "permissionList": "holiday/list",
+    "permissionCreate": "holiday/create",
+    "shiftPing": "pdks/ping",
+    "shiftQR": "pdks/zone",
+    "shiftList": "pdks/list",
+    "isAvailable": "isavailable",
+    "register": "auth/register",
+    "refreshToken": "auth/refresh",
+    "map": "https://mt0.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&s=Ga"
   }
 }

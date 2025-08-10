@@ -1,133 +1,158 @@
+import 'package:easy_localization/easy_localization.dart';
+
 class StringConstants {
   static StringConstants? _instance;
 
   static StringConstants get instance => _instance ??= StringConstants._init();
 
   StringConstants._init();
-  final String appName = "PDKS";
-  final String begining = "Başlangıç";
-  final String choose = "Seçiniz";
-  final String email = "Email";
-  final String description = "Açıklama";
-  final String dontAccount = "Hesabınız yok mu?";
-  final String finish = "Bitiş";
-  final String mission = "Görev";
-  final String monthlyData = "Aylık Verilerim";
-  final String name = "Ad - Soyad";
-  final String newAccount = "Yeni bir hesap oluşturun!";
-  final String inTime = "Giriş Saati";
-  final String outTime = "Çıkış Saati";
-  final String send = "Gönder";
-  final String shift = "Mesai";
-  final String password = "Şifre";
-  final String passwordConfirm = "Şifre Tekrarı";
-  final String phone = "Telefon";
-  final String profileLoading = "Profiliniz güncelleniyor...";
-  final String companyText = "MaviHost";
-  final String splashFooter = " tarafından geliştirilmiştir";
-  final String signUp = "Kayıt Ol";
-  final String welcome = "Hoşgeldiniz!";
-  final String okey = "Tamam";
-  final String outSideText = "Kurum Dışı";
-  final String splashText1 = 'Personel Devam';
-  final String splashText2 = 'Kontrol Sistemi';
-  final String welcomeText = "Giriş yapmak için lütfen bilgilerinizi giriniz.";
-  final String signUpText =
-      "Kayıt olmak için lütfen bilgilerinizi eksiksizce giriniz.";
-  final String loginText = "Giriş Yap";
-  final String signUpBtnText = "Kayıt Ol";
-  final String logOutText = "Çıkış Yap";
-  final String profileText = "Profilim";
-  final String inAndOutText = "Mesai Hareketleri";
-  final String leavelProsedureText = "İzinlerim";
-  final String leaveText = 'İzin Tipi';
-  final String leaveStartText = 'İzin Başlangıç';
-  final String leaveReasonText = 'İzin Sebebi';
-  final String moveAddressText = 'İzindeki Adres';
-  final String getLeavePermissionText = "İzin Al";
-  final String locationError =
-      'Lütfen konum bilgilerinin alınmasını bekleyiniz.';
-  final String exitInfo =
-      "'Çıkış Yap' butonuna tıklarsanız bu cihazdaki tüm bilgileriniz (otomatik giriş bilgileriniz, cihaz bilgileriniz vb.) silinecektir!!";
-  final String exitTitle = 'PDKS Kullanıcılarının Çıkış Yapması Önerilmez!!\n ';
-  final String noLeaveText = 'Henüz Bir İzin İşleminiz Bulunmamaktadır.';
-  final String noInAndOutText = 'Henüz Bir Mesai İşleminiz Bulunmamaktadır.';
-  final String mockTimeText1 = 'Telefonunuzun saati yanlış\n';
-  final String mockTimeTex2 =
-      "Telefon saatinin yanlış olması PDKS kurallarını ihlal eder. Lütfen telefon ayarlarından 'Tarih ve Saat' ayarını 'Ağın sağladığı saati kullan' seçiniz!";
-  final String appVersionText = "Uygulama versiyonu";
-  final String inText = 'Giriş Yapıyorsunuz';
-  final String outText = 'Çıkış Yapıyorsunuz';
-  final String lateText = 'Geç Kaldınız!!';
-  final String lateDescription = 'Geç kalma sebebinizi açıklar mısınız..';
-  final String cancelText = 'İşlem Tamamlanmadı';
-  final String successMessage = "İşlem Başarılı";
-  final String successMessage2 = "İşleminiz Başarılı";
-  final String earlyText = "Erken Çıkıyorsunuz !!";
-  final String earlyDescription = "Erken Çıkma Sebebinizi Açıklar mısınız ..";
-  final String cancelText2 = "İşlem İptal Edildi";
-  final String networkMsg =
-      "İnternetiniz Kapalı.Şu anda işlem gerçekleştirilemiyor.";
-  final String warningMessage1 = "İnternetinizi açınız !!";
-  final String outSuccessMessage = "Çıkış işlemi başarılı";
-  final String qrErrorMessage = "Karekod Ayrıştırılamadı.";
-  final String inErrorMessage = "Bugüne ait giriş işleminiz bulunmaktadır.";
-  final String outErrorMessage = "Bugüne ait çıkış işleminiz bulunmaktadır.";
-  final String approveButtonText = "Onayla";
-  final String cancelButtonText = "İptal";
-  final String confirmText = "Onayla";
-  final String confirmText2 = "Onayla";
-  final String checkInTime = "Giriş Saati";
-  final String checkOutTime = "Çıkış Saati";
-  final String unSpecified = "Belirtilmedi";
-  final String unExpectedError = "Bir şeyler ters gitti";
-  final String nonAppRedirect = "Uygulama Dışı Yönlendirme!";
-  final String enterTheAdress = "Adresine girmek istediğinize emin misiniz?";
-  final String errorMessage = "Beklenmedik bir hata oluştu";
-  final String errorMessageContinue = ",Lütfen daha sonra tekrar deneyiniz.";
-  final String dialogAlertDescription =
-      "Açıklama alanı zorunludur ve minimum 5 karakterden oluşmalıdır.";
-  final String isMockLocationPermissionTitle =
-      "Sahte konum kullanmak PDKS kurallarını ihlal eder.";
-  final String isMockLocationPermissionDescription =
-      "PDKS uygulamasını kullanabilmeniz için telefonunuzda sahte konum hizmeti veren uygulama olmadığından emin olun.";
-  final String isEnableLocationAlertText =
-      "Telefonun Konumu Kapalı Görünüyor\nLütfen Konumunuzu Açın";
-  final String isNotEnableLocationAlertText =
-      "PDKS'nin Konum İznini Reddettiniz.\nLütfen Uygulama Ayarlarından Konuma İzin Verin.";
-  final String hackText =
-      "Sistemi Bozmaya Çalıştığınız Tespit Edildi. PDKS Kurallarını İhlal Ettiğiniz İçin Uygulamayı Kullanmaya Devam Etmenize İzin Veremiyoruz.";
-  final String dateText = "Tarih";
-  final String notEmptyText = "Lütfen Bütün Alanları Doldurunuz!";
-  final String reviewText = "İncelenmek üzere gönderildi";
-  final String loginErrorMsg = "Email ya da parola boş olamaz";
-  final String loginErrorMsg2 =
-      "Lütfen sizden istenilen bilgileri eksiksizce giriniz.";
-  final String loginSuccessMsg = "Bilgileriniz Onaylandı.";
-  final String emailValidMsg = "Lütfen geçerli bir email adresi giriniz.";
-  final String passwordValidMsg = "Şifre uzunluğu 6 karakterden az olamaz!";
-  final String qrErrorMsg = "Alan esnetme bildiriminize izin verilmemektedir.";
-  final String locationErrorMsg = "Konumunuz işlem için uygun değil.";
-  final String registerNameErrorMsg =
-      "Ad - Soyad alanı en az 5 karakterden oluşmalıdır.";
-  final String appMessage =
-      "Uygulamayı kullanabilmek için uygulamayı son sürüme güncellemeniz gereklidir.";
-  final String mapUrl =
-      "https://mt0.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&s=Ga";
+
+  // App related
+  String get appName => "app.name".tr();
+  String get appVersionText => "app.version".tr();
+  String get appMessage => "app.message".tr();
+
+  // General
+  String get begining => "general.beginning".tr();
+  String get choose => "general.choose".tr();
+  String get description => "general.description".tr();
+  String get finish => "general.finish".tr();
+  String get mission => "general.mission".tr();
+  String get name => "general.name".tr();
+  String get send => "general.send".tr();
+  String get shift => "general.shift".tr();
+  String get okey => "general.ok".tr();
+  String get dateText => "general.date".tr();
+  String get notEmptyText => "general.notEmpty".tr();
+  String get unSpecified => "general.unSpecified".tr();
+  String get unExpectedError => "general.unExpectedError".tr();
+  String get errorMessage => "general.errorMessage".tr();
+  String get errorMessageContinue => "general.errorMessageContinue".tr();
+
+  // Auth
+  String get email => "auth.email".tr();
+  String get password => "auth.password".tr();
+  String get passwordConfirm => "auth.passwordConfirm".tr();
+  String get phone => "auth.phone".tr();
+  String get welcome => "auth.welcome".tr();
+  String get welcomeText => "auth.welcomeText".tr();
+  String get loginText => "auth.login".tr();
+  String get signUp => "auth.signUp".tr();
+  String get signUpText => "auth.signUpText".tr();
+  String get signUpBtnText => "auth.signUpBtn".tr();
+  String get dontAccount => "auth.dontAccount".tr();
+  String get newAccount => "auth.newAccount".tr();
+  String get logOutText => "auth.logout".tr();
+  String get exitTitle => "auth.exitTitle".tr();
+  String get exitInfo => "auth.exitInfo".tr();
+
+  // Profile
+  String get profileText => "profile.profile".tr();
+  String get profileLoading => "profile.loading".tr();
+
+  // Company
+  String get companyText => "company.text".tr();
+  String get splashFooter => "company.splashFooter".tr();
+  String get outSideText => "company.outSide".tr();
+
+  // Splash
+  String get splashText1 => "splash.text1".tr();
+  String get splashText2 => "splash.text2".tr();
+
+  // Menu
+  String get inAndOutText => "menu.inAndOut".tr();
+  String get leavelProsedureText => "menu.leavelProcedure".tr();
+
+  // Time
+  String get inTime => "time.in".tr();
+  String get outTime => "time.out".tr();
+  String get checkInTime => "time.checkIn".tr();
+  String get checkOutTime => "time.checkOut".tr();
+  String get monthlyData => "time.monthly".tr();
+
+  // Leave
+  String get leaveText => "leave.type".tr();
+  String get leaveStartText => "leave.start".tr();
+  String get leaveReasonText => "leave.reason".tr();
+  String get moveAddressText => "leave.address".tr();
+  String get getLeavePermissionText => "leave.getPermission".tr();
+  String get noLeaveText => "leave.noLeave".tr();
+
+  // In/Out
+  String get inText => "inOut.in".tr();
+  String get outText => "inOut.out".tr();
+  String get noInAndOutText => "inOut.noInAndOut".tr();
+
+  // Late
+  String get lateText => "late.text".tr();
+  String get lateDescription => "late.description".tr();
+
+  // Early
+  String get earlyText => "early.text".tr();
+  String get earlyDescription => "early.description".tr();
+
+  // Buttons
+  String get cancelText => "buttons.cancel".tr();
+  String get cancelText2 => "buttons.cancel2".tr();
+  String get approveButtonText => "buttons.approve".tr();
+  String get cancelButtonText => "buttons.cancel_btn".tr();
+  String get confirmText => "buttons.confirm".tr();
+  String get confirmText2 => "buttons.confirm2".tr();
+
+  // Messages
+  String get successMessage => "messages.success".tr();
+  String get successMessage2 => "messages.success2".tr();
+  String get outSuccessMessage => "messages.outSuccess".tr();
+  String get loginSuccessMsg => "messages.loginSuccess".tr();
+  String get reviewText => "messages.review".tr();
+  String get networkMsg => "messages.network".tr();
+  String get warningMessage1 => "messages.warning1".tr();
+
+  // Errors
+  String get qrErrorMessage => "errors.qr".tr();
+  String get qrErrorMsg => "errors.qrError".tr();
+  String get inErrorMessage => "errors.inError".tr();
+  String get outErrorMessage => "errors.outError".tr();
+  String get locationError => "errors.location".tr();
+  String get locationErrorMsg => "errors.locationError".tr();
+  String get loginErrorMsg => "errors.loginError".tr();
+  String get loginErrorMsg2 => "errors.loginError2".tr();
+  String get emailValidMsg => "errors.emailValid".tr();
+  String get passwordValidMsg => "errors.passwordValid".tr();
+  String get registerNameErrorMsg => "errors.registerNameError".tr();
+
+  // Location
+  String get isEnableLocationAlertText => "location.isEnableAlert".tr();
+  String get isNotEnableLocationAlertText => "location.isNotEnableAlert".tr();
+  String get isMockLocationPermissionTitle => "location.isMockTitle".tr();
+  String get isMockLocationPermissionDescription =>
+      "location.isMockDescription".tr();
+
+  // Security
+  String get hackText => "security.hack".tr();
+
+  // Dialog
+  String get dialogAlertDescription => "dialog.alertDescription".tr();
+  String get nonAppRedirect => "dialog.nonAppRedirect".tr();
+  String get enterTheAdress => "dialog.enterTheAddress".tr();
+
+  // URLs - These should remain as static values
+  String get mapUrl => "urls.map".tr();
 
   String determineString(int index) {
     switch (index) {
       case 0:
-        return 'Beklemede';
+        return "status.pending".tr();
       case 1:
-        return 'Onaylandı';
+        return "status.approved".tr();
       case 2:
-        return 'Reddedildi';
+        return "status.denied".tr();
       default:
-        return 'Beklemede';
+        return "status.pending".tr();
     }
   }
 
+  // API URLs - These remain as static strings
   final String baseUrl = "https://cinarceyizcrm.bilmos.com/api/";
   final String loginUrl = 'auth/login';
   final String logout = 'auth/logout';

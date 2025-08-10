@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:crm_pdks_mobile/app.dart';
 import 'package:crm_pdks_mobile/core/init/cache/locale_manager.dart';
+import 'package:crm_pdks_mobile/core/translations/translation_manager.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
@@ -29,14 +30,7 @@ void main() async {
         ..environment = kDebugMode ? "development" : "production";
     },
     appRunner: () {
-      runApp(
-        EasyLocalization(
-          supportedLocales: const [Locale('en'), Locale('tr')],
-          path: 'assets/translations',
-          fallbackLocale: const Locale('tr'),
-          child: const App(),
-        ),
-      );
+      runApp(TranslationManager(child: const App()));
     },
   );
 }
