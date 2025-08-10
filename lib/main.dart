@@ -5,10 +5,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:crm_pdks_mobile/app.dart';
+import 'package:crm_pdks_mobile/core/init/cache/locale_manager.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize SharedPreferences first
+  await LocaleManager.prefrencesInit();
+
   await Future.wait([EasyLocalization.ensureInitialized()]);
   HttpOverrides.global = MyHttpOverrides();
   SystemChrome.setPreferredOrientations([

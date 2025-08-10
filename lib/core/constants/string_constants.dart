@@ -48,7 +48,7 @@ class StringConstants {
   final String locationError =
       'Lütfen konum bilgilerinin alınmasını bekleyiniz.';
   final String exitInfo =
-      "'Çıkış Yap' butonuna tıklarsanız bu cihazdaki tüm bilgileriniz (otomatik giriş bilgileriniz, offline giriş çıkış bilgileriniz, cihaz bilgileriniz vb.) silinecektir!!";
+      "'Çıkış Yap' butonuna tıklarsanız bu cihazdaki tüm bilgileriniz (otomatik giriş bilgileriniz, cihaz bilgileriniz vb.) silinecektir!!";
   final String exitTitle = 'PDKS Kullanıcılarının Çıkış Yapması Önerilmez!!\n ';
   final String noLeaveText = 'Henüz Bir İzin İşleminiz Bulunmamaktadır.';
   final String noInAndOutText = 'Henüz Bir Mesai İşleminiz Bulunmamaktadır.';
@@ -58,14 +58,11 @@ class StringConstants {
   final String appVersionText = "Uygulama versiyonu";
   final String inText = 'Giriş Yapıyorsunuz';
   final String outText = 'Çıkış Yapıyorsunuz';
-  final String noOffMode = 'Bu cihazda offline mod bulunmamaktadır.';
   final String lateText = 'Geç Kaldınız!!';
   final String lateDescription = 'Geç kalma sebebinizi açıklar mısınız..';
   final String cancelText = 'İşlem Tamamlanmadı';
   final String successMessage = "İşlem Başarılı";
   final String successMessage2 = "İşleminiz Başarılı";
-  final String offModeDialog =
-      "Çevrim dışı mod kapalı. Bu işlemi yapamazsınız!! \nYöneticiniz ile iletişime geçiniz..";
   final String earlyText = "Erken Çıkıyorsunuz !!";
   final String earlyDescription = "Erken Çıkma Sebebinizi Açıklar mısınız ..";
   final String cancelText2 = "İşlem İptal Edildi";
@@ -78,6 +75,8 @@ class StringConstants {
   final String outErrorMessage = "Bugüne ait çıkış işleminiz bulunmaktadır.";
   final String approveButtonText = "Onayla";
   final String cancelButtonText = "İptal";
+  final String confirmText = "Onayla";
+  final String confirmText2 = "Onayla";
   final String checkInTime = "Giriş Saati";
   final String checkOutTime = "Çıkış Saati";
   final String unSpecified = "Belirtilmedi";
@@ -113,8 +112,6 @@ class StringConstants {
       "Ad - Soyad alanı en az 5 karakterden oluşmalıdır.";
   final String appMessage =
       "Uygulamayı kullanabilmek için uygulamayı son sürüme güncellemeniz gereklidir.";
-  final String offModeandQrAreaDialog =
-      "Alan Bildirimi ve Çevrim dışı modları kapalı olabilir. Bu işlemi gerçekleştiremezsiniz \nYöneticiniz ile iletişime geçiniz..";
   final String mapUrl =
       "https://mt0.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&s=Ga";
 
@@ -131,7 +128,7 @@ class StringConstants {
     }
   }
 
-  final String baseUrl = "https://crm.mavihost.com.tr/api/";
+  final String baseUrl = "https://cinarceyizcrm.bilmos.com/api/";
   final String loginUrl = 'auth/login';
   final String logout = 'auth/logout';
   final String profile = "user/profile";

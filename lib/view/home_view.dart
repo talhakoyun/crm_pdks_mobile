@@ -21,8 +21,8 @@ import 'drawer_menu_view.dart';
 enum AlertCabilitySituation {
   onlineInEvent,
   onlineOutEvent,
-  offlineInEvent,
-  offlineOutEvent,
+  lateInEvent,
+  earlyOutEvent,
 }
 
 class HomeView extends StatefulWidget {
@@ -54,136 +54,127 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async => false,
-      child:
-          (inAndOutViewModel.authVM.event == SignStatus.logined)
-              ? Scaffold(
-                key: inAndOutViewModel.scaffoldKey,
-                appBar: AppBar(actions: [outSideArea()]),
-                drawer: const DrawerMenuView(),
-                body: ChangeNotifierProvider<LocationManager>(
-                  create: (BuildContext context) => locationManager,
-                  child: Consumer<LocationManager>(
-                    builder: (context, value, _) {
-                      if (!Platform.isIOS) {
-                        inAndOutViewModel.buildMethod(context);
-                      }
-                      if (value.currentPosition == null) {
-                        value.determinePosition(context);
-                      } else {
-                        debugPrint(
-                          "latitude: | ${value.currentPosition!.latitude}",
-                        );
-                      }
-                      return GestureDetector(
-                        onTap: () {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                        },
-                        child: Stack(
-                          children: [
-                            SizedBox(
-                              height: context.mediaQuery.size.height,
-                              child:
-                                  (inAndOutViewModel
-                                          .networkConnectivity
-                                          .internet)
-                                      ? (value.currentPosition != null)
-                                          ? Padding(
-                                            padding: context.onlyTopPaddingHigh,
-                                            child: Text("data"),
-                                            // child: FlutterMap(
-                                            //   options: MapOptions(
-                                            //     bounds: LatLngBounds(
-                                            //       LatLng(
-                                            //         value.currentPosition!.latitude,
-                                            //         value.currentPosition!.longitude,
-                                            //       ),
-                                            //     ),
-                                            //     boundsOptions: const FitBoundsOptions(
-                                            //         padding: EdgeInsets.all(8.0)),
-                                            //     maxZoom: 18,
-                                            //     zoom: 18,
-                                            //   ),
-                                            //   layers: [
-                                            //     TileLayerOptions(
-                                            //       urlTemplate: strCons.mapUrl,
-                                            //       subdomains: const ['a', 'b', 'c'],
-                                            //     ),
-                                            //     MarkerLayerOptions(
-                                            //       markers:
-                                            //           value.currentPosition != null
-                                            //               ? [
-                                            //                   Marker(
-                                            //                     point: LatLng(
-                                            //                       value
-                                            //                           .currentPosition!
-                                            //                           .latitude,
-                                            //                       value
-                                            //                           .currentPosition!
-                                            //                           .longitude,
-                                            //                     ),
-                                            //                     builder: (context) {
-                                            //                       return Image(
-                                            //                         image: AssetImage(
-                                            //                             ImageConstants
-                                            //                                 .instance
-                                            //                                 .marker),
-                                            //                       );
-                                            //                     },
-                                            //                   )
-                                            //                 ]
-                                            //               : [],
-                                            //     ),
-                                            //   ],
-                                            // ),
-                                          )
-                                          : Center(
-                                            child: Padding(
-                                              padding:
-                                                  context.onlyTopPaddingHigh *
-                                                  2.5,
-                                              child: SvgPicture.asset(
-                                                imgCons.noLocation,
-                                              ),
-                                            ),
-                                          )
-                                      : Center(
-                                        child: Padding(
-                                          padding:
-                                              context.onlyTopPaddingHigh * 2.5,
-                                          child: SvgPicture.asset(
-                                            imgCons.offMode,
-                                          ),
-                                        ),
-                                      ),
-                            ),
-                            buildNavbarArea(context),
-                            buildHomeTopContainer(context),
-                          ],
-                        ),
+      child: (inAndOutViewModel.authVM.event == SignStatus.logined)
+          ? Scaffold(
+              key: inAndOutViewModel.scaffoldKey,
+              appBar: AppBar(actions: [outSideArea()]),
+              drawer: const DrawerMenuView(),
+              body: ChangeNotifierProvider<LocationManager>(
+                create: (BuildContext context) => locationManager,
+                child: Consumer<LocationManager>(
+                  builder: (context, value, _) {
+                    if (!Platform.isIOS) {
+                      inAndOutViewModel.buildMethod(context);
+                    }
+                    if (value.currentPosition == null) {
+                      value.determinePosition(context);
+                    } else {
+                      debugPrint(
+                        "latitude: | ${value.currentPosition!.latitude}",
                       );
-                    },
-                  ),
+                    }
+                    return GestureDetector(
+                      onTap: () {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                      },
+                      child: Stack(
+                        children: [
+                          SizedBox(
+                            height: context.mediaQuery.size.height,
+                            child:
+                                (inAndOutViewModel.networkConnectivity.internet)
+                                ? (value.currentPosition != null)
+                                      ? Padding(
+                                          padding: context.onlyTopPaddingHigh,
+                                          child: Text("data"),
+                                          // child: FlutterMap(
+                                          //   options: MapOptions(
+                                          //     bounds: LatLngBounds(
+                                          //       LatLng(
+                                          //         value.currentPosition!.latitude,
+                                          //         value.currentPosition!.longitude,
+                                          //       ),
+                                          //     ),
+                                          //     boundsOptions: const FitBoundsOptions(
+                                          //         padding: EdgeInsets.all(8.0)),
+                                          //     maxZoom: 18,
+                                          //     zoom: 18,
+                                          //   ),
+                                          //   layers: [
+                                          //     TileLayerOptions(
+                                          //       urlTemplate: strCons.mapUrl,
+                                          //       subdomains: const ['a', 'b', 'c'],
+                                          //     ),
+                                          //     MarkerLayerOptions(
+                                          //       markers:
+                                          //           value.currentPosition != null
+                                          //               ? [
+                                          //                   Marker(
+                                          //                     point: LatLng(
+                                          //                       value
+                                          //                           .currentPosition!
+                                          //                           .latitude,
+                                          //                       value
+                                          //                           .currentPosition!
+                                          //                           .longitude,
+                                          //                     ),
+                                          //                     builder: (context) {
+                                          //                       return Image(
+                                          //                         image: AssetImage(
+                                          //                             ImageConstants
+                                          //                                 .instance
+                                          //                                 .marker),
+                                          //                       );
+                                          //                     },
+                                          //                   )
+                                          //                 ]
+                                          //               : [],
+                                          //     ),
+                                          //   ],
+                                          // ),
+                                        )
+                                      : Center(
+                                          child: Padding(
+                                            padding:
+                                                context.onlyTopPaddingHigh *
+                                                2.5,
+                                            child: SvgPicture.asset(
+                                              imgCons.noLocation,
+                                            ),
+                                          ),
+                                        )
+                                : Center(
+                                    child: Padding(
+                                      padding: context.onlyTopPaddingHigh * 2.5,
+                                      child: SvgPicture.asset(imgCons.offMode),
+                                    ),
+                                  ),
+                          ),
+                          buildNavbarArea(context),
+                          buildHomeTopContainer(context),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              )
-              : !(inAndOutViewModel.networkConnectivity.internet)
-              ? errorPageView(
-                context: context,
-                imagePath: imgCons.warning,
-                title: strCons.unExpectedError,
-                subtitle: ' ',
-              )
-              : const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
               ),
+            )
+          : !(inAndOutViewModel.networkConnectivity.internet)
+          ? errorPageView(
+              context: context,
+              imagePath: imgCons.warning,
+              title: strCons.unExpectedError,
+              subtitle: ' ',
+            )
+          : const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
   }
 
   Widget buildHomeTopContainer(BuildContext context) {
     return SizedBox(
-      height:
-          SizerUtil.height > 600
-              ? sizeConfig.heightSize(context, 255)
-              : sizeConfig.heightSize(context, 280),
+      height: SizerUtil.height > 600
+          ? sizeConfig.heightSize(context, 255)
+          : sizeConfig.heightSize(context, 280),
       width: SizerUtil.width,
       child: ClipRRect(
         borderRadius: const BorderRadius.only(
@@ -201,11 +192,11 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                   Image(
                     image:
                         inAndOutViewModel.localeManager.getStringValue(
-                                  PreferencesKeys.GENDER,
-                                ) ==
-                                'male'
-                            ? AssetImage(imgCons.male)
-                            : AssetImage(imgCons.female),
+                              PreferencesKeys.GENDER,
+                            ) ==
+                            'male'
+                        ? AssetImage(imgCons.male)
+                        : AssetImage(imgCons.female),
                     fit: BoxFit.contain,
                     height: sizeConfig.heightSize(context, 80),
                     width: sizeConfig.widthSize(context, 80),

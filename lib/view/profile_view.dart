@@ -77,14 +77,13 @@ class _ProfileViewState extends State<ProfileView>
                   ProfileTextInput(
                     title: strCons.phone,
                     description: value.phone,
-                    heightCon:
-                        Platform.isIOS
-                            ? SizerUtil.height > 670
-                                ? sizeConfig.heightSize(context, 60)
-                                : sizeConfig.heightSize(context, 75)
-                            : SizerUtil.height > 535
-                            ? sizeConfig.heightSize(context, 65)
-                            : sizeConfig.heightSize(context, 80),
+                    heightCon: Platform.isIOS
+                        ? SizerUtil.height > 670
+                              ? sizeConfig.heightSize(context, 60)
+                              : sizeConfig.heightSize(context, 75)
+                        : SizerUtil.height > 535
+                        ? sizeConfig.heightSize(context, 65)
+                        : sizeConfig.heightSize(context, 80),
                     icon: Icons.phone_iphone_rounded,
                     iconSize: 22.scalablePixel,
                   ),
@@ -92,29 +91,27 @@ class _ProfileViewState extends State<ProfileView>
                   ProfileTextInput(
                     title: strCons.email,
                     description: value.email,
-                    heightCon:
-                        Platform.isIOS
-                            ? SizerUtil.height > 670
-                                ? sizeConfig.heightSize(context, 60)
-                                : sizeConfig.heightSize(context, 75)
-                            : SizerUtil.height > 535
-                            ? sizeConfig.heightSize(context, 65)
-                            : sizeConfig.heightSize(context, 80),
+                    heightCon: Platform.isIOS
+                        ? SizerUtil.height > 670
+                              ? sizeConfig.heightSize(context, 60)
+                              : sizeConfig.heightSize(context, 75)
+                        : SizerUtil.height > 535
+                        ? sizeConfig.heightSize(context, 65)
+                        : sizeConfig.heightSize(context, 80),
                     icon: Icons.mail,
                     iconSize: 22.scalablePixel,
                   ),
                   context.emptySizedHeightBoxLow2x,
                   ProfileTextInput(
                     title: strCons.mission,
-                    description: value.title,
-                    heightCon:
-                        Platform.isIOS
-                            ? SizerUtil.height > 670
-                                ? sizeConfig.heightSize(context, 60)
-                                : sizeConfig.heightSize(context, 75)
-                            : SizerUtil.height > 535
-                            ? sizeConfig.heightSize(context, 65)
-                            : sizeConfig.heightSize(context, 80),
+                    description: value.gender,
+                    heightCon: Platform.isIOS
+                        ? SizerUtil.height > 670
+                              ? sizeConfig.heightSize(context, 60)
+                              : sizeConfig.heightSize(context, 75)
+                        : SizerUtil.height > 535
+                        ? sizeConfig.heightSize(context, 65)
+                        : sizeConfig.heightSize(context, 80),
                     icon: Icons.mail,
                     iconSize: 22.scalablePixel,
                   ),

@@ -1,4 +1,3 @@
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -7,7 +6,6 @@ class NetworkConnectivity {
   OverlayEntry? entry;
   bool first = true;
   bool internet = false;
-  //DataBaseController dataBaseController = DataBaseController();
   NetworkConnectivity() {
     checkInternet();
   }
@@ -20,15 +18,8 @@ class NetworkConnectivity {
     }
     _connectivity.onConnectivityChanged.listen((event) {
       connectivityResult = event;
-      if (connectivityResult[0] == ConnectivityResult.mobile) {
-        internet = true;
-        //dataBaseController.fetchUserData();
-        //dataBaseController.fetchQrUserData();
-      } else if (connectivityResult[0] == ConnectivityResult.wifi) {
-        //dataBaseController.fetchUserData();
-        //dataBaseController.fetchQrUserData();
-        //dataBaseController.fetchIndata();
-        //dataBaseController.fetchQrdata();
+      if (connectivityResult[0] == ConnectivityResult.mobile ||
+          connectivityResult[0] == ConnectivityResult.wifi) {
         internet = true;
       } else {
         internet = false;
@@ -36,8 +27,6 @@ class NetworkConnectivity {
     });
     if (internet) {
       first = false;
-      //dataBaseController.isThereData();
-      //dataBaseController.isThereQrData();
     }
   }
 }

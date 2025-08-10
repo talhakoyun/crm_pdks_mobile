@@ -3,19 +3,24 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 
-import '../core/base/size_singleton.dart';
+import '../core/constants/size_config.dart';
 import '../core/constants/string_constants.dart';
 import '../core/extension/context_extension.dart';
 
-class InAndOutsPointsCard extends StatelessWidget with SizeSingleton {
+class InAndOutsPointsCard extends StatelessWidget {
   final String? startDate, endDate, dateTime;
-  InAndOutsPointsCard({super.key, this.startDate, this.endDate, this.dateTime});
+  const InAndOutsPointsCard({
+    super.key,
+    this.startDate,
+    this.endDate,
+    this.dateTime,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: sizeConfig.widthSize(context, 330),
-      height: sizeConfig.heightSize(context, 120),
+      width: SizeConfig.instance.widthSize(context, 330),
+      height: SizeConfig.instance.heightSize(context, 120),
       child: Card(
         elevation: 0,
         color: context.colorScheme.onError,

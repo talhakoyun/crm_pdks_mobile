@@ -4,14 +4,17 @@ class UserModel {
   final String? surname;
   final String? email;
   final String? phone;
+  final String? gender;
   final Role? role;
   final Company? company;
   final Department? department;
   final Settings? settings;
+  final String? birthday;
   final String? profilePhoto;
   final String? tokenType;
   final String? accessToken;
   final int? expiresAt;
+  final String? createdAt;
 
   UserModel({
     this.id,
@@ -19,14 +22,17 @@ class UserModel {
     this.surname,
     this.email,
     this.phone,
+    this.gender,
     this.role,
     this.company,
     this.department,
     this.settings,
+    this.birthday,
     this.profilePhoto,
     this.tokenType,
     this.accessToken,
     this.expiresAt,
+    this.createdAt,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -36,6 +42,7 @@ class UserModel {
       surname: json['surname'],
       email: json['email'],
       phone: json['phone'],
+      gender: json['gender'],
       role: json['role'] != null ? Role.fromJson(json['role']) : null,
       company: json['company'] != null
           ? Company.fromJson(json['company'])
@@ -46,40 +53,37 @@ class UserModel {
       settings: json['settings'] != null
           ? Settings.fromJson(json['settings'])
           : null,
+      birthday: json['birthday'],
       profilePhoto: json['profile_photo'],
       tokenType: json['token_type'],
       accessToken: json['access_token'],
       expiresAt: json['expires_at'],
+      createdAt: json['created_at'],
     );
   }
 
-  static List<UserModel> fromJsonList(List<Map<String, dynamic>> jsonList) {
+  static List<UserModel> fromJsonList(List<dynamic> jsonList) {
     return jsonList.map((json) => UserModel.fromJson(json)).toList();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
+    final Map<String, dynamic> data = {};
     data['id'] = id;
     data['name'] = name;
     data['surname'] = surname;
     data['email'] = email;
     data['phone'] = phone;
-    if (role != null) {
-      data['role'] = role!.toJson();
-    }
-    if (company != null) {
-      data['company'] = company!.toJson();
-    }
-    if (department != null) {
-      data['department'] = department!.toJson();
-    }
-    if (settings != null) {
-      data['settings'] = settings!.toJson();
-    }
+    data['gender'] = gender;
+    if (role != null) data['role'] = role!.toJson();
+    if (company != null) data['company'] = company!.toJson();
+    if (department != null) data['department'] = department!.toJson();
+    if (settings != null) data['settings'] = settings!.toJson();
+    data['birthday'] = birthday;
     data['profile_photo'] = profilePhoto;
     data['token_type'] = tokenType;
     data['access_token'] = accessToken;
     data['expires_at'] = expiresAt;
+    data['created_at'] = createdAt;
     return data;
   }
 
@@ -109,7 +113,7 @@ class Role {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
+    final Map<String, dynamic> data = {};
     data['id'] = id;
     data['name'] = name;
     data['is_active'] = isActive;
@@ -117,9 +121,7 @@ class Role {
   }
 
   @override
-  String toString() {
-    return 'Role(id: $id, name: $name, isActive: $isActive)';
-  }
+  String toString() => 'Role(id: $id, name: $name, isActive: $isActive)';
 }
 
 class Company {
@@ -138,7 +140,7 @@ class Company {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
+    final Map<String, dynamic> data = {};
     data['id'] = id;
     data['name'] = name;
     data['address'] = address;
@@ -146,9 +148,7 @@ class Company {
   }
 
   @override
-  String toString() {
-    return 'Company(id: $id, name: $name, address: $address)';
-  }
+  String toString() => 'Company(id: $id, name: $name, address: $address)';
 }
 
 class Department {
@@ -162,43 +162,33 @@ class Department {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
+    final Map<String, dynamic> data = {};
     data['id'] = id;
     data['name'] = name;
     return data;
   }
 
   @override
-  String toString() {
-    return 'Department(id: $id, name: $name)';
-  }
+  String toString() => 'Department(id: $id, name: $name)';
 }
 
 class Settings {
   final bool? outside;
-  final bool? offline;
   final bool? zone;
 
-  Settings({this.outside, this.offline, this.zone});
+  Settings({this.outside, this.zone});
 
   factory Settings.fromJson(Map<String, dynamic> json) {
-    return Settings(
-      outside: json['outside'],
-      offline: json['offline'],
-      zone: json['zone'],
-    );
+    return Settings(outside: json['outside'], zone: json['zone']);
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
+    final Map<String, dynamic> data = {};
     data['outside'] = outside;
-    data['offline'] = offline;
     data['zone'] = zone;
     return data;
   }
 
   @override
-  String toString() {
-    return 'Settings(outside: $outside, offline: $offline, zone: $zone)';
-  }
+  String toString() => 'Settings(outside: $outside, zone: $zone)';
 }

@@ -22,7 +22,6 @@ class InAndOutService {
     String? deviceId,
     String? deviceModel,
     String? myNote,
-    DateTime? offline,
   }) async {
     var client = http.Client();
 
@@ -35,26 +34,15 @@ class InAndOutService {
               'Accept': 'application/json',
               'Authorization': 'Bearer $token',
             },
-            body: offline == null
-                ? {
-                    "type": type.toString(),
-                    "outside": outside.toString(),
-                    "longitude": longitude.toString(),
-                    "latitude": latitude.toString(),
-                    "device_id": deviceId.toString(),
-                    "device_model": deviceModel.toString(),
-                    "note": myNote ?? "",
-                  }
-                : {
-                    "type": type.toString(),
-                    "outside": outside.toString(),
-                    "longitude": longitude.toString(),
-                    "latitude": latitude.toString(),
-                    "device_id": deviceId.toString(),
-                    "device_model": deviceModel.toString(),
-                    "note": myNote ?? "",
-                    "offline": "$offline",
-                  },
+            body: {
+              "type": type.toString(),
+              "outside": outside.toString(),
+              "longitude": longitude.toString(),
+              "latitude": latitude.toString(),
+              "device_id": deviceId.toString(),
+              "device_model": deviceModel.toString(),
+              "note": myNote ?? "",
+            },
           )
           .timeout(const Duration(seconds: 10));
 
@@ -90,7 +78,6 @@ class InAndOutService {
     required int zoneId,
     String? deviceId,
     String? deviceModel,
-    DateTime? offline,
   }) async {
     var client = http.Client();
     try {
@@ -103,24 +90,14 @@ class InAndOutService {
               'Accept': 'application/json',
               'Authorization': 'Bearer $token',
             },
-            body: offline == null
-                ? {
-                    "type": type.toString(),
-                    "longitude": longitude.toString(),
-                    "latitude": latitude.toString(),
-                    "zone": zoneId.toString(),
-                    "device_id": deviceId.toString(),
-                    "device_model": deviceModel.toString(),
-                  }
-                : {
-                    "type": type.toString(),
-                    "longitude": longitude.toString(),
-                    "latitude": latitude.toString(),
-                    "zone": zoneId.toString(),
-                    "device_id": deviceId.toString(),
-                    "device_model": deviceModel.toString(),
-                    "offline": "$offline",
-                  },
+            body: {
+              "type": type.toString(),
+              "longitude": longitude.toString(),
+              "latitude": latitude.toString(),
+              "zone": zoneId.toString(),
+              "device_id": deviceId.toString(),
+              "device_model": deviceModel.toString(),
+            },
           )
           .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {

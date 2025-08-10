@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -17,11 +18,9 @@ import '../core/init/cache/locale_manager.dart';
 import '../core/init/network/connectivity/network_connectivity.dart';
 import '../core/widget/customize_dialog.dart';
 import '../core/widget/loader.dart';
-import '../helper/database_helper.dart';
+
 import '../models/base_model.dart';
-import '../models/is_available_model.dart';
 import '../models/logout_model.dart';
-import '../models/register_model.dart';
 import '../models/user_model.dart';
 import '../service/auth_service.dart';
 import '../widgets/dialog/snackbar.dart';
@@ -56,11 +55,10 @@ class AuthViewModel extends BaseViewModel {
   String? endTDate = "";
   String? phone = "";
   String? email = "";
-  String? title = "";
   String? shiftName = "";
   String? department = "";
   bool? outside;
-  bool? offline;
+
   bool? zone;
 
   AuthViewModel({
@@ -113,17 +111,144 @@ class AuthViewModel extends BaseViewModel {
     notifyListeners();
   }
 
+  /// Centralized error logging
+  void _logError(String operation, dynamic error, [StackTrace? stackTrace]) {
+    dev.log(
+      'AuthViewModel Error in $operation: $error',
+      name: 'AuthViewModel',
+      error: error,
+      stackTrace: stackTrace,
+    );
+  }
+
+  /// Safe network connectivity check
+  bool _isNetworkConnected() {
+    try {
+      return networkConnectivity.internet;
+    } catch (e) {
+      _logError('Network Check', e);
+      return false;
+    }
+  }
+
+  /// Main app initialization with silent login support
+  Future<void> initializeApp(BuildContext context) async {
+    try {
+      // Device validation
+      if (!await _isDeviceValid()) {
+        _navigateToHackScreen();
+        return;
+      }
+
+      // Network check and silent login
+      await _handleOnlineInitialization(context);
+    } catch (e, stackTrace) {
+      _logError('App Initialization', e, stackTrace);
+      _navigateToLoginScreen();
+    }
+  }
+
   Future<void> splashCheck(BuildContext context) async {
-    if (!await _isDeviceValid()) {
-      _navigateToHackScreen();
+    await initializeApp(context);
+  }
+
+  Future<void> _handleOnlineInitialization(BuildContext context) async {
+    // Check app availability first
+    final isAvailableResult = await _authService.isAvalible();
+    isAvalibleApp = isAvailableResult;
+
+    if (!isAvailableResult.isSuccess) {
+      _showErrorDialog(
+        context,
+        isAvailableResult.message ?? StringConstants.instance.errorMessage,
+      );
       return;
     }
 
-    if (_isNetworkConnected()) {
-      await _handleOnlineMode(context);
-    } else {
-      _handleOfflineMode(context);
+    // Set register status
+    registerStatus = Platform.isAndroid
+        ? isAvailableResult.data?.android?.isRegister
+        : isAvailableResult.data?.ios?.isRegister;
+
+    // Attempt silent login
+    await _attemptSilentLogin(context);
+  }
+
+  Future<void> _attemptSilentLogin(BuildContext context) async {
+    final token = _storageService.getStringValue(PreferencesKeys.TOKEN);
+
+    dev.log(
+      'Token read from storage: ${token.isNotEmpty ? "Token found (${token.substring(0, 10)}...)" : "No token found"}',
+      name: 'AuthViewModel',
+    );
+
+    if (token.isEmpty) {
+      dev.log(
+        'No stored token found, navigating to login',
+        name: 'AuthViewModel',
+      );
+      await getProfile(context, true);
+      return;
     }
+
+    try {
+      dev.log(
+        'Attempting silent login by fetching profile',
+        name: 'AuthViewModel',
+      );
+
+      // Direkt profile'i çek - başarılıysa token geçerli demektir
+      final profileResult = await _authService.profile();
+
+      if (profileResult.isSuccess && profileResult.hasData) {
+        try {
+          dev.log(
+            'Silent login successful - profile fetched',
+            name: 'AuthViewModel',
+          );
+          user = profileResult.data;
+          event = SignStatus.logined;
+          await profileSetDataShared(profileResult);
+          await _handleAppVersionCheck(context);
+          notifyListeners();
+          navigation.navigateToPageClear(path: NavigationConstants.HOME);
+        } catch (e, stackTrace) {
+          _logError('Profile Data Processing', e, stackTrace);
+          await _clearInvalidToken();
+          await getProfile(context, true);
+        }
+      } else {
+        dev.log(
+          'Silent login failed - profile fetch failed: ${profileResult.message}',
+          name: 'AuthViewModel',
+        );
+        await _clearInvalidToken();
+        await getProfile(context, true);
+      }
+    } catch (e, stackTrace) {
+      _logError('Silent Login', e, stackTrace);
+      await _clearInvalidToken();
+      await getProfile(context, true);
+    }
+  }
+
+  Future<void> _clearInvalidToken() async {
+    try {
+      await _storageService.clearAll();
+      event = SignStatus.lyLogin;
+      user = null;
+      accessToken = null;
+      dev.log('Invalid token cleared', name: 'AuthViewModel');
+    } catch (e, stackTrace) {
+      _logError('Clear Invalid Token', e, stackTrace);
+    }
+  }
+
+  void _navigateToLoginScreen() {
+    navigation.navigateToPageClear(
+      path: NavigationConstants.LOGIN,
+      data: registerStatus,
+    );
   }
 
   Future<bool> _isDeviceValid() async {
@@ -132,51 +257,6 @@ class AuthViewModel extends BaseViewModel {
 
   void _navigateToHackScreen() {
     navigation.navigateToPageClear(path: NavigationConstants.HACK);
-  }
-
-  bool _isNetworkConnected() {
-    return networkConnectivity.internet;
-  }
-
-  Future<void> _handleOnlineMode(BuildContext context) async {
-    IsAvailableModel? isAvailableModel = await _authService.isAvalible();
-    isAvalibleApp = isAvailableModel;
-
-    if (isAvailableModel.status == true) {
-      _processSuccessfulAvailabilityCheck(isAvailableModel, context);
-    } else if (isAvailableModel.status == false) {
-      _showErrorDialog(context, isAvailableModel.message!);
-    } else {
-      _showErrorDialog(
-        context,
-        StringConstants.instance.errorMessage +
-            StringConstants.instance.errorMessageContinue,
-      );
-    }
-  }
-
-  void _processSuccessfulAvailabilityCheck(
-    IsAvailableModel model,
-    BuildContext context,
-  ) {
-    registerStatus = Platform.isAndroid
-        ? model.data!.android!.isRegister
-        : model.data!.ios!.isRegister;
-    getProfile(context, true);
-  }
-
-  void _handleOfflineMode(BuildContext context) {
-    bool? offlineSplash = _storageService.getBoolValue(PreferencesKeys.OFFLINE);
-    String? accessToken = _storageService.getStringValue(PreferencesKeys.TOKEN);
-
-    if (offlineSplash && accessToken.isNotEmpty) {
-      navigation.navigateToPageClear(path: NavigationConstants.HOME);
-    } else {
-      navigation.navigateToPageClear(
-        path: NavigationConstants.LOGIN,
-        data: registerStatus,
-      );
-    }
   }
 
   void _showErrorDialog(
@@ -277,35 +357,35 @@ class AuthViewModel extends BaseViewModel {
   Future<void> _login(BuildContext context, Map bodyData) async {
     Loader.show(context);
 
-    if (!_isNetworkConnected()) {
-      Loader.hide();
-      _showErrorDialog(
-        context,
-        StringConstants.instance.networkMsg,
-        exitOnClose: false,
-      );
-      return;
-    }
-
     try {
-      BaseModel<List<UserModel>> data = await _authService.login(
-        body: bodyData,
-      );
-      Loader.hide();
-
-      if (data.status!) {
-        _handleSuccessfulLogin(context, data);
-      } else {
-        _showErrorDialog(context, data.message ?? "", exitOnClose: false);
+      if (!_isNetworkConnected()) {
+        _showErrorDialog(
+          context,
+          StringConstants.instance.networkMsg,
+          exitOnClose: false,
+        );
+        return;
       }
-    } catch (e) {
-      Loader.hide();
+
+      final result = await _authService.login(body: bodyData);
+
+      if (result.isSuccess && result.hasData) {
+        await _handleSuccessfulLogin(context, result);
+      } else {
+        final errorMessage =
+            result.message ?? StringConstants.instance.errorMessage;
+        _logError('Login Failed', errorMessage);
+        _showErrorDialog(context, errorMessage, exitOnClose: false);
+      }
+    } catch (e, stackTrace) {
+      _logError('Login Exception', e, stackTrace);
       _showErrorDialog(
         context,
-        StringConstants.instance.errorMessage +
-            StringConstants.instance.errorMessageContinue,
+        '${StringConstants.instance.errorMessage} ${StringConstants.instance.errorMessageContinue}',
         exitOnClose: false,
       );
+    } finally {
+      Loader.hide();
     }
   }
 
@@ -314,8 +394,12 @@ class AuthViewModel extends BaseViewModel {
     BaseModel<List<UserModel>> data,
   ) async {
     await setDataShared(data);
-    await getProfile(context, false);
-    event = SignStatus.logined;
+    event = SignStatus.logined; // Event'i önce set et
+
+    // Login başarılı olduktan sonra profile bilgileri zaten data'da mevcut
+    // Tekrar API çağrısı yapmaya gerek yok
+    await _handleAppVersionCheck(context);
+
     navigation.navigateToPageClear(path: NavigationConstants.HOME);
     CustomSnackBar(context, StringConstants.instance.loginSuccessMsg);
   }
@@ -385,37 +469,41 @@ class AuthViewModel extends BaseViewModel {
   Future<void> _register(BuildContext context, Map dataRegister) async {
     Loader.show(context);
 
-    if (!_isNetworkConnected()) {
-      Loader.hide();
-      _showErrorDialog(
-        context,
-        StringConstants.instance.networkMsg,
-        exitOnClose: false,
-      );
-      return;
-    }
-
     try {
-      RegisterModel data = await _authService.register(body: dataRegister);
-      Loader.hide();
+      if (!_isNetworkConnected()) {
+        _showErrorDialog(
+          context,
+          StringConstants.instance.networkMsg,
+          exitOnClose: false,
+        );
+        return;
+      }
 
-      if (data.status!) {
+      final result = await _authService.register(body: dataRegister);
+
+      if (result.isSuccess) {
+        final message =
+            result.message ?? StringConstants.instance.successMessage;
         _showSuccessDialog(
           context,
-          data.message!,
+          message,
           onConfirm: () => _navigateToLoginAfterRegistration(),
         );
       } else {
-        _showErrorDialog(context, data.message!, exitOnClose: false);
+        final errorMessage =
+            result.message ?? StringConstants.instance.errorMessage;
+        _logError('Registration Failed', errorMessage);
+        _showErrorDialog(context, errorMessage, exitOnClose: false);
       }
-    } catch (e) {
-      Loader.hide();
+    } catch (e, stackTrace) {
+      _logError('Registration Exception', e, stackTrace);
       _showErrorDialog(
         context,
-        StringConstants.instance.errorMessage +
-            StringConstants.instance.errorMessageContinue,
+        '${StringConstants.instance.errorMessage} ${StringConstants.instance.errorMessageContinue}',
         exitOnClose: false,
       );
+    } finally {
+      Loader.hide();
     }
   }
 
@@ -427,90 +515,135 @@ class AuthViewModel extends BaseViewModel {
   }
 
   Future<void> getProfile([BuildContext? context, bool? isSplash]) async {
-    var utoken = _storageService.getStringValue(PreferencesKeys.TOKEN);
+    try {
+      await _fetchUserProfile(context, isSplash);
+      await _handleAppVersionCheck(context);
+    } catch (e, stackTrace) {
+      _logError('Get Profile', e, stackTrace);
 
-    if (utoken.isNotEmpty) {
-      BaseModel<List<UserModel>> profileModel = await _authService.profile();
+      // Sadece splash sırasında login'e dön, normal login sonrası hata durumunda dönme
+      if (isSplash == true) {
+        _navigateToLoginScreen();
+      } else if (context != null) {
+        _showErrorDialog(
+          context,
+          StringConstants.instance.errorMessage,
+          exitOnClose: false,
+        );
+      }
+    }
+  }
 
-      if (profileModel.status == true) {
-        user = profileModel.data;
+  Future<void> _fetchUserProfile(BuildContext? context, bool? isSplash) async {
+    final token = _storageService.getStringValue(PreferencesKeys.TOKEN);
 
-        if (isSplash == null || isSplash == false) {
+    if (token.isEmpty) {
+      _logError('Profile Fetch', 'No token available');
+      return;
+    }
+
+    try {
+      final profileResult = await _authService.profile();
+
+      if (profileResult.isSuccess && profileResult.hasData) {
+        user = profileResult.data;
+        await profileSetDataShared(profileResult);
+
+        if (isSplash != true && context != null) {
           Fluttertoast.showToast(
             msg: StringConstants.instance.successMessage,
             backgroundColor: const Color(0xffFF981A),
           );
         }
-
-        await profileSetDataShared(profileModel);
       } else {
-        if (isSplash == null || isSplash == false) {
+        final errorMessage =
+            profileResult.message ?? StringConstants.instance.errorMessage;
+        _logError('Profile Fetch Failed', errorMessage);
+
+        if (isSplash != true && context != null) {
           Fluttertoast.showToast(
-            msg: profileModel.message!,
-            backgroundColor: context!.colorScheme.error,
+            msg: errorMessage,
+            backgroundColor: context.colorScheme.error,
           );
         }
       }
 
-      await Future.delayed(Duration.zero);
       await profileGetDataShared();
       notifyListeners();
+    } catch (e, stackTrace) {
+      _logError('Profile Fetch Exception', e, stackTrace);
+      // Hata durumunda rethrow yapmayalım, sadece log edelim
+      // rethrow;
+    }
+  }
+
+  Future<void> _handleAppVersionCheck(BuildContext? context) async {
+    if (isAvalibleApp == null) {
+      _navigateBasedOnUserStatus();
+      return;
     }
 
-    if (isAvalibleApp != null) {
+    try {
+      final currentVersion = int.parse(version?.replaceAll(".", "") ?? "0");
+
       if (Platform.isAndroid) {
-        if (isAvalibleApp.data.android!.version >
-            int.parse(version!.replaceAll(".", ""))) {
-          CustomizeDialog.show(
-            context: context!,
-            type: DialogType.update,
-            message: StringConstants.instance.appMessage,
-            onConfirm: () =>
-                UrlLaunch.openUrl(context, isAvalibleApp.data.android!.link),
-          );
-        } else {
-          Timer(const Duration(seconds: 2), () {
-            if (user != null) {
-              navigation.navigateToPageClear(path: NavigationConstants.HOME);
-            } else {
-              navigation.navigateToPageClear(
-                path: NavigationConstants.LOGIN,
-                data: registerStatus,
-              );
-            }
-          });
-        }
+        await _handleAndroidVersionCheck(context, currentVersion);
+      } else if (Platform.isIOS) {
+        await _handleIOSVersionCheck(context, currentVersion);
       }
-
-      if (Platform.isIOS) {
-        if (isAvalibleApp.data.ios!.version >
-            int.parse(version!.replaceAll(".", ""))) {
-          CustomizeDialog.show(
-            context: context!,
-            type: DialogType.update,
-            message: StringConstants.instance.appMessage,
-            onConfirm: () =>
-                UrlLaunch.openUrl(context, isAvalibleApp.data.ios!.link),
-          );
-        } else {
-          Timer(const Duration(seconds: 3), () {
-            if (user != null) {
-              navigation.navigateToPageClear(path: NavigationConstants.HOME);
-            } else {
-              navigation.navigateToPageClear(
-                path: NavigationConstants.LOGIN,
-                data: registerStatus,
-              );
-            }
-          });
-        }
-      }
-    } else {
-      navigation.navigateToPageClear(
-        path: NavigationConstants.LOGIN,
-        data: registerStatus,
-      );
+    } catch (e, stackTrace) {
+      _logError('Version Check', e, stackTrace);
+      _navigateBasedOnUserStatus();
     }
+  }
+
+  Future<void> _handleAndroidVersionCheck(
+    BuildContext? context,
+    int currentVersion,
+  ) async {
+    final androidVersion = isAvalibleApp?.data?.android?.version ?? 0;
+
+    if (androidVersion > currentVersion) {
+      _showUpdateDialog(context, isAvalibleApp.data.android!.link);
+    } else {
+      Timer(const Duration(seconds: 2), _navigateBasedOnUserStatus);
+    }
+  }
+
+  Future<void> _handleIOSVersionCheck(
+    BuildContext? context,
+    int currentVersion,
+  ) async {
+    final iosVersion = isAvalibleApp?.data?.ios?.version ?? 0;
+
+    if (iosVersion > currentVersion) {
+      _showUpdateDialog(context, isAvalibleApp.data.ios!.link);
+    } else {
+      Timer(const Duration(seconds: 3), _navigateBasedOnUserStatus);
+    }
+  }
+
+  void _showUpdateDialog(BuildContext? context, String updateUrl) {
+    if (context == null) return;
+
+    CustomizeDialog.show(
+      context: context,
+      type: DialogType.update,
+      message: StringConstants.instance.appMessage,
+      onConfirm: () => UrlLaunch.openUrl(context, updateUrl),
+    );
+  }
+
+  void _navigateBasedOnUserStatus() {
+    // Login başarılı olduysa user set edilmiş olmalı
+    final targetPath = user != null && event == SignStatus.logined
+        ? NavigationConstants.HOME
+        : NavigationConstants.LOGIN;
+
+    navigation.navigateToPageClear(
+      path: targetPath,
+      data: user == null ? registerStatus : null,
+    );
   }
 
   Future<void> fetchLogout(BuildContext context) async {
@@ -543,7 +676,6 @@ class AuthViewModel extends BaseViewModel {
   }
 
   Future<void> _clearCache() async {
-    await DatabaseHelper.instance.deleteMyDatabase();
     await _storageService.clearAll();
     navigation.navigateToPageClear(path: NavigationConstants.LOGIN);
   }
@@ -552,48 +684,64 @@ class AuthViewModel extends BaseViewModel {
     BaseModel<List<UserModel>> profileModel,
   ) async {
     await _storeUserData(profileModel.data);
-    await _storeCompanyData(profileModel.data!.first.company);
-    await _storeDepartmentData(profileModel.data!.first.department);
-    // await _storeShiftData(profileModel.data!.first.shiftTime);
-    await _storeSettingsData(profileModel.data!.first.settings);
+
+    // Company data varsa kaydet
+    if (profileModel.data!.first.company != null) {
+      await _storeCompanyData(profileModel.data!.first.company);
+    }
+
+    // Department data varsa kaydet
+    if (profileModel.data!.first.department != null) {
+      await _storeDepartmentData(profileModel.data!.first.department);
+    }
+
+    // Settings data varsa kaydet
+    if (profileModel.data!.first.settings != null) {
+      await _storeSettingsData(profileModel.data!.first.settings);
+    }
+
     await profileGetDataShared();
   }
 
   Future<void> _storeUserData(dynamic userData) async {
+    // userData bir List<UserModel>, ilk elemanını al
+    final user = userData is List ? userData.first : userData;
+
+    // UserModel'deki field'lara göre kaydet
+    await _storageService.setStringValue(
+      PreferencesKeys.ID,
+      user.id?.toString() ?? "",
+    );
     await _storageService.setStringValue(
       PreferencesKeys.USERNAME,
-      userData!.name ?? "",
+      user.name ?? "",
     );
     await _storageService.setStringValue(
       PreferencesKeys.GENDER,
-      userData.gender ?? "",
-    );
-    await _storageService.setStringValue(
-      PreferencesKeys.ID,
-      userData.id.toString(),
+      user.gender ?? "",
     );
     await _storageService.setStringValue(
       PreferencesKeys.PHONE,
-      userData.phone ?? "",
+      user.phone ?? "",
     );
     await _storageService.setStringValue(
       PreferencesKeys.EMAIL,
-      userData.email ?? "",
+      user.email ?? "",
     );
     await _storageService.setStringValue(
       PreferencesKeys.ROLE,
-      userData.role ?? "",
+      user.role?.name ?? "",
     );
-    await _storageService.setStringValue(
-      PreferencesKeys.TITLE,
-      userData.title ?? "",
-    );
+    // TITLE field'ı UserModel'de yok, boş bırak veya kaldır
+    // await _storageService.setStringValue(PreferencesKeys.TITLE, "");
   }
 
   Future<void> _storeCompanyData(dynamic companyData) async {
+    if (companyData == null) return;
+
     await _storageService.setStringValue(
       PreferencesKeys.COMPID,
-      companyData!.id.toString(),
+      companyData.id?.toString() ?? "",
     );
     await _storageService.setStringValue(
       PreferencesKeys.COMPNAME,
@@ -606,9 +754,11 @@ class AuthViewModel extends BaseViewModel {
   }
 
   Future<void> _storeDepartmentData(dynamic departmentData) async {
+    if (departmentData == null) return;
+
     await _storageService.setStringValue(
       PreferencesKeys.DEPARTMENTID,
-      departmentData!.id.toString(),
+      departmentData.id?.toString() ?? "",
     );
     await _storageService.setStringValue(
       PreferencesKeys.DEPARTMENT,
@@ -617,10 +767,8 @@ class AuthViewModel extends BaseViewModel {
   }
 
   Future<void> _storeSettingsData(dynamic settingsData) async {
-    await _storageService.setBoolValue(
-      PreferencesKeys.OFFLINE,
-      settingsData!.offline ?? false,
-    );
+    if (settingsData == null) return;
+
     await _storageService.setBoolValue(
       PreferencesKeys.OUTSIDE,
       settingsData.outside ?? false,
@@ -635,9 +783,15 @@ class AuthViewModel extends BaseViewModel {
     if (loginModel.data != null &&
         loginModel.data!.isNotEmpty &&
         loginModel.data!.first.accessToken != null) {
-      await _storageService.setStringValue(
-        PreferencesKeys.TOKEN,
-        loginModel.data!.first.accessToken ?? "",
+      // User değişkenini set et
+      user = loginModel.data;
+
+      final tokenToSave = loginModel.data!.first.accessToken ?? "";
+      await _storageService.setStringValue(PreferencesKeys.TOKEN, tokenToSave);
+
+      dev.log(
+        'Token saved to storage: ${tokenToSave.isNotEmpty ? "Token saved (${tokenToSave.substring(0, 10)}...)" : "Empty token saved"}',
+        name: 'AuthViewModel',
       );
       await _loadUserDataFromStorage();
     }
@@ -657,10 +811,9 @@ class AuthViewModel extends BaseViewModel {
     endTDate = _storageService.getStringValue(PreferencesKeys.ENDTDATE);
     department = _storageService.getStringValue(PreferencesKeys.DEPARTMENT);
     email = _storageService.getStringValue(PreferencesKeys.EMAIL);
-    title = _storageService.getStringValue(PreferencesKeys.TITLE);
     phone = _storageService.getStringValue(PreferencesKeys.PHONE);
     outside = _storageService.getBoolValue(PreferencesKeys.OUTSIDE);
-    offline = _storageService.getBoolValue(PreferencesKeys.OFFLINE);
+
     zone = _storageService.getBoolValue(PreferencesKeys.ZONE);
     notifyListeners();
   }

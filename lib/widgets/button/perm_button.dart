@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../core/base/size_singleton.dart';
 import '../../core/extension/context_extension.dart';
 
-class PermButton extends StatelessWidget with SizeSingleton {
-  PermButton({
+class PermButton extends StatelessWidget {
+  const PermButton({
     super.key,
     required this.onTap,
     required this.buttonTex,

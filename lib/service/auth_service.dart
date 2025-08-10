@@ -100,10 +100,28 @@ class AuthService {
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         if (data['status']) {
-          return BaseModel.fromJsonList(
-            data,
-            (jsonList) => UserModel.fromJsonList(jsonList),
-          );
+          // API response'u tek user objesi dönüyor, liste değil
+          if (data['data'] is Map) {
+            // Tek bir user objesi geliyorsa onu listeye çevir
+            final userModel = UserModel.fromJson(data['data']);
+            return BaseModel<List<UserModel>>(
+              status: true,
+              message: data['message'],
+              data: [userModel],
+            );
+          } else if (data['data'] is List) {
+            // Liste geliyorsa normal işle
+            return BaseModel.fromJsonList(
+              data,
+              (jsonList) => UserModel.fromJsonList(jsonList),
+            );
+          } else {
+            return BaseModel(
+              status: false,
+              message: 'Beklenmeyen data formatı',
+              data: null,
+            );
+          }
         } else {
           return BaseModel(
             status: false,
