@@ -1,11 +1,11 @@
 import 'dart:convert';
 
+import 'package:crm_pdks_mobile/models/holiday_types_model.dart';
 import 'package:http/http.dart' as http;
 
 import '../core/constants/string_constants.dart';
 import '../core/init/cache/locale_manager.dart';
 import '../models/base_model.dart';
-
 import '../models/holidays_model.dart';
 
 class PermissionService {
@@ -31,6 +31,50 @@ class PermissionService {
         var data = json.decode(response.body);
         if (data['status']) {
           return holidaysModelFromJson(response.body);
+        } else {
+          return BaseModel(
+            status: false,
+            message: strCons.errorMessage,
+            data: null,
+          );
+        }
+      } else {
+        return BaseModel(
+          status: false,
+          message: strCons.errorMessage,
+          data: null,
+        );
+      }
+    } catch (e) {
+      return BaseModel(
+        status: false,
+        message: strCons.errorMessage,
+        data: null,
+      );
+    } finally {
+      client.close();
+    }
+  }
+
+  Future<HolidayTypeListModel> holidayTypeList() async {
+    var client = http.Client();
+    try {
+      String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
+
+      var response = await client
+          .get(
+            Uri.parse(strCons.baseUrl + strCons.holidayTypeList),
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        if (data['status']) {
+          return holidayTypesModelFromJson(response.body);
         } else {
           return BaseModel(
             status: false,

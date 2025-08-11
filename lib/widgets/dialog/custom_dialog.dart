@@ -7,10 +7,11 @@ import '../../core/constants/string_constants.dart';
 import '../../core/extension/context_extension.dart';
 
 class CustomAlertDialog {
-  static locationPermissionAlert(
-      {required BuildContext context,
-      required bool isEnabled,
-      required bool isMock}) async {
+  static locationPermissionAlert({
+    required BuildContext context,
+    required bool isEnabled,
+    required bool isMock,
+  }) async {
     return showDialog<void>(
       useSafeArea: true,
       context: context,
@@ -21,7 +22,8 @@ class CustomAlertDialog {
           scrollable: true,
           elevation: 2,
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(32.0))),
+            borderRadius: BorderRadius.all(Radius.circular(32.0)),
+          ),
           content: SingleChildScrollView(
             child: Center(
               child: Column(
@@ -30,11 +32,13 @@ class CustomAlertDialog {
                       ? Text.rich(
                           TextSpan(
                             text: StringConstants
-                                .instance.isMockLocationPermissionTitle,
+                                .instance
+                                .isMockLocationPermissionTitle,
                             style: context.textTheme.bodyLarge,
                             children: [
                               TextSpan(
-                                text: StringConstants.instance
+                                text: StringConstants
+                                    .instance
                                     .isMockLocationPermissionDescription,
                                 style: context.textTheme.bodyLarge,
                               ),
@@ -44,15 +48,15 @@ class CustomAlertDialog {
                       : Text(
                           isEnabled
                               ? StringConstants
-                                  .instance.isEnableLocationAlertText
+                                    .instance
+                                    .isEnableLocationAlertText
                               : StringConstants
-                                  .instance.isNotEnableLocationAlertText,
+                                    .instance
+                                    .isNotEnableLocationAlertText,
                           style: context.textTheme.bodyLarge,
                           textAlign: TextAlign.center,
                         ),
-                  const SizedBox(
-                    height: 5,
-                  ),
+                  const SizedBox(height: 5),
                 ],
               ),
             ),
@@ -78,7 +82,7 @@ class CustomAlertDialog {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         );
       },

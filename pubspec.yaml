@@ -1,8 +1,6 @@
 name: crm_pdks_mobile
 description: "Mavi Host CRM Mobile"
 publish_to: "none"
-
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 1.0.0+1
 
 environment:
@@ -27,6 +25,7 @@ dependencies:
   platform_device_id_plus: ^1.0.7
   provider: ^6.1.5
   sentry_flutter: ^9.6.0
+  shared_preferences: ^2.5.3
   url_launcher: ^6.3.2
 
 dev_dependencies:

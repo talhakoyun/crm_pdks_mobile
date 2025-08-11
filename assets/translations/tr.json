@@ -131,20 +131,5 @@
     "alertDescription": "Açıklama alanı zorunludur ve minimum 5 karakterden oluşmalıdır.",
     "nonAppRedirect": "Uygulama Dışı Yönlendirme!",
     "enterTheAddress": "Adresine girmek istediğinize emin misiniz?"
-  },
-  "urls": {
-    "base": "https://cinarceyizcrm.bilmos.com/api/",
-    "login": "auth/login",
-    "logout": "auth/logout",
-    "profile": "user/profile",
-    "permissionList": "holiday/list",
-    "permissionCreate": "holiday/create",
-    "shiftPing": "pdks/ping",
-    "shiftQR": "pdks/zone",
-    "shiftList": "pdks/list",
-    "isAvailable": "isavailable",
-    "register": "auth/register",
-    "refreshToken": "auth/refresh",
-    "map": "https://mt0.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&s=Ga"
   }
 }

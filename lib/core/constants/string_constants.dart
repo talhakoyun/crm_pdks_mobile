@@ -137,7 +137,8 @@ class StringConstants {
   String get enterTheAdress => "dialog.enterTheAddress".tr();
 
   // URLs - These should remain as static values
-  String get mapUrl => "urls.map".tr();
+  String get mapUrl =>
+      "https://mt0.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&s=Ga";
 
   String determineString(int index) {
     switch (index) {
@@ -153,12 +154,13 @@ class StringConstants {
   }
 
   // API URLs - These remain as static strings
-  final String baseUrl = "https://cinarceyizcrm.bilmos.com/api/";
+  final String baseUrl = "https://crm.mavihost.com.tr/api/";
   final String loginUrl = 'auth/login';
   final String logout = 'auth/logout';
   final String profile = "user/profile";
-  final String permissionList = "holiday/list";
-  final String permissionCreate = "holiday/create";
+  final String permissionList = "holidays/list";
+  final String holidayTypeList = "holidays/types";
+  final String permissionCreate = "holidays/store";
   final String shiftPing = "pdks/ping";
   final String shiftQR = "pdks/zone";
   final String shiftList = "pdks/list";

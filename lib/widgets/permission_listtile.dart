@@ -18,12 +18,13 @@ class PermissionListTile extends StatelessWidget with BaseSingleton {
     required this.typeText,
     required this.reasonText,
     required this.address,
+    required this.iconName,
     this.type,
   });
   final int approvalStatus;
   final int? type;
   final String startDate, endDate, confirmText, address, typeText, reasonText;
-
+  final String iconName;
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -40,29 +41,7 @@ class PermissionListTile extends StatelessWidget with BaseSingleton {
             children: [
               Row(
                 children: [
-                  SvgPicture.asset(
-                    (type == 1)
-                        ? imgCons.free
-                        : (type == 2)
-                        ? imgCons.administrative
-                        : (type == 3)
-                        ? imgCons.annualpermit
-                        : (type == 4)
-                        ? imgCons.health
-                        : (type == 5)
-                        ? imgCons.maternity
-                        : (type == 6)
-                        ? imgCons.breastfeeding
-                        : (type == 7)
-                        ? imgCons.paternity
-                        : (type == 8)
-                        ? imgCons.wedding
-                        : (type == 9)
-                        ? imgCons.death
-                        : (type == 10)
-                        ? imgCons.birthPerm
-                        : imgCons.administrative,
-                  ),
+                  SvgPicture.asset(iconName),
                   Padding(
                     padding: context.onlyLeftPaddingLow,
                     child: Column(
@@ -133,9 +112,9 @@ class PermissionListTile extends StatelessWidget with BaseSingleton {
                     child: Center(
                       child: Text.rich(
                         TextSpan(
-                          text: Jiffy.parseFromDateTime(
-                            startDate as DateTime,
-                          ).format(pattern: 'dd.MM.yyyy, HH:mm'),
+                          text: Jiffy.parse(
+                            startDate,
+                          ).format(pattern: 'dd.MM.yyyy'),
                           style: context.textTheme.bodyMedium!.copyWith(
                             color: context.colorScheme.onTertiary,
                           ),
@@ -155,9 +134,9 @@ class PermissionListTile extends StatelessWidget with BaseSingleton {
                     child: Center(
                       child: Text.rich(
                         TextSpan(
-                          text: Jiffy.parseFromDateTime(
-                            endDate as DateTime,
-                          ).format(pattern: 'dd.MM.yyyy, HH:mm'),
+                          text: Jiffy.parse(
+                            endDate,
+                          ).format(pattern: 'dd.MM.yyyy'),
                           style: context.textTheme.bodyMedium!.copyWith(
                             color: context.colorScheme.onTertiary,
                           ),

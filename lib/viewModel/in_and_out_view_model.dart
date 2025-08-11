@@ -1,7 +1,9 @@
 // ignore_for_file: use_build_context_synchronously,
 
+import 'package:crm_pdks_mobile/core/constants/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
@@ -479,13 +481,32 @@ class InAndOutViewModel extends BaseViewModel {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(content),
-          content: Icon(Icons.login, color: color),
+          backgroundColor: context.colorScheme.onError,
+          titleTextStyle: context.textTheme.titleLarge,
+          title: Text(content, textAlign: TextAlign.center),
+          actionsAlignment: MainAxisAlignment.center,
+          alignment: Alignment.center,
+          content: Padding(
+            padding: context.paddingLow,
+            child: SvgPicture.asset(
+              fit: BoxFit.contain,
+              colorFilter: ColorFilter.mode(
+                context.colorScheme.tertiaryContainer,
+                BlendMode.srcIn,
+              ),
+              ImageConstants.instance.start,
+              width: SizeConfig.instance.widthSize(context, 5),
+              height: SizeConfig.instance.heightSize(context, 35),
+            ),
+          ),
           actions: [
-            TextButton(onPressed: onPressed, child: Text('Tamam')),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('İptal'),
+              child: Text(StringConstants.instance.cancelButtonText),
+            ),
+            TextButton(
+              onPressed: onPressed,
+              child: Text(StringConstants.instance.okey),
             ),
           ],
         );

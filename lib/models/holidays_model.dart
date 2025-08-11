@@ -1,40 +1,119 @@
 import 'dart:convert';
 import 'base_model.dart';
 
+class HolidayTypeInfo {
+  final int? id;
+  final String? title;
+  final String? iconName;
+
+  HolidayTypeInfo({this.id, this.title, this.iconName});
+
+  factory HolidayTypeInfo.fromJson(Map<String, dynamic> json) {
+    return HolidayTypeInfo(
+      id: json['id'],
+      title: json['title'],
+      iconName: json['icon_name'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['title'] = title;
+    data['icon_name'] = iconName;
+    return data;
+  }
+
+  @override
+  String toString() =>
+      'HolidayTypeInfo(id: $id, title: $title, iconName: $iconName)';
+}
+
+class BranchInfo {
+  final int? id;
+  final String? title;
+
+  BranchInfo({this.id, this.title});
+
+  factory BranchInfo.fromJson(Map<String, dynamic> json) {
+    return BranchInfo(id: json['id'], title: json['title']);
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['title'] = title;
+    return data;
+  }
+
+  @override
+  String toString() => 'BranchInfo(id: $id, title: $title)';
+}
+
+class CompanyInfo {
+  final int? id;
+  final String? title;
+
+  CompanyInfo({this.id, this.title});
+
+  factory CompanyInfo.fromJson(Map<String, dynamic> json) {
+    return CompanyInfo(id: json['id'], title: json['title']);
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['title'] = title;
+    return data;
+  }
+
+  @override
+  String toString() => 'CompanyInfo(id: $id, title: $title)';
+}
+
 class HolidayDataModel {
   final int? id;
-  final String? reason;
-  final String? address;
   final String? startDate;
   final String? endDate;
-  final int? type;
-  final String? typeText;
-  final int? confirm;
-  final String? confirmText;
+  final int? duration;
+  final HolidayTypeInfo? type;
+  final int? status;
+  final String? statusText;
+  final String? note;
+  final BranchInfo? branch;
+  final CompanyInfo? company;
 
   HolidayDataModel({
     this.id,
-    this.reason,
-    this.address,
     this.startDate,
     this.endDate,
+    this.duration,
     this.type,
-    this.typeText,
-    this.confirm,
-    this.confirmText,
+    this.status,
+    this.statusText,
+    this.note,
+    this.branch,
+    this.company,
   });
 
   factory HolidayDataModel.fromJson(Map<String, dynamic> json) {
     return HolidayDataModel(
       id: json['id'],
-      reason: json['reason'],
-      address: json['address'],
       startDate: json['start_date'],
       endDate: json['end_date'],
-      type: json['type'],
-      typeText: json['type_text'],
-      confirm: json['confirm'],
-      confirmText: json['confirm_text'],
+      duration: json['duration'],
+      type: json['type'] != null
+          ? HolidayTypeInfo.fromJson(json['type'])
+          : null,
+      status: json['status'],
+      statusText: json['status_text'],
+      note: json['note'],
+      branch: json['branch'] != null
+          ? BranchInfo.fromJson(json['branch'])
+          : null,
+      company: json['company'] != null
+          ? CompanyInfo.fromJson(json['company'])
+          : null,
     );
   }
 
@@ -47,34 +126,32 @@ class HolidayDataModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
-    data['reason'] = reason;
-    data['address'] = address;
     data['start_date'] = startDate;
     data['end_date'] = endDate;
-    data['type'] = type;
-    data['type_text'] = typeText;
-    data['confirm'] = confirm;
-    data['confirm_text'] = confirmText;
+    data['duration'] = duration;
+    data['type'] = type?.toJson();
+    data['status'] = status;
+    data['status_text'] = statusText;
+    data['note'] = note;
+    data['branch'] = branch?.toJson();
+    data['company'] = company?.toJson();
     return data;
   }
 
-  bool get isApproved => confirm == 1;
+  bool get isApproved => status == 1;
 
-  bool get isRejected => confirm == 0;
+  bool get isRejected => status == 2;
 
-  bool get isPending => confirm == null;
+  bool get isPending => status == 0;
 
   @override
   String toString() {
-    return 'HolidayDataModel(id: $id, reason: $reason, startDate: $startDate, endDate: $endDate, confirm: $confirm)';
+    return 'HolidayDataModel(id: $id, startDate: $startDate, endDate: $endDate, duration: $duration, status: $status, branch: $branch, company: $company)';
   }
 }
 
-/// Holiday List response için BaseModel tip tanımı
-/// BaseModel<List<HolidayDataModel>> olarak kullanılır
 typedef HolidayListModel = BaseModel<List<HolidayDataModel>>;
 
-/// JSON string'den HolidayListModel oluşturmak için helper fonksiyon
 HolidayListModel holidaysModelFromJson(String str) {
   final json = jsonDecode(str);
   return BaseModel.fromJsonList(
@@ -83,5 +160,4 @@ HolidayListModel holidaysModelFromJson(String str) {
   );
 }
 
-/// HolidayListModel'i JSON string'e çevirmek için helper fonksiyon
 String holidaysModelToJson(HolidayListModel data) => json.encode(data.toJson());

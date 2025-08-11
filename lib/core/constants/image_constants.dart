@@ -22,7 +22,7 @@ class ImageConstants {
   String get administrative => toSVG('administrative');
   String get annualpermit => toSVG('annualPermit');
   String get approved => toSVG('approved');
-  String get birthPerm => toSVG('birthPerm');
+  String get birthperm => toSVG('birthPerm');
   String get breastfeeding => toSVG('breastfeeding');
   String get ddIcon => toSVG('ddIcon'); //xx
   String get death => toSVG('death');
