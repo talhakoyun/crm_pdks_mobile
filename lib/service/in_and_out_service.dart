@@ -123,7 +123,7 @@ class InAndOutService {
     try {
       String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
       var response = await client
-          .get(
+          .post(
             Uri.parse(strCons.baseUrl + strCons.shiftList),
             headers: {
               'Accept': 'application/json',

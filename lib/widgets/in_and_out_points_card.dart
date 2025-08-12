@@ -48,7 +48,7 @@ class InAndOutsPointsCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  startDate!,
+                  startDate ?? '--',
                   style: context.textTheme.headlineSmall!.copyWith(
                     color: context.colorScheme.tertiaryContainer,
                   ),
@@ -67,9 +67,9 @@ class InAndOutsPointsCard extends StatelessWidget {
                 ),
                 Text.rich(
                   TextSpan(
-                    text: Jiffy.parseFromDateTime(
-                      dateTime as DateTime,
-                    ).format(pattern: 'dd\nMMM '),
+                    text: dateTime != null && dateTime!.isNotEmpty
+                        ? Jiffy.parse(dateTime!).format(pattern: 'dd\nMMM ')
+                        : '--\n--',
                     style: context.textTheme.headlineSmall!.copyWith(
                       color: context.colorScheme.surface,
                       fontWeight: FontWeight.w400,
@@ -97,7 +97,7 @@ class InAndOutsPointsCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  endDate!,
+                  endDate ?? '--',
                   style: context.textTheme.headlineSmall!.copyWith(
                     color: context.colorScheme.error,
                   ),

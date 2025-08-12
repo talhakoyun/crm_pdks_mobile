@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../core/base/base_singleton.dart';
@@ -40,18 +41,15 @@ class _ProfileViewState extends State<ProfileView>
                   color: context.colorScheme.surface,
                 ),
               ),
-              // actions: [
-              //   IconButton(
-              //     onPressed: () {
-              //       Fluttertoast.showToast(msg: strCons.profileLoading);
-              //       value.getProfile(context, false);
-              //     },
-              //     icon: Icon(
-              //       Icons.refresh,
-              //       color: context.colorScheme.surface,
-              //     ),
-              //   ),
-              // ],
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    Fluttertoast.showToast(msg: strCons.profileLoading);
+                    value.getProfile(context, false);
+                  },
+                  icon: Icon(Icons.refresh, color: context.colorScheme.surface),
+                ),
+              ],
             ),
             body: Container(
               margin: const EdgeInsets.all(12),
@@ -103,7 +101,7 @@ class _ProfileViewState extends State<ProfileView>
                   ),
                   context.emptySizedHeightBoxLow2x,
                   ProfileTextInput(
-                    title: strCons.mission,
+                    title: strCons.gender,
                     description: value.gender,
                     heightCon: Platform.isIOS
                         ? SizerUtil.height > 670
@@ -112,7 +110,7 @@ class _ProfileViewState extends State<ProfileView>
                         : SizerUtil.height > 535
                         ? sizeConfig.heightSize(context, 65)
                         : sizeConfig.heightSize(context, 80),
-                    icon: Icons.mail,
+                    icon: Icons.transgender_sharp,
                     iconSize: 22.scalablePixel,
                   ),
                   context.emptySizedHeightBoxLow2x,

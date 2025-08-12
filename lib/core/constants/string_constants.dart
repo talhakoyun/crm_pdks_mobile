@@ -18,6 +18,7 @@ class StringConstants {
   String get description => "general.description".tr();
   String get finish => "general.finish".tr();
   String get mission => "general.mission".tr();
+  String get gender => "general.gender".tr();
   String get name => "general.name".tr();
   String get send => "general.send".tr();
   String get shift => "general.shift".tr();
@@ -161,9 +162,9 @@ class StringConstants {
   final String permissionList = "holidays/list";
   final String holidayTypeList = "holidays/types";
   final String permissionCreate = "holidays/store";
-  final String shiftPing = "pdks/ping";
-  final String shiftQR = "pdks/zone";
-  final String shiftList = "pdks/list";
+  final String shiftPing = "shift/follow/store";
+  final String shiftQR = "shift/follow/qr/store";
+  final String shiftList = "shift/follow/list";
   final String isAvalible = "isavailable";
   final String register = "auth/register";
   final String refreshToken = "auth/refresh";

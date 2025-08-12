@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'base_model.dart';
+
 class UserModel {
   final int? id;
   final String? name;
@@ -9,6 +12,7 @@ class UserModel {
   final Company? company;
   final Department? department;
   final Settings? settings;
+  final Shift? shift;
   final String? birthday;
   final String? profilePhoto;
   final String? tokenType;
@@ -27,6 +31,7 @@ class UserModel {
     this.company,
     this.department,
     this.settings,
+    this.shift,
     this.birthday,
     this.profilePhoto,
     this.tokenType,
@@ -53,6 +58,7 @@ class UserModel {
       settings: json['settings'] != null
           ? Settings.fromJson(json['settings'])
           : null,
+      shift: json['shift'] != null ? Shift.fromJson(json['shift']) : null,
       birthday: json['birthday'],
       profilePhoto: json['profile_photo'],
       tokenType: json['token_type'],
@@ -78,6 +84,7 @@ class UserModel {
     if (company != null) data['company'] = company!.toJson();
     if (department != null) data['department'] = department!.toJson();
     if (settings != null) data['settings'] = settings!.toJson();
+    if (shift != null) data['shift'] = shift!.toJson();
     data['birthday'] = birthday;
     data['profile_photo'] = profilePhoto;
     data['token_type'] = tokenType;
@@ -100,15 +107,43 @@ class UserModel {
 class Role {
   final int? id;
   final String? name;
+  final String? slug;
+  final dynamic permissions;
   final int? isActive;
+  final dynamic createdBy;
+  final dynamic updatedBy;
+  final dynamic deletedBy;
+  final String? createdAt;
+  final String? updatedAt;
+  final String? deletedAt;
 
-  Role({this.id, this.name, this.isActive});
+  Role({
+    this.id,
+    this.name,
+    this.slug,
+    this.permissions,
+    this.isActive,
+    this.createdBy,
+    this.updatedBy,
+    this.deletedBy,
+    this.createdAt,
+    this.updatedAt,
+    this.deletedAt,
+  });
 
   factory Role.fromJson(Map<String, dynamic> json) {
     return Role(
       id: json['id'],
       name: json['name'],
+      slug: json['slug'],
+      permissions: json['permissions'],
       isActive: json['is_active'],
+      createdBy: json['created_by'],
+      updatedBy: json['updated_by'],
+      deletedBy: json['deleted_by'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
+      deletedAt: json['deleted_at'],
     );
   }
 
@@ -116,12 +151,21 @@ class Role {
     final Map<String, dynamic> data = {};
     data['id'] = id;
     data['name'] = name;
+    data['slug'] = slug;
+    data['permissions'] = permissions;
     data['is_active'] = isActive;
+    data['created_by'] = createdBy;
+    data['updated_by'] = updatedBy;
+    data['deleted_by'] = deletedBy;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    data['deleted_at'] = deletedAt;
     return data;
   }
 
   @override
-  String toString() => 'Role(id: $id, name: $name, isActive: $isActive)';
+  String toString() =>
+      'Role(id: $id, name: $name, slug: $slug, isActive: $isActive)';
 }
 
 class Company {
@@ -174,21 +218,81 @@ class Department {
 
 class Settings {
   final bool? outside;
-  final bool? zone;
 
-  Settings({this.outside, this.zone});
+  Settings({this.outside});
 
   factory Settings.fromJson(Map<String, dynamic> json) {
-    return Settings(outside: json['outside'], zone: json['zone']);
+    return Settings(outside: json['outside']);
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
     data['outside'] = outside;
-    data['zone'] = zone;
     return data;
   }
 
   @override
-  String toString() => 'Settings(outside: $outside, zone: $zone)';
+  String toString() => 'Settings(outside: $outside)';
 }
+
+class Shift {
+  final String? start;
+  final String? end;
+  final Tolerance? tolerance;
+
+  Shift({this.start, this.end, this.tolerance});
+
+  factory Shift.fromJson(Map<String, dynamic> json) {
+    return Shift(
+      start: json['start'],
+      end: json['end'],
+      tolerance: json['tolerance'] != null
+          ? Tolerance.fromJson(json['tolerance'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {};
+    data['start'] = start;
+    data['end'] = end;
+    if (tolerance != null) data['tolerance'] = tolerance!.toJson();
+    return data;
+  }
+
+  @override
+  String toString() => 'Shift(start: $start, end: $end, tolerance: $tolerance)';
+}
+
+class Tolerance {
+  final String? start;
+  final String? end;
+
+  Tolerance({this.start, this.end});
+
+  factory Tolerance.fromJson(Map<String, dynamic> json) {
+    return Tolerance(start: json['start'], end: json['end']);
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {};
+    data['start'] = start;
+    data['end'] = end;
+    return data;
+  }
+
+  @override
+  String toString() => 'Tolerance(start: $start, end: $end)';
+}
+
+typedef UserLoginModel = BaseModel<List<UserModel>>;
+
+UserLoginModel userLoginModelFromJson(String str) {
+  final json = jsonDecode(str);
+  return BaseModel.fromJsonList(
+    json,
+    (jsonList) => UserModel.fromJsonList(jsonList),
+  );
+}
+
+String userLoginModelToJson(UserLoginModel data) => json.encode(data.toJson());

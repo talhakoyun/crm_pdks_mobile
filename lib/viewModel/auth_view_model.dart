@@ -11,6 +11,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../widgets/launch_url.dart';
 import '../core/base/view_model/base_view_model.dart';
 import '../core/constants/device_constants.dart';
+
 import '../core/constants/navigation_constants.dart';
 import '../core/constants/string_constants.dart';
 import '../core/extension/context_extension.dart';
@@ -58,7 +59,6 @@ class AuthViewModel extends BaseViewModel {
   String? shiftName = "";
   String? department = "";
   bool? outside;
-
   bool? zone;
 
   AuthViewModel({
@@ -732,8 +732,32 @@ class AuthViewModel extends BaseViewModel {
       PreferencesKeys.ROLE,
       user.role?.name ?? "",
     );
-    // TITLE field'ı UserModel'de yok, boş bırak veya kaldır
-    // await _storageService.setStringValue(PreferencesKeys.TITLE, "");
+
+    // Shift bilgilerini kaydet
+    if (user.shift != null) {
+      await _storageService.setStringValue(
+        PreferencesKeys.SHIFTNAME,
+        "Default Shift", // API'de shift name yok, default değer
+      );
+      await _storageService.setStringValue(
+        PreferencesKeys.STARTDATE,
+        user.shift!.start ?? "belirtilmedi",
+      );
+      await _storageService.setStringValue(
+        PreferencesKeys.ENDDATE,
+        user.shift!.end ?? "belirtilmedi",
+      );
+      if (user.shift!.tolerance != null) {
+        await _storageService.setStringValue(
+          PreferencesKeys.STARTTDATE,
+          user.shift!.tolerance!.start ?? "00:00",
+        );
+        await _storageService.setStringValue(
+          PreferencesKeys.ENDTDATE,
+          user.shift!.tolerance!.end ?? "00:00",
+        );
+      }
+    }
   }
 
   Future<void> _storeCompanyData(dynamic companyData) async {
@@ -773,10 +797,8 @@ class AuthViewModel extends BaseViewModel {
       PreferencesKeys.OUTSIDE,
       settingsData.outside ?? false,
     );
-    await _storageService.setBoolValue(
-      PreferencesKeys.ZONE,
-      settingsData.zone ?? false,
-    );
+    // Zone için default değer - model'de olmadığı için
+    await _storageService.setBoolValue(PreferencesKeys.ZONE, false);
   }
 
   Future<void> setDataShared(BaseModel<List<UserModel>> loginModel) async {
@@ -807,13 +829,12 @@ class AuthViewModel extends BaseViewModel {
     compAddress = _storageService.getStringValue(PreferencesKeys.COMPADDRESS);
     startDate = _storageService.getStringValue(PreferencesKeys.STARTDATE);
     endDate = _storageService.getStringValue(PreferencesKeys.ENDDATE);
-    startTDate = _storageService.getStringValue(PreferencesKeys.STARTDATE);
+    startTDate = _storageService.getStringValue(PreferencesKeys.STARTTDATE);
     endTDate = _storageService.getStringValue(PreferencesKeys.ENDTDATE);
     department = _storageService.getStringValue(PreferencesKeys.DEPARTMENT);
     email = _storageService.getStringValue(PreferencesKeys.EMAIL);
     phone = _storageService.getStringValue(PreferencesKeys.PHONE);
     outside = _storageService.getBoolValue(PreferencesKeys.OUTSIDE);
-
     zone = _storageService.getBoolValue(PreferencesKeys.ZONE);
     notifyListeners();
   }

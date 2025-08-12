@@ -19,32 +19,44 @@ class InAndOutListViewModel extends BaseViewModel {
   InAndOutListViewModel() {
     shiftStatus = ShiftStatus.loading;
   }
-  void fetchList(BuildContext context) async {
-    shiftStatus = ShiftStatus.loading;
-    EventsModel shiftListModel = await inAndOutService.shiftList();
-    if (shiftListModel.status!) {
-      shiftListItems = shiftListModel.data!;
-      shiftStatus = ShiftStatus.loaded;
-      notifyListeners();
-    } else {
-      shiftStatus = ShiftStatus.loadingFailed;
-      CustomSnackBar(
-        context,
-        shiftListModel.message!,
-        backgroundColor: context.colorScheme.error,
-      );
-      notifyListeners();
-    }
-  }
-
-  void changeExpanded(index) {
-    shiftListItems[index].expanded = !shiftListItems[index].expanded!;
-    notifyListeners();
-  }
 
   @override
   void disp() {}
 
   @override
   void init() {}
+
+  // Deprecated method, use init() instead
+  void fetchList(BuildContext context) async {
+    await fetchShiftList(context);
+  }
+
+  Future<void> fetchShiftList(BuildContext context) async {
+    shiftStatus = ShiftStatus.loading;
+    notifyListeners();
+
+    try {
+      EventsModel shiftListModel = await inAndOutService.shiftList();
+      if (shiftListModel.status!) {
+        shiftListItems = shiftListModel.data!;
+        // Veriler başarıyla yüklendi
+        shiftStatus = ShiftStatus.loaded;
+      } else {
+        shiftStatus = ShiftStatus.loadingFailed;
+        CustomSnackBar(
+          context,
+          shiftListModel.message!,
+          backgroundColor: context.colorScheme.error,
+        );
+      }
+    } catch (e) {
+      shiftStatus = ShiftStatus.loadingFailed;
+      CustomSnackBar(
+        context,
+        'Veri yüklenirken hata oluştu',
+        backgroundColor: context.colorScheme.error,
+      );
+    }
+    notifyListeners();
+  }
 }
