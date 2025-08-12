@@ -41,7 +41,11 @@ class PermissionListTile extends StatelessWidget with BaseSingleton {
             children: [
               Row(
                 children: [
-                  SvgPicture.asset(iconName),
+                  SvgPicture.asset(
+                    iconName.isNotEmpty
+                        ? imgCons.toSVG(iconName)
+                        : imgCons.administrative,
+                  ),
                   Padding(
                     padding: context.onlyLeftPaddingLow,
                     child: Column(

@@ -25,7 +25,8 @@ void main() async {
     (options) {
       options
         ..dsn =
-            "https://345e62a0b9b4ba4edcfd34cdf837f23f@o4509412197400576.ingest.us.sentry.io/4509412205330432"
+            "https://7a919953b09362912e341a6ee90d5257@o4509829783683072.ingest.de.sentry.io/4509829786959952"
+        ..sendDefaultPii = true
         ..tracesSampleRate = 1.0
         ..environment = kDebugMode ? "development" : "production";
     },

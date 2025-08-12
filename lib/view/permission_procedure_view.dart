@@ -101,7 +101,11 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
                           permissionVM.permissionListItems[index].note ??
                           strCons.unSpecified,
                       iconName:
-                          'imgCons.${permissionVM.permissionListItems[index].type?.iconName}',
+                          permissionVM
+                              .permissionListItems[index]
+                              .type
+                              ?.iconName ??
+                          '',
                     ),
                   )
                 : Center(

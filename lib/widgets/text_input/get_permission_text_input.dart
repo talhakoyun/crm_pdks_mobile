@@ -38,11 +38,12 @@ class GetPermissionInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      cursorColor: context.colorScheme.surface,
+      cursorColor: context.colorScheme.onError,
       controller: controller,
       keyboardType: textInputType,
-      style: textStyle ??
-          context.textTheme.bodyLarge!.copyWith(
+      style:
+          textStyle ??
+          context.primaryTextTheme.bodyLarge!.copyWith(
             fontWeight: FontWeight.w400,
           ),
       showCursor: showCursor,
@@ -55,10 +56,9 @@ class GetPermissionInput extends StatelessWidget {
       maxLength: maxLength,
       decoration: InputDecoration(
         constraints: constraints,
-        hintStyle: hintStyle ??
-            context.textTheme.bodyMedium!.copyWith(
-              fontWeight: FontWeight.w400,
-            ),
+        hintStyle:
+            hintStyle ??
+            context.textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.w400),
         prefixIcon: Container(
           margin: margin ?? const EdgeInsets.all(7.5),
           decoration: BoxDecoration(
@@ -80,14 +80,18 @@ class GetPermissionInput extends StatelessWidget {
         alignLabelWithHint: true,
         enabledBorder: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(15)),
-          borderSide:
-              BorderSide(color: context.colorScheme.surface, width: 1.0),
+          borderSide: BorderSide(
+            color: context.colorScheme.surface,
+            width: 1.0,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           //Add this to your code...
           borderRadius: const BorderRadius.all(Radius.circular(15)),
-          borderSide:
-              BorderSide(color: context.colorScheme.surface, width: 1.0),
+          borderSide: BorderSide(
+            color: context.colorScheme.surface,
+            width: 1.0,
+          ),
         ),
       ),
     );

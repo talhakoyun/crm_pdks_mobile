@@ -8,8 +8,8 @@ class CustomColorScheme {
     return _instance;
   }
 
-// Her temada olması gerekenler.
-//-----------------------------------------------------------------------------
+  // Her temada olması gerekenler.
+  //-----------------------------------------------------------------------------
   final Brightness brightnessLight = Brightness.light;
   CustomColorScheme._init();
   final SystemUiOverlayStyle systemUiOverlayLight = SystemUiOverlayStyle.light;
@@ -17,9 +17,9 @@ class CustomColorScheme {
   final Color blackColor = const Color(0xFF000000);
   final Color errorColor = const Color(0xFFAE2E22);
   final Color successColor = const Color(0xFF00C9A5);
-//-----------------------------------------------------------------------------
-//Proje'ye göre değişecekler.
-//xx kullanılmamışlar silinecekleri ifade eder
+  //-----------------------------------------------------------------------------
+  //Proje'ye göre değişecekler.
+  //xx kullanılmamışlar silinecekleri ifade eder
   final Color newPrimaryColor = const Color(0xff6376FD);
   final Color newonPrimaryColor = const Color(0xFF869FFF);
   final Color newSecondaryColor = const Color(0xffFFAE1A);
@@ -37,17 +37,17 @@ class CustomColorScheme {
 
   final MaterialColor colorSwatch =
       const MaterialColor(0xff6376FD, <int, Color>{
-    50: Color(0xff6376FD),
-    100: Color(0xff6376FD),
-    200: Color(0xff6376FD),
-    300: Color(0xff6376FD),
-    400: Color(0xff6376FD),
-    500: Color(0xff6376FD),
-    600: Color(0xff6376FD),
-    700: Color(0xff6376FD),
-    800: Color(0xff6376FD),
-    900: Color(0xff6376FD),
-  });
+        50: Color(0xff6376FD),
+        100: Color(0xff6376FD),
+        200: Color(0xff6376FD),
+        300: Color(0xff6376FD),
+        400: Color(0xff6376FD),
+        500: Color(0xff6376FD),
+        600: Color(0xff6376FD),
+        700: Color(0xff6376FD),
+        800: Color(0xff6376FD),
+        900: Color(0xff6376FD),
+      });
 
   Color determineColor(int index) {
     switch (index) {

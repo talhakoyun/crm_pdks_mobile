@@ -29,6 +29,18 @@ class _GetPermissionViewState extends State<GetPermissionView>
   int type = 0;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final permissionVM = Provider.of<PermissionViewModel>(
+        context,
+        listen: false,
+      );
+      permissionVM.init();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     PermissionViewModel permissionVM = Provider.of<PermissionViewModel>(
       context,
@@ -132,17 +144,24 @@ class _GetPermissionViewState extends State<GetPermissionView>
         maxHeight: sizeConfig.heightSize(context, 55),
         maxWidth: sizeConfig.widthSize(context, 300),
       ),
-      hintText: StringConstants.instance.choose,
+      hintText: permissionVM.typeItems.isEmpty
+          ? 'Yükleniyor...'
+          : StringConstants.instance.choose,
       maxLines: 1,
       minLines: 1,
       readOnly: true,
-      suffixIcon: Icon(
-        Icons.keyboard_arrow_down,
-        color: context.colorScheme.surface,
-      ),
+      suffixIcon: permissionVM.typeItems.isEmpty
+          ? SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Icon(Icons.keyboard_arrow_down, color: context.colorScheme.surface),
       showCursor: false,
       textInputType: TextInputType.text,
-      onTap: () => _showTypePicker(context, permissionVM),
+      onTap: permissionVM.typeItems.isNotEmpty
+          ? () => _showTypePicker(context, permissionVM)
+          : null,
     );
   }
 
@@ -174,17 +193,13 @@ class _GetPermissionViewState extends State<GetPermissionView>
           obscureText: false,
           controller: permissionVM.holidayStartDt,
           hintText: StringConstants.instance.choose,
-          textStyle: context.textTheme.bodyLarge!.copyWith(
+          textStyle: context.primaryTextTheme.bodyLarge!.copyWith(
             fontWeight: FontWeight.w400,
             fontSize: 10,
           ),
           maxLines: 1,
           minLines: 1,
           readOnly: true,
-          suffixIcon: Icon(
-            Icons.keyboard_arrow_down,
-            color: context.colorScheme.surface,
-          ),
           showCursor: false,
           textInputType: TextInputType.text,
           onTap: () => _showStartDatePicker(context, permissionVM),
@@ -221,17 +236,13 @@ class _GetPermissionViewState extends State<GetPermissionView>
           ),
           controller: permissionVM.holidayEndDt,
           hintText: StringConstants.instance.choose,
-          textStyle: context.textTheme.bodyLarge!.copyWith(
+          textStyle: context.primaryTextTheme.bodyLarge!.copyWith(
             fontWeight: FontWeight.w400,
             fontSize: 10,
           ),
           maxLines: 1,
           minLines: 1,
           readOnly: true,
-          suffixIcon: Icon(
-            Icons.keyboard_arrow_down,
-            color: context.colorScheme.surface,
-          ),
           showCursor: false,
           textInputType: TextInputType.text,
           onTap: () => _showEndDatePicker(context, permissionVM),
@@ -311,73 +322,78 @@ class _GetPermissionViewState extends State<GetPermissionView>
   }
 
   void _showTypePicker(BuildContext ctx, PermissionViewModel permissionVM) {
+    if (permissionVM.typeItems.isEmpty) {
+      permissionVM.fetchHolidayTypes();
+      return;
+    }
+
     showCupertinoModalPopup(
       context: ctx,
-      builder:
-          (_) => Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              SizedBox(
-                height: SizerUtil.height * .2,
-                child: CupertinoPicker(
-                  backgroundColor: Colors.white,
-                  itemExtent: 30,
-                  scrollController: FixedExtentScrollController(initialItem: 0),
-                  children: [
-                    for (var i in permissionVM.typeItems)
-                      Text(
-                        i,
-                        style: const TextStyle(fontSize: 18),
-                        textAlign: TextAlign.center,
-                      ),
-                  ],
-                  onSelectedItemChanged: (int index) {
-                    permissionVM.holidayType.text =
-                        permissionVM.typeItems[index];
-                    type = index + 1;
-                  },
-                ),
-              ),
-            ],
+      builder: (_) => Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          SizedBox(
+            height: SizerUtil.height * .2,
+            child: CupertinoPicker(
+              backgroundColor: Colors.white,
+              itemExtent: 30,
+              scrollController: FixedExtentScrollController(initialItem: 0),
+              children: [
+                for (var type in permissionVM.typeItems)
+                  Text(
+                    type.title ?? '',
+                    style: const TextStyle(fontSize: 18),
+                    textAlign: TextAlign.center,
+                  ),
+              ],
+              onSelectedItemChanged: (int index) {
+                final selectedType = permissionVM.typeItems[index];
+                permissionVM.holidayType.text = selectedType.title ?? '';
+                type = selectedType.id ?? 0;
+              },
+            ),
           ),
+        ],
+      ),
     ).whenComplete(() {
-      if (type == 0) {
-        type = 1;
+      if (type == 0 && permissionVM.typeItems.isNotEmpty) {
+        final firstType = permissionVM.typeItems.first;
+        type = firstType.id ?? 0;
+        permissionVM.holidayType.text = firstType.title ?? '';
       }
-      permissionVM.holidayType.text = permissionVM.typeItems[type - 1];
     });
   }
 
   void _showStartDatePicker(ctx, PermissionViewModel permissionVM) {
     showCupertinoModalPopup(
       context: ctx,
-      builder:
-          (_) => Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              SizedBox(
-                height: SizerUtil.height * .2,
-                child: CupertinoDatePicker(
-                  minimumDate: DateTime.now(),
-                  backgroundColor: Colors.white,
-                  use24hFormat: true,
-                  initialDateTime: DateTime.now(),
-                  onDateTimeChanged: (val) {
-                    endDt = DateTime(1890);
-                    permissionVM.holidayEndDt.text = "";
-                    startDt = val;
-                    permissionVM.holidayStartDt.text = 
-                    Jiffy.parseFromDateTime(startDt).format(pattern:'dd.MM.yyyy, HH:mm');
-                  },
-                ),
-              ),
-            ],
+      builder: (_) => Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          SizedBox(
+            height: SizerUtil.height * .2,
+            child: CupertinoDatePicker(
+              minimumDate: DateTime.now(),
+              backgroundColor: Colors.white,
+              use24hFormat: true,
+              initialDateTime: DateTime.now(),
+              onDateTimeChanged: (val) {
+                endDt = DateTime(1890);
+                permissionVM.holidayEndDt.text = "";
+                startDt = val;
+                permissionVM.holidayStartDt.text = Jiffy.parseFromDateTime(
+                  startDt,
+                ).format(pattern: 'dd.MM.yyyy, HH:mm');
+              },
+            ),
           ),
+        ],
+      ),
     ).whenComplete(() {
       if (permissionVM.holidayStartDt.text.isEmpty) {
-        permissionVM.holidayStartDt.text = 
-        Jiffy.parseFromDateTime(DateTime.now()).format(pattern:'dd.MM.yyyy, HH:mm');
-        
+        permissionVM.holidayStartDt.text = Jiffy.parseFromDateTime(
+          DateTime.now(),
+        ).format(pattern: 'dd.MM.yyyy, HH:mm');
       }
     });
   }
@@ -385,39 +401,37 @@ class _GetPermissionViewState extends State<GetPermissionView>
   void _showEndDatePicker(ctx, PermissionViewModel permissionVM) {
     showCupertinoModalPopup(
       context: ctx,
-      builder:
-          (_) => Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              SizedBox(
-                height: SizerUtil.height * .2,
-                child: CupertinoDatePicker(
-                  minimumDate: DateTime.now(),
-                  backgroundColor: Colors.white,
-                  use24hFormat: true,
-                  initialDateTime: DateTime.now(),
-                  onDateTimeChanged: (val) {
-                    endDt = val;
+      builder: (_) => Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          SizedBox(
+            height: SizerUtil.height * .2,
+            child: CupertinoDatePicker(
+              minimumDate: DateTime.now(),
+              backgroundColor: Colors.white,
+              use24hFormat: true,
+              initialDateTime: DateTime.now(),
+              onDateTimeChanged: (val) {
+                endDt = val;
 
-                    permissionVM.holidayEndDt.text = 
-                    Jiffy.parseFromDateTime(endDt).format(pattern:'dd.MM.yyyy, HH:mm');
-                  },
-                ),
-              ),
-            ],
+                permissionVM.holidayEndDt.text = Jiffy.parseFromDateTime(
+                  endDt,
+                ).format(pattern: 'dd.MM.yyyy, HH:mm');
+              },
+            ),
           ),
+        ],
+      ),
     ).whenComplete(() {
       if (permissionVM.holidayEndDt.text.isEmpty) {
-        permissionVM.holidayEndDt.text = 
-        Jiffy.parseFromDateTime(
+        permissionVM.holidayEndDt.text = Jiffy.parseFromDateTime(
           DateTime(
             DateTime.now().year,
             DateTime.now().month,
             DateTime.now().day + 1,
           ),
-        ).format(pattern:'dd.MM.yyyy, HH:mm');
+        ).format(pattern: 'dd.MM.yyyy, HH:mm');
       }
     });
   }
 }
-
