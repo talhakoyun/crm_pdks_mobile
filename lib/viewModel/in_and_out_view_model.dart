@@ -11,11 +11,12 @@ import '../core/base/view_model/base_view_model.dart';
 import '../core/constants/device_constants.dart';
 import '../core/constants/image_constants.dart';
 import '../core/constants/string_constants.dart';
+import '../core/enums/alert_capability_situation.dart';
 import '../core/extension/context_extension.dart';
 import '../core/init/network/connectivity/network_connectivity.dart';
 import '../models/last_event_model.dart';
 import '../service/in_and_out_service.dart';
-import '../view/home_view.dart';
+
 import '../view/qr_scanner_view.dart';
 import '../widgets/dialog/custom_dialog.dart';
 import '../widgets/dialog/custom_illegal_dialog.dart';

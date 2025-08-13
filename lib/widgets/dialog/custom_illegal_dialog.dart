@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../core/constants/device_constants.dart';
 import '../../core/constants/string_constants.dart';
+import '../../core/enums/alert_capability_situation.dart';
 import '../../core/extension/context_extension.dart';
 import '../../core/init/size/size_extension.dart';
 import '../../core/position/location_manager.dart';
-import '../../view/home_view.dart';
+
 import '../../viewModel/in_and_out_view_model.dart';
 import '../../widgets/text_input/custom_text_input.dart';
 import '../button/dialogbutton.dart';
@@ -128,6 +129,7 @@ class CustomIllegalDialog {
     switch (situation) {
       case AlertCabilitySituation.onlineInEvent:
         return () async {
+          final errorColor = context.colorScheme.error; // Store before async
           var data = await inAndOutVM.executeShiftProcedure(
             type: 1, // Giriş
             longitude: locationManager.currentPosition!.longitude,
@@ -139,19 +141,22 @@ class CustomIllegalDialog {
             myNote: controller.text,
           );
 
-          Navigator.pop(context);
-          if (data['status']) {
-            CustomSnackBar(scaffoldKey.currentContext!, message);
-          } else {
-            CustomSnackBar(
-              scaffoldKey.currentContext!,
-              data['message'],
-              backgroundColor: context.colorScheme.error,
-            );
+          if (context.mounted) {
+            Navigator.pop(context);
+            if (data['status']) {
+              CustomSnackBar(scaffoldKey.currentContext!, message);
+            } else {
+              CustomSnackBar(
+                scaffoldKey.currentContext!,
+                data['message'],
+                backgroundColor: errorColor,
+              );
+            }
           }
         };
       case AlertCabilitySituation.onlineOutEvent:
         return () async {
+          final errorColor = context.colorScheme.error; // Store before async
           var data = await inAndOutVM.executeShiftProcedure(
             type: 2, // Çıkış
             longitude: locationManager.currentPosition!.longitude,
@@ -163,15 +168,17 @@ class CustomIllegalDialog {
             myNote: controller.text,
           );
 
-          Navigator.pop(context);
-          if (data['status']) {
-            CustomSnackBar(scaffoldKey.currentContext!, message);
-          } else {
-            CustomSnackBar(
-              scaffoldKey.currentContext!,
-              data['message'],
-              backgroundColor: context.colorScheme.error,
-            );
+          if (context.mounted) {
+            Navigator.pop(context);
+            if (data['status']) {
+              CustomSnackBar(scaffoldKey.currentContext!, message);
+            } else {
+              CustomSnackBar(
+                scaffoldKey.currentContext!,
+                data['message'],
+                backgroundColor: errorColor,
+              );
+            }
           }
         };
       case AlertCabilitySituation.lateInEvent:
