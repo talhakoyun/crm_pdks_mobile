@@ -195,7 +195,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                         inAndOutViewModel.localeManager.getStringValue(
                               PreferencesKeys.GENDER,
                             ) ==
-                            'male'
+                            'Erkek'
                         ? AssetImage(imgCons.male)
                         : AssetImage(imgCons.female),
                     fit: BoxFit.contain,

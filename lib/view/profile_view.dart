@@ -56,7 +56,7 @@ class _ProfileViewState extends State<ProfileView>
               child: ListView(
                 children: [
                   Image.asset(
-                    value.gender == "male" ? imgCons.male : imgCons.female,
+                    value.gender == "Erkek" ? imgCons.male : imgCons.female,
                     height: sizeConfig.widthSize(context, 90),
                     width: sizeConfig.widthSize(context, 90),
                   ),

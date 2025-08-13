@@ -199,7 +199,7 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
                       child: Column(
                         children: [
                           Image(
-                            image: value.gender == 'male'
+                            image: value.gender == 'Erkek'
                                 ? AssetImage(ImageConstants.instance.male)
                                 : AssetImage(ImageConstants.instance.female),
                             fit: BoxFit.contain,

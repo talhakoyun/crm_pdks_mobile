@@ -128,7 +128,8 @@ class CustomIllegalDialog {
     switch (situation) {
       case AlertCabilitySituation.onlineInEvent:
         return () async {
-          var data = await inAndOutVM.inProcedure(
+          var data = await inAndOutVM.executeShiftProcedure(
+            type: 1, // Giriş
             longitude: locationManager.currentPosition!.longitude,
             latitude: locationManager.currentPosition!.latitude,
             deviceId: deviceInfo.deviceId,
@@ -151,7 +152,8 @@ class CustomIllegalDialog {
         };
       case AlertCabilitySituation.onlineOutEvent:
         return () async {
-          var data = await inAndOutVM.outProcedure(
+          var data = await inAndOutVM.executeShiftProcedure(
+            type: 2, // Çıkış
             longitude: locationManager.currentPosition!.longitude,
             latitude: locationManager.currentPosition!.latitude,
             deviceId: deviceInfo.deviceId,

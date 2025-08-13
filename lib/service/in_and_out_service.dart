@@ -72,10 +72,10 @@ class InAndOutService {
   }
 
   Future<Map<String, dynamic>> sendQrShift({
+    required String qrStr,
     required int type,
     required double longitude,
     required double latitude,
-    required int zoneId,
     String? deviceId,
     String? deviceModel,
   }) async {
@@ -89,27 +89,33 @@ class InAndOutService {
             headers: {
               'Accept': 'application/json',
               'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
             },
-            body: {
-              "type": type.toString(),
-              "longitude": longitude.toString(),
-              "latitude": latitude.toString(),
-              "zone": zoneId.toString(),
-              "device_id": deviceId.toString(),
-              "device_model": deviceModel.toString(),
-            },
+            body: json.encode({
+              "qr_str": qrStr,
+              "type": type,
+              "device_id": deviceId,
+              "device_model": deviceModel,
+              "positions": {"latitude": latitude, "longitude": longitude},
+            }),
           )
           .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         if (data['status']) {
-          return {"status": true, "message": "işlem başarılı"};
+          return {
+            "status": true,
+            "message": data['message'] ?? "İşlem başarılı",
+          };
         } else {
           return {"status": false, "message": data['message']};
         }
       } else {
         var data = json.decode(response.body);
-        return {"status": data['status'], "message": data['message']};
+        return {
+          "status": false,
+          "message": data['message'] ?? strCons.errorMessage,
+        };
       }
     } catch (e) {
       return {"status": false, "message": strCons.errorMessage};

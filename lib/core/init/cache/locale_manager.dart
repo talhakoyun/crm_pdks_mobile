@@ -99,6 +99,8 @@ class LocaleManager {
       print(
         '❌ LocaleManager: SharedPreferences is null when trying to get ${key.toString()}',
       );
+      // SharedPreferences null ise yeniden initialize et
+      _initializePreferences();
       return '';
     }
 
@@ -111,6 +113,16 @@ class LocaleManager {
     } catch (e) {
       print('❌ LocaleManager: Error getting ${key.toString()}: $e');
       return '';
+    }
+  }
+
+  // SharedPreferences'ı yeniden initialize etmek için helper method
+  Future<void> _initializePreferences() async {
+    try {
+      _preferences = await SharedPreferences.getInstance();
+      print('✅ LocaleManager: SharedPreferences re-initialized');
+    } catch (e) {
+      print('❌ LocaleManager: Failed to re-initialize SharedPreferences: $e');
     }
   }
 

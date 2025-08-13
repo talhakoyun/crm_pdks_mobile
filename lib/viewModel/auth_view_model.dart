@@ -131,132 +131,40 @@ class AuthViewModel extends BaseViewModel {
     }
   }
 
-  /// Main app initialization with silent login support
-  Future<void> initializeApp(BuildContext context) async {
-    try {
-      // Device validation
-      if (!await _isDeviceValid()) {
-        _navigateToHackScreen();
-        return;
-      }
+  void splashCheck(BuildContext context) async {
+    bool? isRealDevice = await _deviceService.isRealDevice();
 
-      // Network check and silent login
-      await _handleOnlineInitialization(context);
-    } catch (e, stackTrace) {
-      _logError('App Initialization', e, stackTrace);
-      _navigateToLoginScreen();
-    }
-  }
+    if (isRealDevice! == false) {
+      navigation.navigateToPageClear(path: NavigationConstants.HACK);
+    } else {
+      if (networkConnectivity.internet) {
+        final isAvailableResult = await _authService.isAvalible();
+        isAvalibleApp = isAvailableResult;
 
-  Future<void> splashCheck(BuildContext context) async {
-    await initializeApp(context);
-  }
-
-  Future<void> _handleOnlineInitialization(BuildContext context) async {
-    // Check app availability first
-    final isAvailableResult = await _authService.isAvalible();
-    isAvalibleApp = isAvailableResult;
-
-    if (!isAvailableResult.isSuccess) {
-      _showErrorDialog(
-        context,
-        isAvailableResult.message ?? StringConstants.instance.errorMessage,
-      );
-      return;
-    }
-
-    // Set register status
-    registerStatus = Platform.isAndroid
-        ? isAvailableResult.data?.android?.isRegister
-        : isAvailableResult.data?.ios?.isRegister;
-
-    // Attempt silent login
-    await _attemptSilentLogin(context);
-  }
-
-  Future<void> _attemptSilentLogin(BuildContext context) async {
-    final token = _storageService.getStringValue(PreferencesKeys.TOKEN);
-
-    dev.log(
-      'Token read from storage: ${token.isNotEmpty ? "Token found (${token.substring(0, 10)}...)" : "No token found"}',
-      name: 'AuthViewModel',
-    );
-
-    if (token.isEmpty) {
-      dev.log(
-        'No stored token found, navigating to login',
-        name: 'AuthViewModel',
-      );
-      await getProfile(context, true);
-      return;
-    }
-
-    try {
-      dev.log(
-        'Attempting silent login by fetching profile',
-        name: 'AuthViewModel',
-      );
-
-      // Direkt profile'i çek - başarılıysa token geçerli demektir
-      final profileResult = await _authService.profile();
-
-      if (profileResult.isSuccess && profileResult.hasData) {
-        try {
-          dev.log(
-            'Silent login successful - profile fetched',
-            name: 'AuthViewModel',
+        if (isAvailableResult.isSuccess) {
+          registerStatus = Platform.isAndroid
+              ? isAvailableResult.data?.android?.isRegister
+              : isAvailableResult.data?.ios?.isRegister;
+          getProfile(context, true);
+        } else {
+          _showErrorDialog(
+            context,
+            isAvailableResult.message ?? StringConstants.instance.errorMessage,
           );
-          user = profileResult.data;
-          event = SignStatus.logined;
-          await profileSetDataShared(profileResult);
-          await _handleAppVersionCheck(context);
-          notifyListeners();
-          navigation.navigateToPageClear(path: NavigationConstants.HOME);
-        } catch (e, stackTrace) {
-          _logError('Profile Data Processing', e, stackTrace);
-          await _clearInvalidToken();
-          await getProfile(context, true);
         }
       } else {
-        dev.log(
-          'Silent login failed - profile fetch failed: ${profileResult.message}',
-          name: 'AuthViewModel',
-        );
-        await _clearInvalidToken();
-        await getProfile(context, true);
+        // Offline durumda token varsa home'a git
+        final token = _storageService.getStringValue(PreferencesKeys.TOKEN);
+        if (token.isNotEmpty) {
+          navigation.navigateToPageClear(path: NavigationConstants.HOME);
+        } else {
+          navigation.navigateToPageClear(
+            path: NavigationConstants.LOGIN,
+            data: registerStatus,
+          );
+        }
       }
-    } catch (e, stackTrace) {
-      _logError('Silent Login', e, stackTrace);
-      await _clearInvalidToken();
-      await getProfile(context, true);
     }
-  }
-
-  Future<void> _clearInvalidToken() async {
-    try {
-      await _storageService.clearAll();
-      event = SignStatus.lyLogin;
-      user = null;
-      accessToken = null;
-      dev.log('Invalid token cleared', name: 'AuthViewModel');
-    } catch (e, stackTrace) {
-      _logError('Clear Invalid Token', e, stackTrace);
-    }
-  }
-
-  void _navigateToLoginScreen() {
-    navigation.navigateToPageClear(
-      path: NavigationConstants.LOGIN,
-      data: registerStatus,
-    );
-  }
-
-  Future<bool> _isDeviceValid() async {
-    return await _deviceService.isRealDevice() ?? false;
-  }
-
-  void _navigateToHackScreen() {
-    navigation.navigateToPageClear(path: NavigationConstants.HACK);
   }
 
   void _showErrorDialog(
@@ -514,67 +422,31 @@ class AuthViewModel extends BaseViewModel {
     );
   }
 
-  Future<void> getProfile([BuildContext? context, bool? isSplash]) async {
-    try {
-      await _fetchUserProfile(context, isSplash);
-      await _handleAppVersionCheck(context);
-    } catch (e, stackTrace) {
-      _logError('Get Profile', e, stackTrace);
-
-      // Sadece splash sırasında login'e dön, normal login sonrası hata durumunda dönme
-      if (isSplash == true) {
-        _navigateToLoginScreen();
-      } else if (context != null) {
-        _showErrorDialog(
-          context,
-          StringConstants.instance.errorMessage,
-          exitOnClose: false,
-        );
-      }
-    }
-  }
-
-  Future<void> _fetchUserProfile(BuildContext? context, bool? isSplash) async {
-    final token = _storageService.getStringValue(PreferencesKeys.TOKEN);
-
-    if (token.isEmpty) {
-      _logError('Profile Fetch', 'No token available');
-      return;
-    }
-
-    try {
+  Future getProfile([BuildContext? context, bool? isSplash]) async {
+    var utoken = _storageService.getStringValue(PreferencesKeys.TOKEN);
+    if (utoken.isNotEmpty) {
       final profileResult = await _authService.profile();
-
       if (profileResult.isSuccess && profileResult.hasData) {
         user = profileResult.data;
-        await profileSetDataShared(profileResult);
-
-        if (isSplash != true && context != null) {
+        if (isSplash == null || isSplash == false) {
           Fluttertoast.showToast(
             msg: StringConstants.instance.successMessage,
             backgroundColor: const Color(0xffFF981A),
           );
         }
+        await profileSetDataShared(profileResult);
       } else {
-        final errorMessage =
-            profileResult.message ?? StringConstants.instance.errorMessage;
-        _logError('Profile Fetch Failed', errorMessage);
-
-        if (isSplash != true && context != null) {
+        if (isSplash == null || isSplash == false) {
           Fluttertoast.showToast(
-            msg: errorMessage,
-            backgroundColor: context.colorScheme.error,
+            msg: profileResult.message ?? StringConstants.instance.errorMessage,
+            backgroundColor: context!.colorScheme.error,
           );
         }
       }
-
       await profileGetDataShared();
       notifyListeners();
-    } catch (e, stackTrace) {
-      _logError('Profile Fetch Exception', e, stackTrace);
-      // Hata durumunda rethrow yapmayalım, sadece log edelim
-      // rethrow;
     }
+    await _handleAppVersionCheck(context);
   }
 
   Future<void> _handleAppVersionCheck(BuildContext? context) async {
@@ -635,15 +507,16 @@ class AuthViewModel extends BaseViewModel {
   }
 
   void _navigateBasedOnUserStatus() {
-    // Login başarılı olduysa user set edilmiş olmalı
-    final targetPath = user != null && event == SignStatus.logined
-        ? NavigationConstants.HOME
-        : NavigationConstants.LOGIN;
-
-    navigation.navigateToPageClear(
-      path: targetPath,
-      data: user == null ? registerStatus : null,
-    );
+    Timer(const Duration(seconds: 2), () {
+      if (user != null) {
+        navigation.navigateToPageClear(path: NavigationConstants.HOME);
+      } else {
+        navigation.navigateToPageClear(
+          path: NavigationConstants.LOGIN,
+          data: registerStatus,
+        );
+      }
+    });
   }
 
   Future<void> fetchLogout(BuildContext context) async {
@@ -664,7 +537,7 @@ class AuthViewModel extends BaseViewModel {
       if (result is LogoutModelError) {
         _showErrorDialog(context, result.message!, exitOnClose: false);
       } else {
-        await _clearCache();
+        clearCache();
       }
     } catch (e) {
       _showErrorDialog(
@@ -675,7 +548,7 @@ class AuthViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> _clearCache() async {
+  void clearCache() async {
     await _storageService.clearAll();
     navigation.navigateToPageClear(path: NavigationConstants.LOGIN);
   }
@@ -808,14 +681,108 @@ class AuthViewModel extends BaseViewModel {
       // User değişkenini set et
       user = loginModel.data;
 
-      final tokenToSave = loginModel.data!.first.accessToken ?? "";
-      await _storageService.setStringValue(PreferencesKeys.TOKEN, tokenToSave);
+      final userModel = loginModel.data!.first;
 
-      dev.log(
-        'Token saved to storage: ${tokenToSave.isNotEmpty ? "Token saved (${tokenToSave.substring(0, 10)}...)" : "Empty token saved"}',
-        name: 'AuthViewModel',
+      // Token'ı kaydet
+      await _storageService.setStringValue(
+        PreferencesKeys.TOKEN,
+        userModel.accessToken ?? "",
       );
-      await _loadUserDataFromStorage();
+
+      // Kullanıcı bilgilerini kaydet
+      await _storageService.setStringValue(
+        PreferencesKeys.USERNAME,
+        userModel.name ?? "",
+      );
+      await _storageService.setStringValue(
+        PreferencesKeys.GENDER,
+        userModel.gender ?? "",
+      );
+      await _storageService.setStringValue(
+        PreferencesKeys.ID,
+        userModel.id?.toString() ?? "",
+      );
+      await _storageService.setStringValue(
+        PreferencesKeys.PHONE,
+        userModel.phone ?? "",
+      );
+      await _storageService.setStringValue(
+        PreferencesKeys.EMAIL,
+        userModel.email ?? "",
+      );
+      await _storageService.setStringValue(
+        PreferencesKeys.ROLE,
+        userModel.role?.name ?? "",
+      );
+
+      // Company bilgilerini kaydet
+      if (userModel.company != null) {
+        await _storageService.setStringValue(
+          PreferencesKeys.COMPID,
+          userModel.company!.id?.toString() ?? "",
+        );
+        await _storageService.setStringValue(
+          PreferencesKeys.COMPNAME,
+          userModel.company!.name ?? "",
+        );
+        await _storageService.setStringValue(
+          PreferencesKeys.COMPADDRESS,
+          userModel.company!.address ?? "",
+        );
+      }
+
+      // Department bilgilerini kaydet
+      if (userModel.department != null) {
+        await _storageService.setStringValue(
+          PreferencesKeys.DEPARTMENTID,
+          userModel.department!.id?.toString() ?? "",
+        );
+        await _storageService.setStringValue(
+          PreferencesKeys.DEPARTMENT,
+          userModel.department!.name ?? "",
+        );
+      }
+
+      // Shift bilgilerini kaydet
+      if (userModel.shift != null) {
+        await _storageService.setStringValue(
+          PreferencesKeys.SHIFTNAME,
+          "Default Shift",
+        );
+        await _storageService.setStringValue(
+          PreferencesKeys.STARTDATE,
+          userModel.shift!.start ?? "belirtilmedi",
+        );
+        await _storageService.setStringValue(
+          PreferencesKeys.ENDDATE,
+          userModel.shift!.end ?? "belirtilmedi",
+        );
+
+        if (userModel.shift!.tolerance != null) {
+          await _storageService.setStringValue(
+            PreferencesKeys.STARTTDATE,
+            userModel.shift!.tolerance!.start ?? "00:00",
+          );
+          await _storageService.setStringValue(
+            PreferencesKeys.ENDTDATE,
+            userModel.shift!.tolerance!.end ?? "00:00",
+          );
+        }
+      }
+
+      // Settings bilgilerini kaydet
+      if (userModel.settings != null) {
+        await _storageService.setBoolValue(
+          PreferencesKeys.OUTSIDE,
+          userModel.settings!.outside ?? false,
+        );
+      }
+      await _storageService.setBoolValue(PreferencesKeys.ZONE, false);
+
+      dev.log('Login data saved to storage', name: 'AuthViewModel');
+
+      // Verileri memory'e yükle
+      await profileGetDataShared();
     }
   }
 
@@ -840,13 +807,28 @@ class AuthViewModel extends BaseViewModel {
   }
 
   _loadUserDataFromStorage() {
-    event = SignStatus.loading;
+    // Önce mevcut durumu koru, gereksiz loading'e set etme
     profileGetDataShared();
 
-    if (accessToken != null && accessToken!.isNotEmpty) {
+    // Token kontrolü daha güvenli hale getir
+    final storedToken = _storageService.getStringValue(PreferencesKeys.TOKEN);
+
+    if (storedToken.isNotEmpty) {
+      accessToken = storedToken;
       event = SignStatus.logined;
+      dev.log(
+        'Token loaded from storage, user logged in',
+        name: 'AuthViewModel',
+      );
     } else {
+      accessToken = null;
       event = SignStatus.lyLogin;
+      dev.log(
+        'No token found in storage, user not logged in',
+        name: 'AuthViewModel',
+      );
     }
+
+    notifyListeners();
   }
 }

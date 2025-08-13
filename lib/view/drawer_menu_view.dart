@@ -57,7 +57,7 @@ class _DrawerMenuViewState extends State<DrawerMenuView>
                             backgroundColor: Colors.white,
                             radius: 25,
                             child: Image.asset(
-                              value.gender == 'male'
+                              value.gender == 'Erkek'
                                   ? ImageConstants.instance.male
                                   : ImageConstants.instance.female,
                               height: sizeConfig.widthSize(context, 45),

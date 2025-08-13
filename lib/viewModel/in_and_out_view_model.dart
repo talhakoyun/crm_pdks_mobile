@@ -4,7 +4,7 @@ import 'package:crm_pdks_mobile/core/constants/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:geolocator/geolocator.dart';
+
 import 'package:provider/provider.dart';
 
 import '../core/base/view_model/base_view_model.dart';
@@ -16,6 +16,7 @@ import '../core/init/network/connectivity/network_connectivity.dart';
 import '../models/last_event_model.dart';
 import '../service/in_and_out_service.dart';
 import '../view/home_view.dart';
+import '../view/qr_scanner_view.dart';
 import '../widgets/dialog/custom_dialog.dart';
 import '../widgets/dialog/custom_illegal_dialog.dart';
 import '../widgets/dialog/custom_loader.dart';
@@ -53,21 +54,22 @@ class InAndOutViewModel extends BaseViewModel {
         iconPath: ImageConstants.instance.start,
         color: context.colorScheme.tertiaryContainer,
         onPressed: () async {
+          Navigator.pop(context); // Dialog'u kapat
+
           if (location.currentPosition != null) {
             if (networkConnectivity.internet) {
-              await inProcedure(
+              await executeShiftProcedure(
+                type: 1, // Giriş
                 longitude: location.currentPosition!.longitude,
                 latitude: location.currentPosition!.latitude,
                 deviceId: deviceInfo.deviceId,
                 deviceModel: deviceInfo.deviceModel,
-                context: scaffoldKey.currentContext!,
+                context: context,
                 isMockLocation: location.isMockLocation,
               );
-              context.navigationOf.pop();
             } else {
-              context.navigationOf.pop();
               CustomSnackBar(
-                scaffoldKey.currentContext!,
+                context,
                 StringConstants.instance.networkMsg,
                 backgroundColor: context.colorScheme.error,
               );
@@ -108,20 +110,21 @@ class InAndOutViewModel extends BaseViewModel {
         iconPath: ImageConstants.instance.stop,
         color: context.colorScheme.errorContainer,
         onPressed: () async {
+          Navigator.pop(context); // Dialog'u kapat
+
           if (networkConnectivity.internet) {
-            await outProcedure(
+            await executeShiftProcedure(
+              type: 2, // Çıkış
               longitude: location.currentPosition!.longitude,
               latitude: location.currentPosition!.latitude,
               deviceId: deviceInfo.deviceId,
               deviceModel: deviceInfo.deviceModel,
               isMockLocation: location.isMockLocation,
-              context: scaffoldKey.currentContext!,
+              context: context,
             );
-            context.navigationOf.pop();
           } else {
-            context.navigationOf.pop();
             CustomSnackBar(
-              scaffoldKey.currentContext!,
+              context,
               StringConstants.instance.networkMsg,
               backgroundColor: context.colorScheme.error,
             );
@@ -152,7 +155,8 @@ class InAndOutViewModel extends BaseViewModel {
     }
   }
 
-  Future<dynamic> inProcedure({
+  Future<dynamic> executeShiftProcedure({
+    required int type, // 1 = giriş, 2 = çıkış
     required double longitude,
     required double latitude,
     required BuildContext context,
@@ -162,7 +166,13 @@ class InAndOutViewModel extends BaseViewModel {
     String? myNote,
   }) async {
     dynamic data;
-    isLate = false;
+
+    // Type'a göre flag'leri sıfırla
+    if (type == 1) {
+      isLate = false;
+    } else {
+      isEarly = false;
+    }
 
     if (isMockLocation) {
       CustomAlertDialog.locationPermissionAlert(
@@ -170,11 +180,14 @@ class InAndOutViewModel extends BaseViewModel {
         isEnabled: true,
         isMock: isMockLocation,
       );
-    } else {
-      CustomLoader.showAlertDialog(context);
+      return null;
+    }
 
+    CustomLoader.showAlertDialog(context);
+
+    try {
       data = await inAndOutService.sendShift(
-        type: 1,
+        type: type,
         longitude: longitude,
         latitude: latitude,
         outside: outSide,
@@ -182,107 +195,51 @@ class InAndOutViewModel extends BaseViewModel {
         deviceModel: deviceModel,
         myNote: myNote,
       );
+
+      Navigator.pop(context); // Loader'ı kapat
 
       if (data['status']) {
-        Navigator.pop(context);
-        CustomSnackBar(context, data['message']);
-      } else if (data != null && !data['status']) {
-        if (data['note'] != null && !data['note']) {
-          Navigator.pop(context);
-          isLate = true;
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeView()),
-            (Route<dynamic> route) => false,
-          );
-        } else {
-          Navigator.pop(context);
-          CustomSnackBar(context, data['message']);
-        }
-      }
-    }
-
-    data = await inAndOutService.sendShift(
-      type: 1,
-      longitude: longitude,
-      latitude: latitude,
-      outside: outSide,
-      deviceId: deviceId,
-      deviceModel: deviceModel,
-      myNote: myNote,
-    );
-    Navigator.pop(context);
-
-    if (data['status']) {
-      CustomSnackBar(context, data['message']);
-    } else {
-      if (data['note'] != null && !data['note']) {
-        isLate = true;
+        // Başarılı durum - yeşil toast
         CustomSnackBar(context, data['message']);
       } else {
-        CustomSnackBar(context, data['message']);
-      }
-    }
-    return data;
-  }
-
-  Future<dynamic> outProcedure({
-    required double longitude,
-    required double latitude,
-    required BuildContext context,
-    String? deviceId,
-    String? deviceModel,
-    String? myNote,
-    required bool isMockLocation,
-  }) async {
-    dynamic data;
-    isEarly = false;
-
-    if (isMockLocation) {
-      CustomAlertDialog.locationPermissionAlert(
-        context: context,
-        isEnabled: true,
-        isMock: isMockLocation,
-      );
-    } else {
-      CustomLoader.showAlertDialog(context);
-
-      data = await inAndOutService.sendShift(
-        type: 2,
-        longitude: longitude,
-        latitude: latitude,
-        outside: outSide,
-        deviceId: deviceId,
-        deviceModel: deviceModel,
-        myNote: myNote,
-      );
-
-      if (data['status'] != null && data['status']) {
-        Navigator.pop(context);
-        CustomSnackBar(context, data['message']);
-      } else {
+        // Hata durumu - kırmızı toast
         if (data['note'] != null && !data['note']) {
-          Navigator.pop(context);
-          isEarly = true;
-          Navigator.pushAndRemoveUntil(
+          // Type'a göre uygun flag'i set et
+          if (type == 1) {
+            isLate = true;
+          } else {
+            isEarly = true;
+          }
+          CustomSnackBar(
             context,
-            MaterialPageRoute(builder: (context) => const HomeView()),
-            (Route<dynamic> route) => false,
+            data['message'],
+            backgroundColor: context.colorScheme.error,
           );
         } else {
-          Navigator.pop(context);
-          CustomSnackBar(context, data['message']);
+          CustomSnackBar(
+            context,
+            data['message'],
+            backgroundColor: context.colorScheme.error,
+          );
         }
       }
+    } catch (e) {
+      Navigator.pop(context); // Hata durumunda loader'ı kapat
+      CustomSnackBar(
+        context,
+        StringConstants.instance.errorMessage,
+        backgroundColor: context.colorScheme.error,
+      );
     }
+
     return data;
   }
 
   void pressQrArea(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
     if (networkConnectivity.internet) {
       if (location.currentPosition != null) {
-        // QR kod okuma işlemi buraya gelecek
-        scanQR(context, location.currentPosition!);
+        // QR işlem türü seçim popup'ı göster
+        showQrTypeSelectionDialog(context);
       } else {
         CustomSnackBar(
           context,
@@ -299,129 +256,152 @@ class InAndOutViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> qrCodeScanner(BuildContext context) async {
-    if (networkConnectivity.internet) {
-      if (location.currentPosition != null) {
-        await qrShiftSend(
-          longitude: location.currentPosition!.longitude,
-          latitude: location.currentPosition!.latitude,
-          zoneId: int.parse(scannerBarcode),
-          context: context,
-          deviceId: deviceInfo.deviceId,
-          deviceModel: deviceInfo.deviceModel,
-          isMockLocation: location.isMockLocation,
+  void showQrTypeSelectionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "İşlem Seçimi",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: context.colorScheme.onSurface,
+            ),
+          ),
+          content: Text(
+            "Yapmak istediğiniz işlemi seçin",
+            style: TextStyle(
+              fontSize: 16,
+              color: context.colorScheme.onSurface,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                // Giriş yap (type: 1)
+                openQrScanner(context, 1);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: context.colorScheme.tertiaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  "Giriş Yap",
+                  style: TextStyle(
+                    color: context.colorScheme.onTertiaryContainer,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                // Çıkış yap (type: 2)
+                openQrScanner(context, 2);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: context.colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  "Çıkış Yap",
+                  style: TextStyle(
+                    color: context.colorScheme.onErrorContainer,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
         );
-      }
-    } else {
-      CustomSnackBar(
-        context,
-        StringConstants.instance.networkMsg,
-        backgroundColor: context.colorScheme.error,
-      );
-    }
+      },
+    );
   }
 
-  void scanQR(BuildContext context, Position position) async {
-    if (scannerBarcode == "-1") {
-      CustomSnackBar(
-        context,
-        StringConstants.instance.qrErrorMsg,
-        backgroundColor: context.colorScheme.error,
-      );
-    } else {
-      try {
-        await qrShiftSend(
-          longitude: position.longitude,
-          latitude: position.latitude,
-          zoneId: int.parse(scannerBarcode),
+  void openQrScanner(BuildContext context, int selectedType) {
+    type = selectedType; // Seçilen type'ı sakla
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => QrScannerView(
+          onQrScanned: (String qrCode) {
+            // QR kod okunduktan sonra API'ye gönder
+            processQrCode(context, qrCode, selectedType);
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> processQrCode(
+    BuildContext context,
+    String qrCode,
+    int type,
+  ) async {
+    if (location.currentPosition != null) {
+      if (location.isMockLocation) {
+        CustomAlertDialog.locationPermissionAlert(
           context: context,
+          isEnabled: true,
+          isMock: location.isMockLocation,
+        );
+        return;
+      }
+
+      CustomLoader.showAlertDialog(context);
+
+      try {
+        var result = await inAndOutService.sendQrShift(
+          qrStr: qrCode,
+          type: type,
+          longitude: location.currentPosition!.longitude,
+          latitude: location.currentPosition!.latitude,
           deviceId: deviceInfo.deviceId,
           deviceModel: deviceInfo.deviceModel,
-          isMockLocation: location.isMockLocation,
         );
 
-        if (networkConnectivity.internet) {
-          var sendQrShift = await inAndOutService.sendQrShift(
-            type: 3,
-            longitude: position.longitude,
-            latitude: position.latitude,
-            zoneId: int.parse(scannerBarcode),
-            deviceId: deviceInfo.deviceId,
-            deviceModel: deviceInfo.deviceModel,
-          );
+        Navigator.pop(context); // Loader'ı kapat
+        Navigator.pop(context); // QR scanner'ı kapat
 
-          if (sendQrShift["status"]) {
-            CustomSnackBar(context, sendQrShift["message"]);
-          } else {
-            CustomSnackBar(context, sendQrShift["message"]);
-          }
+        if (result['status']) {
+          CustomSnackBar(context, result['message']);
         } else {
           CustomSnackBar(
             context,
-            StringConstants.instance.networkMsg,
+            result['message'],
             backgroundColor: context.colorScheme.error,
           );
         }
       } catch (e) {
+        Navigator.pop(context); // Loader'ı kapat
+        Navigator.pop(context); // QR scanner'ı kapat
         CustomSnackBar(
           context,
-          StringConstants.instance.qrErrorMsg,
+          StringConstants.instance.errorMessage,
           backgroundColor: context.colorScheme.error,
         );
       }
-    }
-  }
-
-  Future<dynamic> qrShiftSend({
-    required double longitude,
-    required double latitude,
-    required int zoneId,
-    required BuildContext context,
-    String? deviceId,
-    String? deviceModel,
-    String? myNote,
-    required bool isMockLocation,
-  }) async {
-    dynamic data;
-    isEarly = false;
-
-    if (isMockLocation) {
-      CustomAlertDialog.locationPermissionAlert(
-        context: context,
-        isEnabled: true,
-        isMock: isMockLocation,
-      );
     } else {
-      CustomLoader.showAlertDialog(context);
-
-      data = await inAndOutService.sendQrShift(
-        type: 3,
-        longitude: longitude,
-        latitude: latitude,
-        zoneId: zoneId,
-        deviceId: deviceId,
-        deviceModel: deviceModel,
+      CustomSnackBar(
+        context,
+        StringConstants.instance.locationErrorMsg,
+        backgroundColor: context.colorScheme.error,
       );
-
-      if (data['status'] != null && data['status']) {
-        Navigator.pop(context);
-        CustomSnackBar(context, data['message']);
-      } else {
-        if (data['note'] != null && !data['note']) {
-          Navigator.pop(context);
-          isEarly = true;
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeView()),
-            (Route<dynamic> route) => false,
-          );
-        } else {
-          Navigator.pop(context);
-          CustomSnackBar(context, data['message']);
-        }
-      }
     }
-    return data;
   }
 
   bool isLateInCompany({
