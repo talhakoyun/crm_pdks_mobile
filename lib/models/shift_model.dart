@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'base_model.dart';
 
-class EventDataModel {
+class ShiftDataModel {
   final String? datetime;
   final String? type;
   final String? startTime;
   final String? endTime;
 
-  EventDataModel({this.datetime, this.type, this.startTime, this.endTime});
+  ShiftDataModel({this.datetime, this.type, this.startTime, this.endTime});
 
-  factory EventDataModel.fromJson(Map<String, dynamic> json) {
-    return EventDataModel(
+  factory ShiftDataModel.fromJson(Map<String, dynamic> json) {
+    return ShiftDataModel(
       datetime: json['datetime'],
       type: json['type'],
       startTime: json['start_time'],
@@ -18,10 +18,10 @@ class EventDataModel {
     );
   }
 
-  static List<EventDataModel> fromJsonList(
+  static List<ShiftDataModel> fromJsonList(
     List<Map<String, dynamic>> jsonList,
   ) {
-    return jsonList.map((json) => EventDataModel.fromJson(json)).toList();
+    return jsonList.map((json) => ShiftDataModel.fromJson(json)).toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -35,18 +35,18 @@ class EventDataModel {
 
   @override
   String toString() {
-    return 'EventDataModel(datetime: $datetime, type: $type, startTime: $startTime, endTime: $endTime)';
+    return 'ShiftDataModel(datetime: $datetime, type: $type, startTime: $startTime, endTime: $endTime)';
   }
 }
 
-typedef EventsModel = BaseModel<List<EventDataModel>>;
+typedef ShiftsModel = BaseModel<List<ShiftDataModel>>;
 
-EventsModel eventsModelFromJson(String str) {
+ShiftsModel shiftsModelFromJson(String str) {
   final json = jsonDecode(str);
   return BaseModel.fromJsonList(
     json,
-    (jsonList) => EventDataModel.fromJsonList(jsonList),
+    (jsonList) => ShiftDataModel.fromJsonList(jsonList),
   );
 }
 
-String eventsModelToJson(EventsModel data) => json.encode(data.toJson());
+String shiftsModelToJson(ShiftsModel data) => json.encode(data.toJson());

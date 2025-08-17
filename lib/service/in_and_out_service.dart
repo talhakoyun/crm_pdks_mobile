@@ -6,7 +6,7 @@ import '../core/constants/string_constants.dart';
 import '../core/enums/enums.dart';
 import '../core/init/cache/locale_manager.dart';
 import '../models/base_model.dart';
-import '../models/events_model.dart';
+import '../models/shift_model.dart';
 
 class InAndOutService {
   LocaleManager localeManager = LocaleManager.instance;
@@ -122,7 +122,7 @@ class InAndOutService {
     }
   }
 
-  Future<EventsModel> shiftList() async {
+  Future<ShiftsModel> shiftList() async {
     var client = http.Client();
     try {
       String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
@@ -138,7 +138,7 @@ class InAndOutService {
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         if (data['status']) {
-          return eventsModelFromJson(response.body);
+          return shiftsModelFromJson(response.body);
         } else {
           return BaseModel(
             status: false,

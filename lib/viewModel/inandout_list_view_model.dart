@@ -3,14 +3,14 @@ import 'package:flutter/cupertino.dart';
 import '../core/base/view_model/base_view_model.dart';
 import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
-import '../models/events_model.dart';
+import '../models/shift_model.dart';
 import '../service/in_and_out_service.dart';
 import '../widgets/dialog/snackbar.dart';
 
 class InAndOutListViewModel extends BaseViewModel {
   ShiftStatus? shiftStatus;
-  List<EventDataModel> shiftListItems = [];
-  EventsModel? eventList;
+  List<ShiftDataModel> shiftListItems = [];
+  ShiftsModel? shiftList;
   final inAndOutService = InAndOutService();
 
   InAndOutListViewModel() {
@@ -33,7 +33,7 @@ class InAndOutListViewModel extends BaseViewModel {
     notifyListeners();
 
     try {
-      EventsModel shiftListModel = await inAndOutService.shiftList();
+      ShiftsModel shiftListModel = await inAndOutService.shiftList();
       if (shiftListModel.status!) {
         shiftListItems = shiftListModel.data!;
         // Veriler başarıyla yüklendi

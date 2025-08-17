@@ -335,7 +335,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                       width: 12.5.width,
                       height: 12.5.width,
                       decoration: BoxDecoration(
-                        color: context.colorScheme.secondaryContainer,
+                        color: context.colorScheme.error,
                         borderRadius: BorderRadius.circular(7.5),
                       ),
                       child: Padding(
