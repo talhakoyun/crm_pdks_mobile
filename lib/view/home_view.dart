@@ -3,17 +3,29 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
-import '../core/constants/image_constants.dart';
-import '../core/constants/string_constants.dart';
-import '../core/constants/size_config.dart';
-
+import '../core/base/base_singleton.dart';
+import '../core/base/size_singleton.dart';
+import '../core/extension/context_extension.dart';
+import '../core/init/cache/locale_manager.dart';
+import '../core/init/size/size_extension.dart';
+import '../core/init/size/size_setting.dart';
 import '../core/position/location_manager.dart';
 import '../viewModel/auth_view_model.dart';
 import '../viewModel/in_and_out_view_model.dart';
-import '../view/drawer_menu_view.dart';
+import '../widgets/error_widget.dart';
+import 'drawer_menu_view.dart';
+
+enum AlertCabilitySituation {
+  onlineInEvent,
+  onlineOutEvent,
+  lateInEvent,
+  earlyOutEvent,
+}
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -22,51 +34,32 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
-  late InAndOutViewModel inAndOutViewModel;
-  late LocationManager locationManager;
-  late SizeConfig sizeConfig;
-  late ImageConstants imgCons;
-  late StringConstants strCons;
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
+class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
+  InAndOutViewModel inAndOutViewModel = InAndOutViewModel();
+  LocationManager locationManager = LocationManager();
+  Position? currentPosition;
+  bool? isMockLocation;
   StreamController<bool> isOutSide = StreamController<bool>.broadcast();
-
   @override
   void initState() {
     super.initState();
-    inAndOutViewModel = InAndOutViewModel();
-    locationManager = LocationManager();
-    sizeConfig = SizeConfig.instance;
-    imgCons = ImageConstants.instance;
-    strCons = StringConstants.instance;
-
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-    _animationController.forward();
+    // inAndOutViewModel.pushSignalService();
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
-    isOutSide.close();
     super.dispose();
+    locationManager.disp();
   }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
+    return WillPopScope(
+      onWillPop: () async => false,
       child: (inAndOutViewModel.authVM.event == SignStatus.logined)
           ? Scaffold(
               key: inAndOutViewModel.scaffoldKey,
-              backgroundColor: const Color(0xFFF8FAFC),
-              appBar: _buildModernAppBar(context),
+              appBar: AppBar(actions: [outSideArea()]),
               drawer: const DrawerMenuView(),
               body: ChangeNotifierProvider<LocationManager>(
                 create: (BuildContext context) => locationManager,
@@ -77,380 +70,311 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                     }
                     if (value.currentPosition == null) {
                       value.determinePosition(context);
+                    } else {
+                      debugPrint(
+                        "latitude: | ${value.currentPosition!.latitude}",
+                      );
                     }
-                    return _buildModernBody(context, value);
+                    return GestureDetector(
+                      onTap: () {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                      },
+                      child: Stack(
+                        children: [
+                          SizedBox(
+                            height: context.mediaQuery.size.height,
+                            child:
+                                (inAndOutViewModel.networkConnectivity.internet)
+                                ? (value.currentPosition != null)
+                                      ? Padding(
+                                          padding: context.onlyTopPaddingHigh,
+                                          child: FlutterMap(
+                                            options: MapOptions(
+                                              initialCenter: LatLng(
+                                                value.currentPosition!.latitude,
+                                                value
+                                                    .currentPosition!
+                                                    .longitude,
+                                              ),
+                                              initialZoom: 18,
+                                              maxZoom: 18,
+                                            ),
+                                            children: [
+                                              TileLayer(
+                                                urlTemplate: strCons.mapUrl,
+                                                subdomains: const [
+                                                  'a',
+                                                  'b',
+                                                  'c',
+                                                ],
+                                              ),
+                                              MarkerLayer(
+                                                markers:
+                                                    value.currentPosition !=
+                                                        null
+                                                    ? [
+                                                        Marker(
+                                                          point: LatLng(
+                                                            value
+                                                                .currentPosition!
+                                                                .latitude,
+                                                            value
+                                                                .currentPosition!
+                                                                .longitude,
+                                                          ),
+                                                          child: Image(
+                                                            image: AssetImage(
+                                                              imgCons.marker,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ]
+                                                    : [],
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : Center(
+                                          child: Padding(
+                                            padding:
+                                                context.onlyTopPaddingHigh *
+                                                2.5,
+                                            child: SvgPicture.asset(
+                                              imgCons.noLocation,
+                                            ),
+                                          ),
+                                        )
+                                : Center(
+                                    child: Padding(
+                                      padding: context.onlyTopPaddingHigh * 2.5,
+                                      child: SvgPicture.asset(imgCons.offMode),
+                                    ),
+                                  ),
+                          ),
+                          buildNavbarArea(context),
+                          buildHomeTopContainer(context),
+                        ],
+                      ),
+                    );
                   },
                 ),
               ),
+            )
+          : !(inAndOutViewModel.networkConnectivity.internet)
+          ? errorPageView(
+              context: context,
+              imagePath: imgCons.warning,
+              title: strCons.unExpectedError,
+              subtitle: ' ',
             )
           : const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
   }
 
-  PreferredSizeWidget _buildModernAppBar(BuildContext context) {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-          ),
-        ),
-      ),
-      leading: Builder(
-        builder: (context) => IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.menu_rounded,
-              color: Colors.white,
-              size: 20,
-            ),
-          ),
-          onPressed: () => Scaffold.of(context).openDrawer(),
-        ),
-      ),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Merhaba 👋',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          Text(
-            inAndOutViewModel.authVM.userName ?? 'Kullanıcı',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        Container(
-          margin: const EdgeInsets.only(right: 16),
-          child: outSideArea(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildModernBody(BuildContext context, LocationManager value) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFF8FAFC), Color(0xFFE2E8F0)],
-          ),
-        ),
-        child: Column(
-          children: [
-            // Status Card
-            _buildStatusCard(context),
-            const SizedBox(height: 20),
-            // Map Section
-            Expanded(flex: 2, child: _buildMapSection(context, value)),
-            const SizedBox(height: 20),
-            // Action Buttons
-            _buildActionButtons(context),
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatusCard(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
-              ),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.access_time_rounded,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Bugünkü Durum',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  inAndOutViewModel.authVM.department ?? 'Departman',
-                  style: TextStyle(
-                    color: Colors.grey[900],
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFF10B981).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              'Aktif',
-              style: TextStyle(
-                color: Color(0xFF10B981),
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMapSection(BuildContext context, LocationManager value) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
+  Widget buildHomeTopContainer(BuildContext context) {
+    return SizedBox(
+      height: SizerUtil.height > 600
+          ? sizeConfig.heightSize(context, 255)
+          : sizeConfig.heightSize(context, 280),
+      width: SizerUtil.width,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: (inAndOutViewModel.networkConnectivity.internet)
-            ? (value.currentPosition != null)
-                  ? FlutterMap(
-                      options: MapOptions(
-                        initialCenter: LatLng(
-                          value.currentPosition!.latitude,
-                          value.currentPosition!.longitude,
-                        ),
-                        initialZoom: 18,
-                        maxZoom: 18,
-                      ),
-                      children: [
-                        TileLayer(
-                          urlTemplate: strCons.mapUrl,
-                          subdomains: const ['a', 'b', 'c'],
-                        ),
-                        MarkerLayer(
-                          markers: [
-                            Marker(
-                              point: LatLng(
-                                value.currentPosition!.latitude,
-                                value.currentPosition!.longitude,
-                              ),
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF4F46E5),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xFF4F46E5),
-                                      blurRadius: 20,
-                                      spreadRadius: 5,
-                                    ),
-                                  ],
-                                ),
-                                child: const Icon(
-                                  Icons.person,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(25),
+          bottomRight: Radius.circular(25),
+        ),
+        child: Container(
+          decoration: BoxDecoration(color: context.colorScheme.primary),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  context.emptySizedHeightBoxLow2x,
+                  Image(
+                    image:
+                        inAndOutViewModel.localeManager.getStringValue(
+                              PreferencesKeys.GENDER,
+                            ) ==
+                            'Erkek'
+                        ? AssetImage(imgCons.male)
+                        : AssetImage(imgCons.female),
+                    fit: BoxFit.contain,
+                    height: sizeConfig.heightSize(context, 80),
+                    width: sizeConfig.widthSize(context, 80),
+                  ),
+                  context.emptySizedHeightBoxLow,
+                  Text(
+                    inAndOutViewModel.authVM.userName!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.primaryTextTheme.headlineSmall,
+                  ),
+                  Text(
+                    inAndOutViewModel.authVM.department!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.primaryTextTheme.bodyLarge,
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '${strCons.checkInTime}\n',
+                              style: context.primaryTextTheme.headlineSmall!
+                                  .copyWith(fontWeight: FontWeight.w400),
+                            ),
+                            TextSpan(
+                              text:
+                                  inAndOutViewModel.authVM.startDate ??
+                                  strCons.unSpecified,
+                              style: context.primaryTextTheme.headlineSmall!
+                                  .copyWith(fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),
-                      ],
-                    )
-                  : const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Color(0xFF4F46E5),
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'Konum alınıyor...',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
+                        textAlign: TextAlign.center,
                       ),
-                    )
-            : const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.wifi_off_rounded, size: 48, color: Colors.grey),
-                    SizedBox(height: 16),
-                    Text(
-                      'İnternet bağlantısı yok',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey,
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: SizedBox(
+                        height: 5.height,
+                        child: VerticalDivider(
+                          thickness: 0.5,
+                          color: context.colorScheme.onError,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 4,
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '${strCons.checkOutTime}\n',
+                              style: context.primaryTextTheme.headlineSmall!
+                                  .copyWith(fontWeight: FontWeight.w400),
+                            ),
+                            TextSpan(
+                              text:
+                                  inAndOutViewModel.authVM.endDate ??
+                                  strCons.unSpecified,
+                              style: context.primaryTextTheme.headlineSmall!
+                                  .copyWith(fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ],
                 ),
               ),
-      ),
-    );
-  }
-
-  Widget _buildActionButtons(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildActionButton(
-              context: context,
-              title: 'Giriş Yap',
-              icon: Icons.login_rounded,
-              gradient: const LinearGradient(
-                colors: [Color(0xFF10B981), Color(0xFF059669)],
-              ),
-              onTap: () {
-                inAndOutViewModel.pressLogin(
-                  context,
-                  inAndOutViewModel.scaffoldKey,
-                );
-              },
-            ),
+            ],
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: _buildActionButton(
-              context: context,
-              title: 'QR Okut',
-              icon: Icons.qr_code_scanner_rounded,
-              gradient: const LinearGradient(
-                colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
-              ),
-              onTap: () {
-                inAndOutViewModel.pressQrArea(
-                  context,
-                  inAndOutViewModel.scaffoldKey,
-                );
-              },
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: _buildActionButton(
-              context: context,
-              title: 'Çıkış Yap',
-              icon: Icons.logout_rounded,
-              gradient: const LinearGradient(
-                colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
-              ),
-              onTap: () {
-                inAndOutViewModel.pressOut(
-                  context,
-                  inAndOutViewModel.scaffoldKey,
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButton({
-    required BuildContext context,
-    required String title,
-    required IconData icon,
-    required Gradient gradient,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          gradient: gradient,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
         ),
-        child: Column(
-          children: [
-            Icon(icon, color: Colors.white, size: 28),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+
+  Widget buildNavbarArea(BuildContext context) {
+    return Positioned(
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: context.onlyBottomPaddingNormal,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Container(
+              width: sizeConfig.widthSize(context, 260),
+              height: sizeConfig.heightSize(context, 80),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomRight,
+                  end: Alignment.topLeft,
+                  tileMode: TileMode.clamp,
+                  colors: [
+                    context.colorScheme.primary,
+                    context.colorScheme.onPrimary,
+                  ],
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      inAndOutViewModel.pressLogin(
+                        context,
+                        inAndOutViewModel.scaffoldKey,
+                      );
+                    },
+                    child: Container(
+                      width: 12.5.width,
+                      height: 12.5.width,
+                      decoration: BoxDecoration(
+                        color: context.colorScheme.tertiaryContainer,
+                        borderRadius: BorderRadius.circular(7.5),
+                      ),
+                      child: Padding(
+                        padding: context.paddingLow,
+                        child: SvgPicture.asset(imgCons.start),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      inAndOutViewModel.pressQrArea(
+                        context,
+                        inAndOutViewModel.scaffoldKey,
+                      );
+                    },
+                    child: Container(
+                      width: 12.5.width,
+                      height: 12.5.width,
+                      decoration: BoxDecoration(
+                        color: context.colorScheme.secondaryContainer,
+                        borderRadius: BorderRadius.circular(7.5),
+                      ),
+                      child: Padding(
+                        padding: context.paddingLow,
+                        child: SvgPicture.asset(imgCons.qr),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      inAndOutViewModel.pressOut(
+                        context,
+                        inAndOutViewModel.scaffoldKey,
+                      );
+                    },
+                    child: Container(
+                      width: 12.5.width,
+                      height: 12.5.width,
+                      decoration: BoxDecoration(
+                        color: context.colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(7.5),
+                      ),
+                      child: Padding(
+                        padding: context.paddingLow,
+                        child: SvgPicture.asset(imgCons.stop),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -461,50 +385,40 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       stream: isOutSide.stream,
       initialData: false,
       builder: (context, snapshot) {
-        return GestureDetector(
+        return InkWell(
           onTap: () {
             isOutSide.sink.add(!snapshot.data!);
             inAndOutViewModel.outSide = (snapshot.data ?? false) ? 0 : 1;
+            debugPrint("${inAndOutViewModel.outSide}");
           },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: (snapshot.data ?? false)
-                  ? const Color(0xFF10B981).withValues(alpha: 0.2)
-                  : const Color(0xFFEF4444).withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: (snapshot.data ?? false)
-                    ? const Color(0xFF10B981)
-                    : const Color(0xFFEF4444),
-                width: 1.5,
+          borderRadius: BorderRadius.circular(15),
+          child: Row(
+            children: [
+              Text(
+                strCons.outSideText,
+                style: context.primaryTextTheme.bodyMedium,
               ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  (snapshot.data ?? false)
-                      ? Icons.check_circle_rounded
-                      : Icons.cancel_rounded,
-                  color: (snapshot.data ?? false)
-                      ? const Color(0xFF10B981)
-                      : const Color(0xFFEF4444),
-                  size: 16,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  (snapshot.data ?? false) ? 'Dışarıda' : 'İçeride',
-                  style: TextStyle(
-                    color: (snapshot.data ?? false)
-                        ? const Color(0xFF10B981)
-                        : const Color(0xFFEF4444),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
+              Transform.scale(
+                scale: 1.1,
+                child: Theme(
+                  data: context.appTheme.copyWith(
+                    unselectedWidgetColor: Colors.white70,
+                  ),
+                  child: Checkbox(
+                    activeColor: context.colorScheme.onSecondary,
+                    shape: const CircleBorder(),
+                    tristate: false,
+                    value: snapshot.hasData ? snapshot.data : false,
+                    splashRadius: 30,
+                    onChanged: (value) {
+                      isOutSide.sink.add(value!);
+                      inAndOutViewModel.outSide = (value) ? 1 : 0;
+                      debugPrint("${inAndOutViewModel.outSide}");
+                    },
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },

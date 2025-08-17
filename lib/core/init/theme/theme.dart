@@ -73,7 +73,7 @@ class AppTheme extends ApplicationTheme with ThemeInterface {
   );
 
   AppBarTheme get _appBarTheme => AppBarTheme(
-    color: customColorScheme!.newPrimaryColor,
+    backgroundColor: customColorScheme!.newPrimaryColor,
     titleTextStyle: _primaryTextTheme.titleMedium,
     elevation: 0,
     centerTitle: true,
@@ -83,8 +83,10 @@ class AppTheme extends ApplicationTheme with ThemeInterface {
 
   ElevatedButtonThemeData get elevatedButtonTheme => ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: customColorScheme!.newPrimaryColor,
-      // shadowColor: customColorScheme!.whiteColor,
+      backgroundColor: customColorScheme!.primaryButtonColor,
+      foregroundColor: customColorScheme!.whiteColor,
+      elevation: 2,
+      shadowColor: customColorScheme!.appBarGradientEnd.withValues(alpha: 0.3),
       alignment: Alignment.center,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
     ),

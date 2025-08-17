@@ -20,33 +20,43 @@ class CustomColorScheme {
   //-----------------------------------------------------------------------------
   //Proje'ye göre değişecekler.
   //xx kullanılmamışlar silinecekleri ifade eder
-  final Color newPrimaryColor = const Color(0xff6376FD);
-  final Color newonPrimaryColor = const Color(0xFF869FFF);
+  final Color newPrimaryColor = const Color(0xFF005792); // Ana mavi renk
+  final Color newonPrimaryColor = const Color(0xFF003d6b);
   final Color newSecondaryColor = const Color(0xffFFAE1A);
   final Color newOnSecondaryColor = const Color(0xffFF981A);
   final Color navbarFirstColor = const Color(0xffFF981A);
-  final Color navbarSecondColor = const Color(0xFFAFC2FF);
+  final Color navbarSecondColor = const Color(0xFFADDCFF);
   final Color navbarThirdColor = const Color(0xff00BB86);
   final Color containerColor = const Color(0xff595457);
-  final Color newPrimaryVariantColor = const Color(0xFFBDCDFF);
+  final Color newPrimaryVariantColor = const Color(0xFF85CAFF);
   final Color cardColor = const Color(0xffE1E1E1);
   final Color notApprovedColor = const Color(0xff929292);
   final Color textColor = const Color(0xff7a7a7a);
   final Color backgroundPermission = const Color(0xfff2f2f2);
   final Color inputBorderColor = const Color(0xff545454);
 
+  // AppBar gradient renkleri
+  final Color appBarGradientStart = const Color(0xFF005792); // Ana renk
+  final Color appBarGradientEnd = const Color(0xFF003d6b); // Koyu ton
+
+  // Buton ve UI element renkleri
+  final Color primaryButtonColor = const Color(0xFF005792);
+  final Color secondaryButtonColor = const Color(
+    0xFF0077B6,
+  ); // Biraz daha açık ton
+
   final MaterialColor colorSwatch =
-      const MaterialColor(0xff6376FD, <int, Color>{
-        50: Color(0xff6376FD),
-        100: Color(0xff6376FD),
-        200: Color(0xff6376FD),
-        300: Color(0xff6376FD),
-        400: Color(0xff6376FD),
-        500: Color(0xff6376FD),
-        600: Color(0xff6376FD),
-        700: Color(0xff6376FD),
-        800: Color(0xff6376FD),
-        900: Color(0xff6376FD),
+      const MaterialColor(0xFF005792, <int, Color>{
+        50: Color(0xFFE3F2FD),
+        100: Color(0xFFBBDEFB),
+        200: Color(0xFF90CAF9),
+        300: Color(0xFF64B5F6),
+        400: Color(0xFF42A5F5),
+        500: Color(0xFF005792),
+        600: Color(0xFF004A7C),
+        700: Color(0xFF003d6b),
+        800: Color(0xFF003055),
+        900: Color(0xFF002340),
       });
 
   Color determineColor(int index) {
