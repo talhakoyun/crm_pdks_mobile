@@ -1,18 +1,18 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
-
 import '../core/constants/string_constants.dart';
 import '../core/enums/enums.dart';
 import '../core/init/cache/locale_manager.dart';
+import '../core/init/network/service/network_api_service.dart';
 import '../models/base_model.dart';
 import '../models/shift_model.dart';
 
 class InAndOutService {
   LocaleManager localeManager = LocaleManager.instance;
   StringConstants get strCons => StringConstants.instance;
+  final _apiServices = NetworkApiServices();
 
-  Future<Map<String, dynamic>> sendShift({
+  Future<BaseModel<Map<String, dynamic>>> sendShift({
     required int type,
     required double longitude,
     required double latitude,
@@ -21,55 +21,47 @@ class InAndOutService {
     String? deviceModel,
     String? myNote,
   }) async {
-    var client = http.Client();
-
     try {
       String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
-      var response = await client
-          .post(
-            Uri.parse(strCons.baseUrl + strCons.shiftPing),
-            headers: {
-              'Accept': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-            body: {
-              "type": type.toString(),
-              "outside": outside.toString(),
-              "longitude": longitude.toString(),
-              "latitude": latitude.toString(),
-              "device_id": deviceId.toString(),
-              "device_model": deviceModel.toString(),
-              "note": myNote ?? "",
-            },
-          )
-          .timeout(const Duration(seconds: 10));
+      Map<String, String> bodyData = {
+        "type": type.toString(),
+        "outside": outside.toString(),
+        "longitude": longitude.toString(),
+        "latitude": latitude.toString(),
+        "device_id": deviceId.toString(),
+        "device_model": deviceModel.toString(),
+        "note": myNote ?? "",
+      };
 
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          return {"status": true, "message": "işlem başarılı"};
-        } else {
-          return {"status": false, "message": data['message']};
-        }
+      dynamic response = await _apiServices.postApiResponse(
+        strCons.baseUrl + strCons.shiftPing,
+        bodyData,
+        token,
+      );
+
+      if (response['status']) {
+        return BaseModel<Map<String, dynamic>>(
+          status: true,
+          message: "İşlem başarılı",
+          data: {"status": true, "message": "İşlem başarılı"},
+        );
       } else {
-        var data = json.decode(response.body);
-        if (data['note'] != null && !data['note']) {
-          return {
-            "status": data['status'],
-            "message": data['message'],
-            "note": data['note'],
-          };
-        }
-        return {"status": data['status'], "message": data['message']};
+        return BaseModel<Map<String, dynamic>>(
+          status: false,
+          message: response['message'] ?? strCons.errorMessage,
+          data: {"status": false, "message": response['message']},
+        );
       }
     } catch (e) {
-      return {"status": false, "message": strCons.errorMessage};
-    } finally {
-      client.close();
+      return BaseModel<Map<String, dynamic>>(
+        status: false,
+        message: strCons.errorMessage,
+        data: {"status": false, "message": strCons.errorMessage},
+      );
     }
   }
 
-  Future<Map<String, dynamic>> sendQrShift({
+  Future<BaseModel<Map<String, dynamic>>> sendQrShift({
     required String qrStr,
     required int type,
     required double longitude,
@@ -77,90 +69,75 @@ class InAndOutService {
     String? deviceId,
     String? deviceModel,
   }) async {
-    var client = http.Client();
     try {
       String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
+      Map<String, dynamic> bodyData = {
+        "qr_str": qrStr,
+        "type": type,
+        "device_id": deviceId,
+        "device_model": deviceModel,
+        "positions": {"latitude": latitude, "longitude": longitude},
+      };
 
-      var response = await client
-          .post(
-            Uri.parse(strCons.baseUrl + strCons.shiftQR),
-            headers: {
-              'Accept': 'application/json',
-              'Authorization': 'Bearer $token',
-              'Content-Type': 'application/json',
-            },
-            body: json.encode({
-              "qr_str": qrStr,
-              "type": type,
-              "device_id": deviceId,
-              "device_model": deviceModel,
-              "positions": {"latitude": latitude, "longitude": longitude},
-            }),
-          )
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          return {
+      dynamic response = await _apiServices.postApiResponse(
+        strCons.baseUrl + strCons.shiftQR,
+        json.encode(bodyData),
+        token,
+      );
+
+      if (response['status']) {
+        return BaseModel<Map<String, dynamic>>(
+          status: true,
+          message: response['message'] ?? "İşlem başarılı",
+          data: {
             "status": true,
-            "message": data['message'] ?? "İşlem başarılı",
-          };
-        } else {
-          return {"status": false, "message": data['message']};
-        }
+            "message": response['message'] ?? "İşlem başarılı",
+          },
+        );
       } else {
-        var data = json.decode(response.body);
-        return {
-          "status": false,
-          "message": data['message'] ?? strCons.errorMessage,
-        };
+        return BaseModel<Map<String, dynamic>>(
+          status: false,
+          message: response['message'] ?? strCons.errorMessage,
+          data: {"status": false, "message": response['message']},
+        );
       }
     } catch (e) {
-      return {"status": false, "message": strCons.errorMessage};
-    } finally {
-      client.close();
+      return BaseModel<Map<String, dynamic>>(
+        status: false,
+        message: strCons.errorMessage,
+        data: {"status": false, "message": strCons.errorMessage},
+      );
     }
   }
 
-  Future<ShiftsModel> shiftList() async {
-    var client = http.Client();
+  Future<BaseModel<List<ShiftDataModel>>> shiftList() async {
     try {
       String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
-      var response = await client
-          .post(
-            Uri.parse(strCons.baseUrl + strCons.shiftList),
-            headers: {
-              'Accept': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-          )
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          return shiftsModelFromJson(response.body);
-        } else {
-          return BaseModel(
-            status: false,
-            message: strCons.errorMessage,
-            data: null,
-          );
-        }
+
+      dynamic response = await _apiServices.postApiResponse(
+        strCons.baseUrl + strCons.shiftList,
+        {},
+        token,
+      );
+
+      if (response['status']) {
+        return BaseModel.fromJsonList(
+          response,
+          (jsonList) => ShiftDataModel.fromJsonList(jsonList),
+        );
       } else {
-        return BaseModel(
+        return BaseModel<List<ShiftDataModel>>(
           status: false,
-          message: strCons.errorMessage,
+          message: response['message'] ?? strCons.errorMessage,
           data: null,
         );
       }
     } catch (e) {
-      return BaseModel(
+      return BaseModel<List<ShiftDataModel>>(
         status: false,
         message: strCons.errorMessage,
         data: null,
       );
-    } finally {
-      client.close();
     }
   }
 }

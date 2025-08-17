@@ -11,10 +11,15 @@ class NetworkApiServices extends BaseApiServices {
   dynamic jsonResponse;
 
   @override
-  Future getApiResponse(String url) async {
+  Future getApiResponse(String url, {String? token}) async {
     var client = http.Client();
     try {
-      final response = await client.get(Uri.parse(url));
+      final response = await client.get(
+        Uri.parse(url),
+        headers: (token != null)
+            ? {'Accept': 'application/json', 'Authorization': 'Bearer $token'}
+            : {'Accept': 'application/json'},
+      );
       jsonResponse = returnResponse(response);
       debugPrint(response.body.toString());
     } on SocketException {

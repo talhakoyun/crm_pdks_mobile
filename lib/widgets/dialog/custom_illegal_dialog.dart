@@ -142,12 +142,12 @@ class CustomIllegalDialog {
 
           if (context.mounted) {
             Navigator.pop(context);
-            if (data['status']) {
+            if (data?.status == true) {
               CustomSnackBar(scaffoldKey.currentContext!, message);
             } else {
               CustomSnackBar(
                 scaffoldKey.currentContext!,
-                data['message'],
+                data?.message ?? StringConstants.instance.errorMessage,
                 backgroundColor: errorColor,
               );
             }
@@ -169,12 +169,12 @@ class CustomIllegalDialog {
 
           if (context.mounted) {
             Navigator.pop(context);
-            if (data['status']) {
+            if (data?.status == true) {
               CustomSnackBar(scaffoldKey.currentContext!, message);
             } else {
               CustomSnackBar(
                 scaffoldKey.currentContext!,
-                data['message'],
+                data?.message ?? StringConstants.instance.errorMessage,
                 backgroundColor: errorColor,
               );
             }

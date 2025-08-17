@@ -6,6 +6,7 @@ import '../core/constants/string_constants.dart';
 import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
 import '../core/widget/customize_dialog.dart';
+import '../models/base_model.dart';
 import '../models/holiday_types_model.dart';
 import '../models/holidays_model.dart';
 import '../service/permission_service.dart';
@@ -81,16 +82,17 @@ class PermissionViewModel extends BaseViewModel {
         holidayAddress.text != "" &&
         holidayEndDt.text != "" &&
         holidayStartDt.text.isNotEmpty) {
-      var data = await permissionServices.holidayCreate(
-        type: type,
-        startDt: startDt,
-        endDt: endDt,
-        reason: holidayReason.text.trim(),
-        address: holidayAddress.text.trim(),
-      );
+      BaseModel<Map<String, dynamic>> data = await permissionServices
+          .holidayCreate(
+            type: type,
+            startDt: startDt,
+            endDt: endDt,
+            reason: holidayReason.text.trim(),
+            address: holidayAddress.text.trim(),
+          );
       if (!context.mounted) return;
       context.navigationOf.pop();
-      if (data['status']) {
+      if (data.status!) {
         holidayAddress.clear();
         holidayReason.clear();
         holidayEndDt.clear();
@@ -101,7 +103,7 @@ class PermissionViewModel extends BaseViewModel {
       } else {
         CustomSnackBar(
           context,
-          data['message'],
+          data.message!,
           backgroundColor: context.colorScheme.error,
         );
       }

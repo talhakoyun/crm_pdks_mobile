@@ -80,74 +80,57 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
                         flex: SizerUtil.height > 535 ? 7 : 5,
                         child: SizedBox(
                           width: double.infinity,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 15.0,
-                              right: 15.0,
-                              bottom: 15.0,
-                            ),
-                            child: ListView(
-                              physics: const BouncingScrollPhysics(),
-                              children: [
-                                listVM.shiftListItems.isNotEmpty
-                                    ? ListView.builder(
-                                        itemCount: listVM.shiftListItems.length,
-                                        shrinkWrap: true,
-                                        physics: const BouncingScrollPhysics(),
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                              return InAndOutsPointsCard(
-                                                startDate:
-                                                    listVM
-                                                        .shiftListItems[index]
-                                                        .startTime!
-                                                        .isNotEmpty
-                                                    ? listVM
-                                                          .shiftListItems[index]
-                                                          .startTime
-                                                    : "--",
-                                                dateTime:
-                                                    listVM
-                                                        .shiftListItems[index]
-                                                        .datetime!
-                                                        .isNotEmpty
-                                                    ? listVM
-                                                          .shiftListItems[index]
-                                                          .datetime
-                                                    : "--",
-                                                endDate:
-                                                    listVM
-                                                        .shiftListItems[index]
-                                                        .endTime!
-                                                        .isNotEmpty
-                                                    ? listVM
-                                                          .shiftListItems[index]
-                                                          .endTime
-                                                    : "--",
-                                              );
-                                            },
-                                      )
-                                    : Padding(
-                                        padding: EdgeInsets.only(
-                                          top: 20.0.height,
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            StringConstants
-                                                .instance
-                                                .noInAndOutText,
-                                            style: context.textTheme.bodyLarge!
-                                                .copyWith(
-                                                  color:
-                                                      context.colorScheme.error,
-                                                ),
-                                            textAlign: TextAlign.center,
+                          child: listVM.shiftListItems.isNotEmpty
+                              ? ListView.builder(
+                                  itemCount: listVM.shiftListItems.length,
+                                  shrinkWrap: true,
+                                  physics: const BouncingScrollPhysics(),
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                        return InAndOutsPointsCard(
+                                          startDate:
+                                              listVM
+                                                  .shiftListItems[index]
+                                                  .startTime!
+                                                  .isNotEmpty
+                                              ? listVM
+                                                    .shiftListItems[index]
+                                                    .startTime
+                                              : "--",
+                                          dateTime:
+                                              listVM
+                                                  .shiftListItems[index]
+                                                  .datetime!
+                                                  .isNotEmpty
+                                              ? listVM
+                                                    .shiftListItems[index]
+                                                    .datetime
+                                              : "--",
+                                          endDate:
+                                              listVM
+                                                  .shiftListItems[index]
+                                                  .endTime!
+                                                  .isNotEmpty
+                                              ? listVM
+                                                    .shiftListItems[index]
+                                                    .endTime
+                                              : "--",
+                                        );
+                                      },
+                                )
+                              : Padding(
+                                  padding: EdgeInsets.only(top: 20.0.height),
+                                  child: Center(
+                                    child: Text(
+                                      StringConstants.instance.noInAndOutText,
+                                      style: context.textTheme.bodyLarge!
+                                          .copyWith(
+                                            color: context.colorScheme.error,
                                           ),
-                                        ),
-                                      ),
-                              ],
-                            ),
-                          ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
                         ),
                       ),
                     ],

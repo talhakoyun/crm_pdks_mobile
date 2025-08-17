@@ -10,6 +10,7 @@ import '../core/constants/string_constants.dart';
 import '../core/enums/alert_capability_situation.dart';
 import '../core/extension/context_extension.dart';
 import '../core/init/network/connectivity/network_connectivity.dart';
+import '../models/base_model.dart';
 import '../service/in_and_out_service.dart';
 import '../view/qr_scanner_view.dart';
 import '../widgets/dialog/custom_dialog.dart';
@@ -148,7 +149,7 @@ class InAndOutViewModel extends BaseViewModel {
     }
   }
 
-  Future<dynamic> executeShiftProcedure({
+  Future<BaseModel<Map<String, dynamic>>?> executeShiftProcedure({
     required int type, // 1 = giriş, 2 = çıkış
     required double longitude,
     required double latitude,
@@ -158,7 +159,7 @@ class InAndOutViewModel extends BaseViewModel {
     String? deviceModel,
     String? myNote,
   }) async {
-    dynamic data;
+    BaseModel<Map<String, dynamic>>? data;
 
     // Type'a göre flag'leri sıfırla
     if (type == 1) {
@@ -188,13 +189,15 @@ class InAndOutViewModel extends BaseViewModel {
         myNote: myNote,
       );
 
-      if (!context.mounted) return;
+      if (!context.mounted) return null;
       Navigator.pop(context);
 
-      if (data['status']) {
-        CustomSnackBar(context, data['message']);
+      if (data.status!) {
+        CustomSnackBar(context, data.message!);
       } else {
-        if (data['note'] != null && !data['note']) {
+        if (data.data != null &&
+            data.data!['note'] != null &&
+            !data.data!['note']) {
           if (type == 1) {
             isLate = true;
           } else {
@@ -202,13 +205,13 @@ class InAndOutViewModel extends BaseViewModel {
           }
           CustomSnackBar(
             context,
-            data['message'],
+            data.message!,
             backgroundColor: context.colorScheme.error,
           );
         } else {
           CustomSnackBar(
             context,
-            data['message'],
+            data.message!,
             backgroundColor: context.colorScheme.error,
           );
         }
@@ -367,12 +370,12 @@ class InAndOutViewModel extends BaseViewModel {
         Navigator.pop(context);
         Navigator.pop(context);
 
-        if (result['status']) {
-          CustomSnackBar(context, result['message']);
+        if (result.status!) {
+          CustomSnackBar(context, result.message!);
         } else {
           CustomSnackBar(
             context,
-            result['message'],
+            result.message!,
             backgroundColor: context.colorScheme.error,
           );
         }

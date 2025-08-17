@@ -19,10 +19,9 @@ class InAndOutsPointsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: SizeConfig.instance.widthSize(context, 330),
-      height: SizeConfig.instance.heightSize(context, 120),
+      width: double.infinity,
+      height: SizeConfig.instance.heightSize(context, 75),
       child: Card(
-        elevation: 0,
         color: context.colorScheme.onError,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),

@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
-
 import '../core/constants/string_constants.dart';
 import '../core/enums/enums.dart';
 import '../core/init/cache/locale_manager.dart';
@@ -18,122 +16,22 @@ class AuthService {
   LocaleManager localeManager = LocaleManager.instance;
 
   Future<BaseModel<List<UserModel>>> login({required Map body}) async {
-    var client = http.Client();
     try {
-      var response = await client
-          .post(
-            Uri.parse(strCons.baseUrl + strCons.loginUrl),
-            body: body,
-            headers: {'Accept': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          return BaseModel.fromJsonList(
-            data,
-            (jsonList) => UserModel.fromJsonList(jsonList),
-          );
-        } else {
-          return BaseModel(status: false, message: data['message'], data: null);
-        }
-      } else {
-        var data = json.decode(response.body);
-        return BaseModel(status: false, message: data['message'], data: null);
-      }
-    } catch (e) {
-      return BaseModel(
-        status: false,
-        message: strCons.errorMessage,
-        data: null,
+      dynamic response = await _apiServices.postApiResponse(
+        strCons.baseUrl + strCons.loginUrl,
+        body,
+        null,
       );
-    } finally {
-      client.close();
-    }
-  }
 
-  Future<RegisterModel> register({required Map body}) async {
-    var client = http.Client();
-    try {
-      var response = await client
-          .post(
-            Uri.parse(strCons.baseUrl + strCons.register),
-            body: body,
-            headers: {'Accept': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          return registerModelFromJson(response.body);
-        } else {
-          return BaseModel(status: false, message: data['message'], data: null);
-        }
+      if (response['status']) {
+        return BaseModel.fromJsonList(
+          response,
+          (jsonList) => UserModel.fromJsonList(jsonList),
+        );
       } else {
-        var data = json.decode(response.body);
-        return BaseModel(status: false, message: data['message'], data: null);
-      }
-    } catch (e) {
-      return BaseModel(
-        status: false,
-        message: strCons.errorMessage,
-        data: null,
-      );
-    } finally {
-      client.close();
-    }
-  }
-
-  Future<BaseModel<List<UserModel>>> profile() async {
-    var client = http.Client();
-    String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
-    try {
-      var response = await client
-          .get(
-            Uri.parse(strCons.baseUrl + strCons.profile),
-            headers: {
-              'Accept': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-          )
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          // API response'u tek user objesi dönüyor, liste değil
-          if (data['data'] is Map) {
-            // Tek bir user objesi geliyorsa onu listeye çevir
-            final userModel = UserModel.fromJson(data['data']);
-            return BaseModel<List<UserModel>>(
-              status: true,
-              message: data['message'],
-              data: [userModel],
-            );
-          } else if (data['data'] is List) {
-            // Liste geliyorsa normal işle
-            return BaseModel.fromJsonList(
-              data,
-              (jsonList) => UserModel.fromJsonList(jsonList),
-            );
-          } else {
-            return BaseModel(
-              status: false,
-              message: 'Beklenmeyen data formatı',
-              data: null,
-            );
-          }
-        } else {
-          return BaseModel(
-            status: false,
-            message: strCons.errorMessage,
-            data: null,
-          );
-        }
-      } else {
-        var data = json.decode(response.body);
         return BaseModel(
           status: false,
-          message: data['message'] ?? strCons.errorMessage,
+          message: response['message'],
           data: null,
         );
       }
@@ -143,8 +41,80 @@ class AuthService {
         message: strCons.errorMessage,
         data: null,
       );
-    } finally {
-      client.close();
+    }
+  }
+
+  Future<RegisterModel> register({required Map body}) async {
+    try {
+      dynamic response = await _apiServices.postApiResponse(
+        strCons.baseUrl + strCons.register,
+        body,
+        null,
+      );
+
+      if (response['status']) {
+        return registerModelFromJson(json.encode(response));
+      } else {
+        return BaseModel(
+          status: false,
+          message: response['message'],
+          data: null,
+        );
+      }
+    } catch (e) {
+      return BaseModel(
+        status: false,
+        message: strCons.errorMessage,
+        data: null,
+      );
+    }
+  }
+
+  Future<BaseModel<List<UserModel>>> profile() async {
+    try {
+      String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
+
+      dynamic response = await _apiServices.getApiResponse(
+        strCons.baseUrl + strCons.profile,
+        token: token,
+      );
+
+      if (response['status']) {
+        // API response'u tek user objesi dönüyor, liste değil
+        if (response['data'] is Map) {
+          // Tek bir user objesi geliyorsa onu listeye çevir
+          final userModel = UserModel.fromJson(response['data']);
+          return BaseModel<List<UserModel>>(
+            status: true,
+            message: response['message'],
+            data: [userModel],
+          );
+        } else if (response['data'] is List) {
+          // Liste geliyorsa normal işle
+          return BaseModel.fromJsonList(
+            response,
+            (jsonList) => UserModel.fromJsonList(jsonList),
+          );
+        } else {
+          return BaseModel(
+            status: false,
+            message: 'Beklenmeyen data formatı',
+            data: null,
+          );
+        }
+      } else {
+        return BaseModel(
+          status: false,
+          message: response['message'] ?? strCons.errorMessage,
+          data: null,
+        );
+      }
+    } catch (e) {
+      return BaseModel(
+        status: false,
+        message: strCons.errorMessage,
+        data: null,
+      );
     }
   }
 
@@ -169,32 +139,20 @@ class AuthService {
   }
 
   Future<IsAvailableModel> isAvalible() async {
-    var client = http.Client();
     try {
-      var response = await client
-          .get(
-            Uri.parse(strCons.baseUrl + strCons.isAvalible),
-            headers: {'Accept': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          return BaseModel.fromJson(
-            data,
-            (dataJson) => AvailabilityModel.fromJson(dataJson),
-          );
-        } else {
-          return BaseModel(
-            status: false,
-            message: strCons.errorMessage,
-            data: null,
-          );
-        }
+      dynamic response = await _apiServices.getApiResponse(
+        strCons.baseUrl + strCons.isAvalible,
+      );
+
+      if (response['status']) {
+        return BaseModel.fromJson(
+          response,
+          (dataJson) => AvailabilityModel.fromJson(dataJson),
+        );
       } else {
         return BaseModel(
           status: false,
-          message: strCons.errorMessage,
+          message: response['message'] ?? strCons.errorMessage,
           data: null,
         );
       }
@@ -204,8 +162,6 @@ class AuthService {
         message: strCons.errorMessage,
         data: null,
       );
-    } finally {
-      client.close();
     }
   }
 }
