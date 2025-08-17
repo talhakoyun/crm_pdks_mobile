@@ -11,6 +11,7 @@ import '../viewModel/auth_view_model.dart';
 import '../viewModel/inandout_list_view_model.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/in_and_out_points_card.dart';
+import '../core/enums/enums.dart';
 
 class InAndOutsView extends StatefulWidget {
   const InAndOutsView({super.key});

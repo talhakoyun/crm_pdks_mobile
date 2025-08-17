@@ -1,4 +1,4 @@
-enum AlertCabilitySituation {
+enum AlertCapabilitySituation {
   onlineInEvent,
   onlineOutEvent,
   lateInEvent,

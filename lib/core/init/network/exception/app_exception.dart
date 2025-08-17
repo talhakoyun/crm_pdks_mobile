@@ -1,30 +1,26 @@
-
 class AppException implements Exception {
-  final _message;
+  final String? msg;
 
-  AppException([this._message]);
+  AppException([this.msg]);
 
   @override
   String toString() {
-    return '$_message';
+    return '$msg';
   }
 }
 
 class FetchDataException extends AppException {
-  FetchDataException([String? message])
-      : super(message);
+  FetchDataException([super.msg]);
 }
 
 class BadRequestException extends AppException {
-  BadRequestException([String? message]) : super(message);
+  BadRequestException([super.msg]);
 }
 
 class UnauthorisedException extends AppException {
-  UnauthorisedException([String? message])
-      : super(message);
+  UnauthorisedException([super.msg]);
 }
 
 class InvalidInputException extends AppException {
-  InvalidInputException([String? message])
-      : super(message);
+  InvalidInputException([super.msg]);
 }

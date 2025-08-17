@@ -38,8 +38,8 @@ class _LoginViewState extends State<LoginView>
     return ChangeNotifierProvider.value(
       value: authVM,
       builder: (context, snapshot) {
-        return WillPopScope(
-          onWillPop: () async => false,
+        return PopScope(
+          canPop: false,
           child: Scaffold(
             backgroundColor: context.colorScheme.onError,
             bottomNavigationBar: Padding(
@@ -175,7 +175,7 @@ class _LoginViewState extends State<LoginView>
     return Align(
       alignment: FractionalOffset.topLeft,
       child: Text.rich(
-        textScaler: TextScaler.linear(1.03) ,
+        textScaler: TextScaler.linear(1.03),
         TextSpan(
           text: "${strCons.welcome}\n",
           style: context.textTheme.headlineLarge!.copyWith(

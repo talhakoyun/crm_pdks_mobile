@@ -11,21 +11,14 @@ import 'package:provider/provider.dart';
 import '../core/base/base_singleton.dart';
 import '../core/base/size_singleton.dart';
 import '../core/extension/context_extension.dart';
-import '../core/init/cache/locale_manager.dart';
 import '../core/init/size/size_extension.dart';
 import '../core/init/size/size_setting.dart';
 import '../core/position/location_manager.dart';
-import '../viewModel/auth_view_model.dart';
 import '../viewModel/in_and_out_view_model.dart';
 import '../widgets/error_widget.dart';
 import 'drawer_menu_view.dart';
-
-enum AlertCabilitySituation {
-  onlineInEvent,
-  onlineOutEvent,
-  lateInEvent,
-  earlyOutEvent,
-}
+import '../core/enums/sign_status.dart';
+import '../core/enums/preferences_keys.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -54,8 +47,8 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
       child: (inAndOutViewModel.authVM.event == SignStatus.logined)
           ? Scaffold(
               key: inAndOutViewModel.scaffoldKey,

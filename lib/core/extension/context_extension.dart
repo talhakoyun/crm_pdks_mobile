@@ -4,6 +4,7 @@ import '../init/size/size_setting.dart';
 import '../widget/page_animation/slider_route.dart';
 import '../widget/space_sized_height_box.dart';
 import '../widget/space_sized_width_box.dart';
+import '../enums/enums.dart';
 
 extension ContextExtension on BuildContext {
   MediaQueryData get mediaQuery => MediaQuery.of(this);
@@ -81,7 +82,8 @@ extension NavigationExtension on BuildContext {
     Object? extra,
     SlideType type = SlideType.DEFAULT,
   }) async {
-    return navigationOf
-        .push<T>(type.route(page, RouteSettings(arguments: extra)));
+    return navigationOf.push<T>(
+      type.route(page, RouteSettings(arguments: extra)),
+    );
   }
 }

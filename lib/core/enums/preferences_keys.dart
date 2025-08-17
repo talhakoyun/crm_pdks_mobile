@@ -1,0 +1,23 @@
+// ignore_for_file: constant_identifier_names
+enum PreferencesKeys {
+  TOKEN,
+  IS_FIRST_APP,
+  ID,
+  USERNAME,
+  GENDER,
+  OUTSIDE,
+  ZONE,
+  PHONE,
+  EMAIL,
+  DEPARTMENT,
+  DEPARTMENTID,
+  STARTDATE,
+  STARTTDATE,
+  ENDDATE,
+  ENDTDATE,
+  ROLE,
+  COMPID,
+  COMPNAME,
+  COMPADDRESS,
+  SHIFTNAME,
+}

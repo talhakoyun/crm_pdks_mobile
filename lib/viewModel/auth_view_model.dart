@@ -25,8 +25,9 @@ import '../models/logout_model.dart';
 import '../models/user_model.dart';
 import '../service/auth_service.dart';
 import '../widgets/dialog/snackbar.dart';
-
-enum SignStatus { loading, logined, loginFailed, lyLogin }
+import '../core/enums/sign_status.dart';
+import '../core/enums/dialog_type.dart';
+import '../core/enums/preferences_keys.dart';
 
 bool? registerStatus;
 

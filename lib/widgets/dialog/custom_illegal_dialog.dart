@@ -25,7 +25,7 @@ class CustomIllegalDialog {
     required TextEditingController controller,
     required String message,
     required DeviceInfoManager deviceInfo,
-    required AlertCabilitySituation situation,
+    required AlertCapabilitySituation situation,
   }) {
     showDialog(
       context: context,
@@ -124,10 +124,10 @@ class CustomIllegalDialog {
     required TextEditingController controller,
     required String message,
     required DeviceInfoManager deviceInfo,
-    required AlertCabilitySituation situation,
+    required AlertCapabilitySituation situation,
   }) {
     switch (situation) {
-      case AlertCabilitySituation.onlineInEvent:
+      case AlertCapabilitySituation.onlineInEvent:
         return () async {
           final errorColor = context.colorScheme.error; // Store before async
           var data = await inAndOutVM.executeShiftProcedure(
@@ -154,7 +154,7 @@ class CustomIllegalDialog {
             }
           }
         };
-      case AlertCabilitySituation.onlineOutEvent:
+      case AlertCapabilitySituation.onlineOutEvent:
         return () async {
           final errorColor = context.colorScheme.error; // Store before async
           var data = await inAndOutVM.executeShiftProcedure(
@@ -181,7 +181,7 @@ class CustomIllegalDialog {
             }
           }
         };
-      case AlertCabilitySituation.lateInEvent:
+      case AlertCapabilitySituation.lateInEvent:
         return () {
           Navigator.pop(context);
           // Handle late in event with note
@@ -190,7 +190,7 @@ class CustomIllegalDialog {
             StringConstants.instance.successMessage2,
           );
         };
-      case AlertCabilitySituation.earlyOutEvent:
+      case AlertCapabilitySituation.earlyOutEvent:
         return () {
           Navigator.pop(context);
           // Handle early out event with note

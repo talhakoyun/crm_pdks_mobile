@@ -97,7 +97,7 @@ class InAndOutViewModel extends BaseViewModel {
         controller: lateNoteText,
         message: StringConstants.instance.successMessage,
         deviceInfo: deviceInfo,
-        situation: AlertCabilitySituation.lateInEvent,
+        situation: AlertCapabilitySituation.lateInEvent,
       );
     }
   }
@@ -151,7 +151,7 @@ class InAndOutViewModel extends BaseViewModel {
         controller: earlyNoteText,
         message: 'message',
         deviceInfo: deviceInfo,
-        situation: AlertCabilitySituation.earlyOutEvent,
+        situation: AlertCapabilitySituation.earlyOutEvent,
       );
     }
   }

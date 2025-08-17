@@ -7,8 +7,7 @@ import '../core/extension/context_extension.dart';
 import '../models/events_model.dart';
 import '../service/in_and_out_service.dart';
 import '../widgets/dialog/snackbar.dart';
-
-enum ShiftStatus { loading, loaded, loadingFailed }
+import '../core/enums/enums.dart';
 
 class InAndOutListViewModel extends BaseViewModel {
   ShiftStatus? shiftStatus;

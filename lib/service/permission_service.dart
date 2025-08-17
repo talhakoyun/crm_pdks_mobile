@@ -7,6 +7,7 @@ import '../core/constants/string_constants.dart';
 import '../core/init/cache/locale_manager.dart';
 import '../models/base_model.dart';
 import '../models/holidays_model.dart';
+import '../core/enums/enums.dart';
 
 class PermissionService {
   LocaleManager localeManager = LocaleManager.instance;

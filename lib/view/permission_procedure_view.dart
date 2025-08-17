@@ -9,6 +9,7 @@ import '../core/init/size/size_extension.dart';
 import '../viewModel/permissions_view_model.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/permission_listtile.dart';
+import '../core/enums/enums.dart';
 
 class PermissionProceduresView extends StatefulWidget {
   const PermissionProceduresView({super.key});

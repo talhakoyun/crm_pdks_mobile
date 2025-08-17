@@ -40,11 +40,9 @@ class NetworkApiServices extends BaseApiServices {
             headers: (token != null)
                 ? {
                     'Accept': 'application/json',
-                    'Authorization': 'Bearer ${token}',
+                    'Authorization': 'Bearer $token',
                   }
-                : {
-                    'Accept': 'application/json',
-                  },
+                : {'Accept': 'application/json'},
           )
           .timeout(const Duration(seconds: 10));
       jsonResponse = returnResponse(response);
@@ -74,7 +72,8 @@ class NetworkApiServices extends BaseApiServices {
         throw BadRequestException(response.body.toString());
       default:
         throw FetchDataException(
-            "Error accourded while communicating with server with status code ${response.statusCode}");
+          "Error accourded while communicating with server with status code ${response.statusCode}",
+        );
     }
   }
 }

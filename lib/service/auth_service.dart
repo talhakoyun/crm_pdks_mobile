@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import '../core/constants/string_constants.dart';
 import '../core/init/cache/locale_manager.dart';
 import '../core/init/network/service/network_api_service.dart';
+import '../core/enums/enums.dart';
 
 import '../models/base_model.dart';
 import '../models/is_available_model.dart';

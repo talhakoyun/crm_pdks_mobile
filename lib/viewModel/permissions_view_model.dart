@@ -13,8 +13,7 @@ import '../models/holiday_types_model.dart';
 import '../service/permission_service.dart';
 import '../widgets/dialog/custom_loader.dart';
 import '../widgets/dialog/snackbar.dart';
-
-enum PermissionStatus { loading, loaded, loadingFailed }
+import '../core/enums/enums.dart';
 
 class PermissionViewModel extends BaseViewModel {
   Map? permissionData;

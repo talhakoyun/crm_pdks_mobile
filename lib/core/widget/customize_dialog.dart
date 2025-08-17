@@ -7,9 +7,7 @@ import '../extension/context_extension.dart';
 import '../init/size/size_extension.dart';
 import '../constants/image_constants.dart';
 import '../constants/string_constants.dart';
-
-// Dialog tipleri için enum
-enum DialogType { error, success, update }
+import '../enums/enums.dart';
 
 class CustomizeDialog {
   static void show({
@@ -26,20 +24,22 @@ class CustomizeDialog {
     late String dialogTitle;
     late String dialogButtonText;
     late Function dialogAction;
-    
+
     // Dialog tipine göre varsayılan değerleri ayarla
     switch (type) {
       case DialogType.error:
         icon = ImageConstants.instance.error;
         dialogTitle = title ?? "Hata";
         dialogButtonText = buttonText ?? "Kapat";
-        dialogAction = onConfirm ?? () {
-          if (exitOnClose) {
-            exit(0);
-          } else {
-            Navigator.of(context).pop();
-          }
-        };
+        dialogAction =
+            onConfirm ??
+            () {
+              if (exitOnClose) {
+                exit(0);
+              } else {
+                Navigator.of(context).pop();
+              }
+            };
         break;
       case DialogType.success:
         icon = ImageConstants.instance.success;
@@ -54,30 +54,20 @@ class CustomizeDialog {
         dialogAction = onConfirm ?? () => Navigator.of(context).pop();
         break;
     }
-    
+
     // Dialog göster
     AlertDialog customizeAlert = AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       title: Column(
         children: [
-          Image.asset(
-            icon,
-            width: 20.width,
-            fit: BoxFit.fitWidth,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
+          Image.asset(icon, width: 20.width, fit: BoxFit.fitWidth),
+          const SizedBox(height: 20),
           Text(
             dialogTitle,
             style: context.primaryTextTheme.titleMedium,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(
-            height: 20,
-          ),
+          const SizedBox(height: 20),
           Text(
             message,
             style: context.primaryTextTheme.titleSmall,
@@ -99,12 +89,12 @@ class CustomizeDialog {
                   style: context.primaryTextTheme.bodyMedium,
                 ),
               ),
-            )
+            ),
           ],
-        )
+        ),
       ],
     );
-    
+
     showDialog(
       useSafeArea: true,
       barrierColor: Colors.black54,
