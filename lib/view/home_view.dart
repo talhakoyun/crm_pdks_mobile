@@ -10,6 +10,8 @@ import 'package:provider/provider.dart';
 
 import '../core/base/base_singleton.dart';
 import '../core/base/size_singleton.dart';
+import '../core/enums/preferences_keys.dart';
+import '../core/enums/sign_status.dart';
 import '../core/extension/context_extension.dart';
 import '../core/init/size/size_extension.dart';
 import '../core/init/size/size_setting.dart';
@@ -17,8 +19,6 @@ import '../core/position/location_manager.dart';
 import '../viewModel/in_and_out_view_model.dart';
 import '../widgets/error_widget.dart';
 import 'drawer_menu_view.dart';
-import '../core/enums/sign_status.dart';
-import '../core/enums/preferences_keys.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});

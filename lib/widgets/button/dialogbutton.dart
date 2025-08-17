@@ -41,10 +41,11 @@ class DialogButton extends StatelessWidget {
       width: SizerUtil.width > 350 ? 120 : 90,
       height: height,
       decoration: BoxDecoration(
-          color: color,
-          gradient: gradient,
-          borderRadius: radius ?? BorderRadius.circular(15),
-          border: border ?? Border.all(color: Colors.transparent, width: 0)),
+        color: color,
+        gradient: gradient,
+        borderRadius: radius ?? BorderRadius.circular(15),
+        border: border ?? Border.all(color: Colors.transparent, width: 0),
+      ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -54,8 +55,9 @@ class DialogButton extends StatelessWidget {
           child: Center(
             child: Text(
               buttonText,
-              style: context.primaryTextTheme.bodyMedium!
-                  .copyWith(fontSize: SizerUtil.width > 350 ? 20 : 16),
+              style: context.primaryTextTheme.bodyMedium!.copyWith(
+                fontSize: SizerUtil.width > 350 ? 20 : 16,
+              ),
             ),
           ),
         ),

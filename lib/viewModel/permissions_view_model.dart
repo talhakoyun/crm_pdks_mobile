@@ -1,19 +1,16 @@
-// ignore_for_file: unused_local_variable, use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 
 import '../core/base/view_model/base_view_model.dart';
-
 import '../core/constants/navigation_constants.dart';
 import '../core/constants/string_constants.dart';
+import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
 import '../core/widget/customize_dialog.dart';
-import '../models/holidays_model.dart';
 import '../models/holiday_types_model.dart';
+import '../models/holidays_model.dart';
 import '../service/permission_service.dart';
 import '../widgets/dialog/custom_loader.dart';
 import '../widgets/dialog/snackbar.dart';
-import '../core/enums/enums.dart';
 
 class PermissionViewModel extends BaseViewModel {
   Map? permissionData;
@@ -62,7 +59,8 @@ class PermissionViewModel extends BaseViewModel {
       notifyListeners();
     } else {
       permissionStatus = PermissionStatus.loadingFailed;
-      CustomSnackBar customSnackBar = CustomSnackBar(
+      if (!context.mounted) return;
+      CustomSnackBar(
         context,
         holidayListModel.message!,
         backgroundColor: context.colorScheme.error,
@@ -90,6 +88,7 @@ class PermissionViewModel extends BaseViewModel {
         reason: holidayReason.text.trim(),
         address: holidayAddress.text.trim(),
       );
+      if (!context.mounted) return;
       context.navigationOf.pop();
       if (data['status']) {
         holidayAddress.clear();
@@ -97,20 +96,17 @@ class PermissionViewModel extends BaseViewModel {
         holidayEndDt.clear();
         holidayStartDt.clear();
         holidayType.clear();
-        CustomSnackBar customSnackBar = CustomSnackBar(
-          context,
-          StringConstants.instance.reviewText,
-        );
+        CustomSnackBar(context, StringConstants.instance.reviewText);
         navigation.navigateToPageClear(path: NavigationConstants.HOME);
       } else {
-        CustomSnackBar customSnackBar = CustomSnackBar(
+        CustomSnackBar(
           context,
           data['message'],
           backgroundColor: context.colorScheme.error,
         );
       }
     } else {
-      CustomSnackBar customSnackBar = CustomSnackBar(
+      CustomSnackBar(
         context,
         StringConstants.instance.notEmptyText,
         backgroundColor: context.colorScheme.error,

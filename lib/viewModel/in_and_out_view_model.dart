@@ -1,22 +1,17 @@
-// ignore_for_file: use_build_context_synchronously,
-
-import 'package:crm_pdks_mobile/core/constants/size_config.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import 'package:provider/provider.dart';
 
 import '../core/base/view_model/base_view_model.dart';
 import '../core/constants/device_constants.dart';
 import '../core/constants/image_constants.dart';
+import '../core/constants/size_config.dart';
 import '../core/constants/string_constants.dart';
 import '../core/enums/alert_capability_situation.dart';
 import '../core/extension/context_extension.dart';
 import '../core/init/network/connectivity/network_connectivity.dart';
 import '../models/last_event_model.dart';
 import '../service/in_and_out_service.dart';
-
 import '../view/qr_scanner_view.dart';
 import '../widgets/dialog/custom_dialog.dart';
 import '../widgets/dialog/custom_illegal_dialog.dart';
@@ -26,7 +21,6 @@ import 'auth_view_model.dart';
 
 class InAndOutViewModel extends BaseViewModel {
   NetworkConnectivity networkConnectivity = NetworkConnectivity();
-  static const platform = MethodChannel('samples.mavihost/mockTime');
   bool isExternal = false;
   TextEditingController lateNoteText = TextEditingController();
   TextEditingController earlyNoteText = TextEditingController();
@@ -185,7 +179,6 @@ class InAndOutViewModel extends BaseViewModel {
     }
 
     CustomLoader.showAlertDialog(context);
-
     try {
       data = await inAndOutService.sendShift(
         type: type,
@@ -197,15 +190,13 @@ class InAndOutViewModel extends BaseViewModel {
         myNote: myNote,
       );
 
-      Navigator.pop(context); // Loader'ı kapat
+      if (!context.mounted) return;
+      Navigator.pop(context);
 
       if (data['status']) {
-        // Başarılı durum - yeşil toast
         CustomSnackBar(context, data['message']);
       } else {
-        // Hata durumu - kırmızı toast
         if (data['note'] != null && !data['note']) {
-          // Type'a göre uygun flag'i set et
           if (type == 1) {
             isLate = true;
           } else {
@@ -225,7 +216,7 @@ class InAndOutViewModel extends BaseViewModel {
         }
       }
     } catch (e) {
-      Navigator.pop(context); // Hata durumunda loader'ı kapat
+      Navigator.pop(context);
       CustomSnackBar(
         context,
         StringConstants.instance.errorMessage,
@@ -374,9 +365,9 @@ class InAndOutViewModel extends BaseViewModel {
           deviceId: deviceInfo.deviceId,
           deviceModel: deviceInfo.deviceModel,
         );
-
-        Navigator.pop(context); // Loader'ı kapat
-        Navigator.pop(context); // QR scanner'ı kapat
+        if (!context.mounted) return;
+        Navigator.pop(context);
+        Navigator.pop(context);
 
         if (result['status']) {
           CustomSnackBar(context, result['message']);
@@ -388,8 +379,8 @@ class InAndOutViewModel extends BaseViewModel {
           );
         }
       } catch (e) {
-        Navigator.pop(context); // Loader'ı kapat
-        Navigator.pop(context); // QR scanner'ı kapat
+        Navigator.pop(context);
+        Navigator.pop(context);
         CustomSnackBar(
           context,
           StringConstants.instance.errorMessage,

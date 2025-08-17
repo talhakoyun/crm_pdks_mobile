@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:io';
@@ -11,23 +9,21 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../widgets/launch_url.dart';
 import '../core/base/view_model/base_view_model.dart';
 import '../core/constants/device_constants.dart';
-
 import '../core/constants/navigation_constants.dart';
 import '../core/constants/string_constants.dart';
+import '../core/enums/dialog_type.dart';
+import '../core/enums/preferences_keys.dart';
+import '../core/enums/sign_status.dart';
 import '../core/extension/context_extension.dart';
 import '../core/init/cache/locale_manager.dart';
 import '../core/init/network/connectivity/network_connectivity.dart';
 import '../core/widget/customize_dialog.dart';
 import '../core/widget/loader.dart';
-
 import '../models/base_model.dart';
 import '../models/logout_model.dart';
 import '../models/user_model.dart';
 import '../service/auth_service.dart';
 import '../widgets/dialog/snackbar.dart';
-import '../core/enums/sign_status.dart';
-import '../core/enums/dialog_type.dart';
-import '../core/enums/preferences_keys.dart';
 
 bool? registerStatus;
 
@@ -141,7 +137,7 @@ class AuthViewModel extends BaseViewModel {
       if (networkConnectivity.internet) {
         final isAvailableResult = await _authService.isAvalible();
         isAvalibleApp = isAvailableResult;
-
+        if (!context.mounted) return;
         if (isAvailableResult.isSuccess) {
           registerStatus = Platform.isAndroid
               ? isAvailableResult.data?.android?.isRegister
@@ -278,6 +274,7 @@ class AuthViewModel extends BaseViewModel {
 
       final result = await _authService.login(body: bodyData);
 
+      if (!context.mounted) return;
       if (result.isSuccess && result.hasData) {
         await _handleSuccessfulLogin(context, result);
       } else {
@@ -287,6 +284,7 @@ class AuthViewModel extends BaseViewModel {
         _showErrorDialog(context, errorMessage, exitOnClose: false);
       }
     } catch (e, stackTrace) {
+      if (!context.mounted) return;
       _logError('Login Exception', e, stackTrace);
       _showErrorDialog(
         context,
@@ -303,13 +301,11 @@ class AuthViewModel extends BaseViewModel {
     BaseModel<List<UserModel>> data,
   ) async {
     await setDataShared(data);
-    event = SignStatus.logined; // Event'i önce set et
-
-    // Login başarılı olduktan sonra profile bilgileri zaten data'da mevcut
-    // Tekrar API çağrısı yapmaya gerek yok
+    event = SignStatus.logined;
+    if (!context.mounted) return;
     await _handleAppVersionCheck(context);
-
     navigation.navigateToPageClear(path: NavigationConstants.HOME);
+    if (!context.mounted) return;
     CustomSnackBar(context, StringConstants.instance.loginSuccessMsg);
   }
 
@@ -389,7 +385,7 @@ class AuthViewModel extends BaseViewModel {
       }
 
       final result = await _authService.register(body: dataRegister);
-
+      if (!context.mounted) return;
       if (result.isSuccess) {
         final message =
             result.message ?? StringConstants.instance.successMessage;
@@ -425,6 +421,7 @@ class AuthViewModel extends BaseViewModel {
 
   Future getProfile([BuildContext? context, bool? isSplash]) async {
     var utoken = _storageService.getStringValue(PreferencesKeys.TOKEN);
+
     if (utoken.isNotEmpty) {
       final profileResult = await _authService.profile();
       if (profileResult.isSuccess && profileResult.hasData) {
@@ -447,6 +444,7 @@ class AuthViewModel extends BaseViewModel {
       await profileGetDataShared();
       notifyListeners();
     }
+    if (context != null && !context.mounted) return;
     await _handleAppVersionCheck(context);
   }
 
@@ -534,7 +532,7 @@ class AuthViewModel extends BaseViewModel {
 
     try {
       var result = await _authService.logout(token);
-
+      if (!context.mounted) return;
       if (result is LogoutModelError) {
         _showErrorDialog(context, result.message!, exitOnClose: false);
       } else {

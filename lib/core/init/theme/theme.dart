@@ -1,4 +1,3 @@
-// ignore_for_file: todo
 import 'package:flutter/material.dart';
 
 import 'theme_app.dart';
@@ -43,7 +42,6 @@ class AppTheme extends ApplicationTheme with ThemeInterface {
     onError: customColorScheme!.whiteColor,
     errorContainer: customColorScheme!.blackColor,
     onTertiaryContainer: customColorScheme!.backgroundPermission,
-    //onBackground: customColorScheme!.notApprovedColor,
     onTertiary: customColorScheme!.textColor,
     onSurfaceVariant: customColorScheme!.cardColor,
   );

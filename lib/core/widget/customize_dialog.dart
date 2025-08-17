@@ -1,13 +1,12 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 
-import '../extension/context_extension.dart';
-import '../init/size/size_extension.dart';
 import '../constants/image_constants.dart';
 import '../constants/string_constants.dart';
 import '../enums/enums.dart';
+import '../extension/context_extension.dart';
+import '../init/size/size_extension.dart';
 
 class CustomizeDialog {
   static void show({
@@ -19,13 +18,11 @@ class CustomizeDialog {
     bool exitOnClose = false,
     Function? onConfirm,
   }) {
-    // Her dialog tipi için varsayılan değerler
     late String icon;
     late String dialogTitle;
     late String dialogButtonText;
     late Function dialogAction;
 
-    // Dialog tipine göre varsayılan değerleri ayarla
     switch (type) {
       case DialogType.error:
         icon = ImageConstants.instance.error;
@@ -55,7 +52,6 @@ class CustomizeDialog {
         break;
     }
 
-    // Dialog göster
     AlertDialog customizeAlert = AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       title: Column(

@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -30,16 +28,11 @@ Future<void> showInAndOutDialog({
             ),
             child: Padding(
               padding: context.paddingLow,
-              child: SvgPicture.asset(
-                iconPath,
-              ),
+              child: SvgPicture.asset(iconPath),
             ),
           ),
           context.emptySizedHeightBoxLow2x,
-          Text(
-            content,
-            style: context.textTheme.bodyMedium,
-          ),
+          Text(content, style: context.textTheme.bodyMedium),
         ],
       ),
       actions: [
@@ -49,8 +42,9 @@ Future<void> showInAndOutDialog({
             ElevatedButton(
               onPressed: onPressed,
               style: ElevatedButton.styleFrom(
-                  backgroundColor: context.colorScheme.primary,
-                  fixedSize: Size(25.width, 5.height)),
+                backgroundColor: context.colorScheme.primary,
+                fixedSize: Size(25.width, 5.height),
+              ),
               child: Text(
                 StringConstants.instance.approveButtonText,
                 style: context.primaryTextTheme.bodyLarge,
@@ -61,15 +55,16 @@ Future<void> showInAndOutDialog({
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: context.colorScheme.error,
-                  fixedSize: Size(25.width, 5.height)),
+                backgroundColor: context.colorScheme.error,
+                fixedSize: Size(25.width, 5.height),
+              ),
               child: Text(
                 StringConstants.instance.cancelButtonText,
                 style: context.primaryTextTheme.bodyLarge,
               ),
-            )
+            ),
           ],
-        )
+        ),
       ],
     ),
   );

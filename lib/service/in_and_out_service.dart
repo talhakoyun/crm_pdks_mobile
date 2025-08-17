@@ -1,14 +1,11 @@
-// ignore_for_file: avoid_print
-
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
 import '../core/constants/string_constants.dart';
+import '../core/enums/enums.dart';
 import '../core/init/cache/locale_manager.dart';
 import '../models/base_model.dart';
-import '../core/enums/enums.dart';
-
 import '../models/events_model.dart';
 
 class InAndOutService {

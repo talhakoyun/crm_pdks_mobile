@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../enums/enums.dart';
 import '../init/size/size_setting.dart';
 import '../widget/page_animation/slider_route.dart';
 import '../widget/space_sized_height_box.dart';
 import '../widget/space_sized_width_box.dart';
-import '../enums/enums.dart';
 
 extension ContextExtension on BuildContext {
   MediaQueryData get mediaQuery => MediaQuery.of(this);

@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, avoid_print
-
 import 'package:flutter/material.dart';
 
 import '../../core/extension/context_extension.dart';
@@ -66,7 +64,7 @@ class Loader extends StatelessWidget {
           }
         });
       } catch (e) {
-        print(e.toString());
+        debugPrint(e.toString());
       }
     }
   }
@@ -101,7 +99,7 @@ class Loader extends StatelessWidget {
       try {
         _currentLoader?.remove();
       } catch (e) {
-        print(e.toString());
+        debugPrint(e.toString());
       } finally {
         _currentLoader = null;
       }

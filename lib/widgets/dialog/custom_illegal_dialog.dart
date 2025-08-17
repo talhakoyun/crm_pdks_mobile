@@ -6,7 +6,6 @@ import '../../core/enums/alert_capability_situation.dart';
 import '../../core/extension/context_extension.dart';
 import '../../core/init/size/size_extension.dart';
 import '../../core/position/location_manager.dart';
-
 import '../../viewModel/in_and_out_view_model.dart';
 import '../../widgets/text_input/custom_text_input.dart';
 import '../button/dialogbutton.dart';

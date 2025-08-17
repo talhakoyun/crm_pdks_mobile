@@ -4,12 +4,12 @@ import 'package:provider/provider.dart';
 import '../core/base/base_singleton.dart';
 import '../core/constants/image_constants.dart';
 import '../core/constants/navigation_constants.dart';
+import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
 import '../core/init/size/size_extension.dart';
 import '../viewModel/permissions_view_model.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/permission_listtile.dart';
-import '../core/enums/enums.dart';
 
 class PermissionProceduresView extends StatefulWidget {
   const PermissionProceduresView({super.key});

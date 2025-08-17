@@ -1,13 +1,11 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/cupertino.dart';
 
 import '../core/base/view_model/base_view_model.dart';
+import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
 import '../models/events_model.dart';
 import '../service/in_and_out_service.dart';
 import '../widgets/dialog/snackbar.dart';
-import '../core/enums/enums.dart';
 
 class InAndOutListViewModel extends BaseViewModel {
   ShiftStatus? shiftStatus;
@@ -42,6 +40,7 @@ class InAndOutListViewModel extends BaseViewModel {
         shiftStatus = ShiftStatus.loaded;
       } else {
         shiftStatus = ShiftStatus.loadingFailed;
+        if (!context.mounted) return;
         CustomSnackBar(
           context,
           shiftListModel.message!,
@@ -50,6 +49,7 @@ class InAndOutListViewModel extends BaseViewModel {
       }
     } catch (e) {
       shiftStatus = ShiftStatus.loadingFailed;
+      if (!context.mounted) return;
       CustomSnackBar(
         context,
         'Veri yüklenirken hata oluştu',

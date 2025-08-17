@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'size_setting.dart';
 import '../../enums/enums.dart';
 
-/// Provides `Context`, `Orientation`, and `DeviceType` parameters to the builder function
 typedef ResponsiveBuild =
     Widget Function(
       BuildContext context,

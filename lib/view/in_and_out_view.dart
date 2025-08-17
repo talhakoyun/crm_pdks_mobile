@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../core/base/size_singleton.dart';
 import '../core/constants/image_constants.dart';
 import '../core/constants/string_constants.dart';
+import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
 import '../core/init/size/size_extension.dart';
 import '../core/init/size/size_setting.dart';
@@ -11,7 +12,6 @@ import '../viewModel/auth_view_model.dart';
 import '../viewModel/inandout_list_view_model.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/in_and_out_points_card.dart';
-import '../core/enums/enums.dart';
 
 class InAndOutsView extends StatefulWidget {
   const InAndOutsView({super.key});

@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_typing_uninitialized_variables
-
 import 'dart:convert';
 import 'dart:io';
 
@@ -10,7 +8,7 @@ import '../../../init/network/exception/app_exception.dart';
 import '../../../init/network/service/base_service.dart';
 
 class NetworkApiServices extends BaseApiServices {
-  var jsonResponse;
+  dynamic jsonResponse;
 
   @override
   Future getApiResponse(String url) async {
@@ -30,7 +28,7 @@ class NetworkApiServices extends BaseApiServices {
 
   @override
   Future postApiResponse(String url, var data, String? token) async {
-    var jsonResponse;
+    dynamic jsonResponse;
     var client = http.Client();
     try {
       http.Response response = await client
