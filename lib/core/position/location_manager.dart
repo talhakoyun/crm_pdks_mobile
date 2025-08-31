@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../widgets/dialog/custom_dialog.dart';
+import '../enums/enums.dart';
+import '../factory/dialog_factory.dart';
 
 class LocationManager extends ChangeNotifier {
   Position? currentPosition;
@@ -16,10 +17,10 @@ class LocationManager extends ChangeNotifier {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!context.mounted) return;
     if (!serviceEnabled) {
-      CustomAlertDialog.locationPermissionAlert(
+      DialogFactory.create(
         context: context,
-        isEnabled: true,
-        isMock: false,
+        type: DialogType.locationPermission,
+        parameters: {'isEnabled': true, 'isMock': false},
       );
     }
     permission = await Geolocator.checkPermission();
@@ -28,10 +29,10 @@ class LocationManager extends ChangeNotifier {
     }
     if (!context.mounted) return;
     if (permission == LocationPermission.deniedForever) {
-      CustomAlertDialog.locationPermissionAlert(
+      DialogFactory.create(
         context: context,
-        isEnabled: false,
-        isMock: false,
+        type: DialogType.locationPermission,
+        parameters: {'isEnabled': false, 'isMock': false},
       );
     }
     return await getCurrentLocation(context);
@@ -57,10 +58,10 @@ class LocationManager extends ChangeNotifier {
 
   mockedCheck(context) {
     if (isMockLocation) {
-      CustomAlertDialog.locationPermissionAlert(
+      DialogFactory.create(
         context: context,
-        isEnabled: true,
-        isMock: isMockLocation,
+        type: DialogType.locationPermission,
+        parameters: {'isEnabled': true, 'isMock': isMockLocation},
       );
     }
   }

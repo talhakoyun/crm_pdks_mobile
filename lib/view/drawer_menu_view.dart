@@ -22,7 +22,14 @@ class DrawerMenuView extends StatefulWidget {
 
 class _DrawerMenuViewState extends State<DrawerMenuView>
     with BaseSingleton, SizeSingleton {
-  AuthViewModel authVM = AuthViewModel();
+  late AuthViewModel authVM;
+
+  @override
+  void initState() {
+    super.initState();
+    authVM = Provider.of<AuthViewModel>(context, listen: false);
+  }
+
   @override
   Widget build(BuildContext context) {
     PermissionViewModel permissionVM = Provider.of<PermissionViewModel>(

@@ -131,6 +131,13 @@
   "dialog": {
     "alertDescription": "Açıklama alanı zorunludur ve minimum 5 karakterden oluşmalıdır.",
     "nonAppRedirect": "Uygulama Dışı Yönlendirme!",
-    "enterTheAddress": "Adresine girmek istediğinize emin misiniz?"
+    "enterTheAddress": "Adresine girmek istediğinize emin misiniz?",
+    "qrTypeSelection": "Yapmak istediğiniz işlemi seçin",
+    "qrEntryAction": "Giriş Yap",
+    "qrExitAction": "Çıkış Yap",
+    "error": "Hata",
+    "success": "Başarılı",
+    "close": "Kapat",
+    "update": "Güncelle"
   }
 }

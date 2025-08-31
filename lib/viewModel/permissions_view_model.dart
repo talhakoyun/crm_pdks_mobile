@@ -3,15 +3,16 @@ import 'package:flutter/material.dart';
 import '../core/base/view_model/base_view_model.dart';
 import '../core/constants/navigation_constants.dart';
 import '../core/constants/string_constants.dart';
+import '../core/di/service_locator.dart';
 import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
-import '../core/widget/customize_dialog.dart';
+import '../core/factory/dialog_factory.dart';
 import '../models/base_model.dart';
 import '../models/holiday_types_model.dart';
 import '../models/holidays_model.dart';
 import '../service/permission_service.dart';
-import '../widgets/dialog/custom_loader.dart';
-import '../widgets/dialog/snackbar.dart';
+import '../core/widget/loader.dart';
+import '../widgets/snackbar.dart';
 
 class PermissionViewModel extends BaseViewModel {
   Map? permissionData;
@@ -22,11 +23,16 @@ class PermissionViewModel extends BaseViewModel {
   TextEditingController holidayEndDt = TextEditingController();
   List<HolidayTypeDataModel> typeItems = [];
   PermissionStatus? permissionStatus;
-  final permissionServices = PermissionService();
+
+  // Dependency injection ile service alımı
+  late final PermissionService _permissionServices;
 
   List<HolidayDataModel> permissionListItems = [];
   HolidayListModel? holidayList;
-  PermissionViewModel() {
+
+  PermissionViewModel({PermissionService? permissionService}) : super() {
+    _permissionServices =
+        permissionService ?? ServiceLocator.instance.get<PermissionService>();
     permissionStatus = PermissionStatus.loading;
   }
 
@@ -40,7 +46,7 @@ class PermissionViewModel extends BaseViewModel {
 
   Future<void> fetchHolidayTypes() async {
     try {
-      final response = await permissionServices.holidayTypeList();
+      final response = await _permissionServices.holidayTypeList();
       debugPrint('Holiday types response: ${response.status}');
       if (response.status!) {
         typeItems = response.data!;
@@ -53,7 +59,7 @@ class PermissionViewModel extends BaseViewModel {
 
   void fetchList(BuildContext context) async {
     permissionStatus = PermissionStatus.loading;
-    HolidayListModel holidayListModel = await permissionServices.holidayList();
+    HolidayListModel holidayListModel = await _permissionServices.holidayList();
     if (holidayListModel.status!) {
       permissionListItems = holidayListModel.data!;
       permissionStatus = PermissionStatus.loaded;
@@ -76,13 +82,13 @@ class PermissionViewModel extends BaseViewModel {
     required DateTime endDt,
     required BuildContext context,
   }) async {
-    CustomLoader.showAlertDialog(context);
+    Loader.show(context);
     if (type != 0 &&
         holidayReason.text != "" &&
         holidayAddress.text != "" &&
         holidayEndDt.text != "" &&
         holidayStartDt.text.isNotEmpty) {
-      BaseModel<Map<String, dynamic>> data = await permissionServices
+      BaseModel<Map<String, dynamic>> data = await _permissionServices
           .holidayCreate(
             type: type,
             startDt: startDt,
@@ -120,10 +126,10 @@ class PermissionViewModel extends BaseViewModel {
   }
 
   errorDialog(BuildContext context, String message) {
-    CustomizeDialog.show(
+    DialogFactory.create(
       context: context,
       type: DialogType.error,
-      message: message,
+      parameters: {'message': message},
     );
   }
 }

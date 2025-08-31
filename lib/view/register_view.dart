@@ -18,10 +18,12 @@ class RegisterView extends StatefulWidget {
 
 class _RegisterViewState extends State<RegisterView>
     with BaseSingleton, SizeSingleton {
-  final AuthViewModel authVM = AuthViewModel();
+  late AuthViewModel authVM;
+
   @override
   void initState() {
     super.initState();
+    authVM = Provider.of<AuthViewModel>(context, listen: false);
     authVM.init();
   }
 
@@ -33,60 +35,55 @@ class _RegisterViewState extends State<RegisterView>
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: authVM,
-      builder: (context, snapshot) {
-        return Scaffold(
-          backgroundColor: context.colorScheme.onError,
-          bottomNavigationBar: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text.rich(
+    return Scaffold(
+      backgroundColor: context.colorScheme.onError,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text.rich(
+          TextSpan(
+            text: strCons.companyText,
+            style: context.textTheme.bodySmall!.copyWith(
+              fontWeight: FontWeight.w400,
+              color: context.colorScheme.onTertiary,
+            ),
+            children: <TextSpan>[
               TextSpan(
-                text: strCons.companyText,
+                text: strCons.splashFooter,
                 style: context.textTheme.bodySmall!.copyWith(
-                  fontWeight: FontWeight.w400,
                   color: context.colorScheme.onTertiary,
+                  fontWeight: FontWeight.w400,
                 ),
-                children: <TextSpan>[
-                  TextSpan(
-                    text: strCons.splashFooter,
-                    style: context.textTheme.bodySmall!.copyWith(
-                      color: context.colorScheme.onTertiary,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
               ),
-              textAlign: TextAlign.center,
+            ],
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            color: context.colorScheme.primary,
+            image: DecorationImage(
+              image: AssetImage(imgCons.splashBG),
+              fit: BoxFit.cover,
             ),
           ),
-          body: GestureDetector(
-            onTap: () {
-              FocusScope.of(context).requestFocus(FocusNode());
-            },
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: BoxDecoration(
-                color: context.colorScheme.primary,
-                image: DecorationImage(
-                  image: AssetImage(imgCons.splashBG),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: Container(
-                constraints: BoxConstraints(
-                  maxHeight: SizerUtil.height,
-                  minWidth: SizerUtil.width,
-                ),
-                child: Column(
-                  children: [buildLogoArea(context), buildFormArea(context)],
-                ),
-              ),
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: SizerUtil.height,
+              minWidth: SizerUtil.width,
+            ),
+            child: Column(
+              children: [buildLogoArea(context), buildFormArea(context)],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 

@@ -1,2 +1,10 @@
-enum DialogType { error, success, update }
-
+enum DialogType {
+  success,
+  error,
+  warning,
+  update,
+  inAndOut,
+  qrTypeSelection,
+  illegal,
+  locationPermission,
+}

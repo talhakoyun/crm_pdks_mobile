@@ -1,19 +1,22 @@
 import 'package:flutter/cupertino.dart';
 
 import '../core/base/view_model/base_view_model.dart';
+import '../core/di/service_locator.dart';
 import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
 import '../models/shift_model.dart';
 import '../service/in_and_out_service.dart';
-import '../widgets/dialog/snackbar.dart';
+import '../widgets/snackbar.dart';
 
 class InAndOutListViewModel extends BaseViewModel {
   ShiftStatus? shiftStatus;
   List<ShiftDataModel> shiftListItems = [];
   ShiftsModel? shiftList;
-  final inAndOutService = InAndOutService();
+  late final InAndOutService _inAndOutService;
 
-  InAndOutListViewModel() {
+  InAndOutListViewModel({InAndOutService? inAndOutService}) : super() {
+    _inAndOutService =
+        inAndOutService ?? ServiceLocator.instance.get<InAndOutService>();
     shiftStatus = ShiftStatus.loading;
   }
 
@@ -23,7 +26,6 @@ class InAndOutListViewModel extends BaseViewModel {
   @override
   void init() {}
 
-  // Deprecated method, use init() instead
   void fetchList(BuildContext context) async {
     await fetchShiftList(context);
   }
@@ -33,10 +35,9 @@ class InAndOutListViewModel extends BaseViewModel {
     notifyListeners();
 
     try {
-      ShiftsModel shiftListModel = await inAndOutService.shiftList();
+      ShiftsModel shiftListModel = await _inAndOutService.shiftList();
       if (shiftListModel.status!) {
         shiftListItems = shiftListModel.data!;
-        // Veriler başarıyla yüklendi
         shiftStatus = ShiftStatus.loaded;
       } else {
         shiftStatus = ShiftStatus.loadingFailed;

@@ -131,6 +131,13 @@
   "dialog": {
     "alertDescription": "Description field is required and must consist of at least 5 characters.",
     "nonAppRedirect": "Non-App Redirect!",
-    "enterTheAddress": "Are you sure you want to enter the address?"
+    "enterTheAddress": "Are you sure you want to enter the address?",
+    "qrTypeSelection": "Select the action you want to perform",
+    "qrEntryAction": "Check In",
+    "qrExitAction": "Check Out",
+    "error": "Error",
+    "success": "Success",
+    "close": "Close",
+    "update": "Update"
   }
 }

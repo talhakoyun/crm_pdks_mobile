@@ -15,11 +15,22 @@ class DeviceInfoManager {
   String? deviceModel;
   bool? isEmulator;
   bool isFailedDeviceInfo = false;
+  bool _isInitialized = false;
 
-  DeviceInfoManager() {
-    if (deviceId == null || deviceModel == null) {
-      getDeviceInfo();
+  DeviceInfoManager();
+
+  Future<void> initialize() async {
+    if (_isInitialized) return;
+
+    await getDeviceInfo();
+    _isInitialized = true;
+  }
+
+  Future<String> getDeviceIdSafe() async {
+    if (!_isInitialized) {
+      await initialize();
     }
+    return deviceId ?? 'unknown_device';
   }
 
   getDeviceInfo() async {

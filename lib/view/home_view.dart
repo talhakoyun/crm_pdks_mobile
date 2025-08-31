@@ -28,14 +28,16 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
-  InAndOutViewModel inAndOutViewModel = InAndOutViewModel();
   LocationManager locationManager = LocationManager();
+  late InAndOutViewModel inAndOutViewModel;
   Position? currentPosition;
   bool? isMockLocation;
   StreamController<bool> isOutSide = StreamController<bool>.broadcast();
+
   @override
   void initState() {
     super.initState();
+    inAndOutViewModel = InAndOutViewModel(locationManager: locationManager);
     // inAndOutViewModel.pushSignalService();
   }
 

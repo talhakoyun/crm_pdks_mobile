@@ -1,38 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../core/base/view_model/base_view_model.dart';
 import '../core/constants/device_constants.dart';
 import '../core/constants/image_constants.dart';
-import '../core/constants/size_config.dart';
 import '../core/constants/string_constants.dart';
-import '../core/enums/alert_capability_situation.dart';
+import '../core/di/service_locator.dart';
+import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
+import '../core/factory/dialog_factory.dart';
 import '../core/init/network/connectivity/network_connectivity.dart';
+import '../core/position/location_manager.dart';
 import '../models/base_model.dart';
 import '../service/in_and_out_service.dart';
 import '../view/qr_scanner_view.dart';
-import '../widgets/dialog/custom_dialog.dart';
-import '../widgets/dialog/custom_illegal_dialog.dart';
-import '../widgets/dialog/custom_loader.dart';
-import '../widgets/dialog/snackbar.dart';
+import '../core/widget/loader.dart';
+import '../widgets/snackbar.dart';
 import 'auth_view_model.dart';
 
 class InAndOutViewModel extends BaseViewModel {
-  NetworkConnectivity networkConnectivity = NetworkConnectivity();
+  final LocationManager locationManager;
+  late final NetworkConnectivity _networkConnectivity;
+  late final InAndOutService _inAndOutService;
+  late final DeviceInfoManager _deviceInfo;
+  late final AuthViewModel _authVM;
   bool isExternal = false;
   TextEditingController lateNoteText = TextEditingController();
   TextEditingController earlyNoteText = TextEditingController();
-  final inAndOutService = InAndOutService();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   bool isLate = false;
   bool isEarly = false;
   String scannerBarcode = "";
   int type = -1;
   int outSide = 0;
-  DeviceInfoManager deviceInfo = DeviceInfoManager();
-  AuthViewModel authVM = AuthViewModel();
+
+  InAndOutViewModel({
+    required this.locationManager,
+    NetworkConnectivity? networkConnectivity,
+    InAndOutService? inAndOutService,
+    DeviceInfoManager? deviceInfo,
+    AuthViewModel? authViewModel,
+  }) : super() {
+    _networkConnectivity =
+        networkConnectivity ??
+        ServiceLocator.instance.get<NetworkConnectivity>();
+    _inAndOutService =
+        inAndOutService ?? ServiceLocator.instance.get<InAndOutService>();
+    _deviceInfo =
+        deviceInfo ?? ServiceLocator.instance.get<DeviceInfoManager>();
+    _authVM = authViewModel ?? ServiceLocator.instance.get<AuthViewModel>();
+  }
+
+  NetworkConnectivity get networkConnectivity => _networkConnectivity;
+  DeviceInfoManager get deviceInfo => _deviceInfo;
+  AuthViewModel get authVM => _authVM;
 
   void buildMethod(BuildContext context) {
     context.watch<AuthViewModel>();
@@ -40,35 +61,39 @@ class InAndOutViewModel extends BaseViewModel {
   }
 
   void pressLogin(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
-    location.determinePosition(context);
-    if (location.currentPosition != null) {
-      showInAndOutDialog(
-        context: context,
-        content: StringConstants.instance.inText,
-        iconPath: ImageConstants.instance.start,
-        color: context.colorScheme.tertiaryContainer,
-        onPressed: () async {
-          Navigator.pop(context); // Dialog'u kapat
+    locationManager.determinePosition(context);
 
-          if (location.currentPosition != null) {
-            if (networkConnectivity.internet) {
-              await executeShiftProcedure(
-                type: 1, // Giriş
-                longitude: location.currentPosition!.longitude,
-                latitude: location.currentPosition!.latitude,
-                deviceId: deviceInfo.deviceId,
-                deviceModel: deviceInfo.deviceModel,
-                context: context,
-                isMockLocation: location.isMockLocation,
-              );
-            } else {
-              CustomSnackBar(
-                context,
-                StringConstants.instance.networkMsg,
-                backgroundColor: context.colorScheme.error,
-              );
+    if (locationManager.currentPosition != null) {
+      DialogFactory.create(
+        context: context,
+        type: DialogType.inAndOut,
+        parameters: {
+          'content': StringConstants.instance.inText,
+          'iconPath': ImageConstants.instance.start,
+          'color': context.colorScheme.tertiaryContainer,
+          'onPressed': () async {
+            Navigator.pop(context);
+
+            if (locationManager.currentPosition != null) {
+              if (networkConnectivity.internet) {
+                await executeShiftProcedure(
+                  type: 1, // Giriş
+                  longitude: locationManager.currentPosition!.longitude,
+                  latitude: locationManager.currentPosition!.latitude,
+                  deviceId: deviceInfo.deviceId,
+                  deviceModel: deviceInfo.deviceModel,
+                  context: context,
+                  isMockLocation: locationManager.isMockLocation,
+                );
+              } else {
+                CustomSnackBar(
+                  context,
+                  StringConstants.instance.networkMsg,
+                  backgroundColor: context.colorScheme.error,
+                );
+              }
             }
-          }
+          },
         },
       );
     } else {
@@ -80,49 +105,56 @@ class InAndOutViewModel extends BaseViewModel {
     }
 
     if (isLate) {
-      CustomIllegalDialog.instance.showIllegalDialog(
+      DialogFactory.create(
         context: context,
-        scaffoldKey: GlobalKey<ScaffoldState>(),
-        locationManager: location,
-        titleText: StringConstants.instance.confirmText,
-        excuseText: StringConstants.instance.lateDescription,
-        cancelText: StringConstants.instance.cancelText,
-        controller: lateNoteText,
-        message: StringConstants.instance.successMessage,
-        deviceInfo: deviceInfo,
-        situation: AlertCapabilitySituation.lateInEvent,
+        type: DialogType.illegal,
+        parameters: {
+          'scaffoldKey': GlobalKey<ScaffoldState>(),
+          'inAndOutViewModel': this,
+          'titleText': StringConstants.instance.confirmText,
+          'excuseText': StringConstants.instance.lateDescription,
+          'cancelText': StringConstants.instance.cancelText,
+          'controller': lateNoteText,
+          'message': StringConstants.instance.successMessage,
+          'deviceInfo': deviceInfo,
+          'situation': AlertCapabilitySituation.lateInEvent,
+        },
       );
     }
   }
 
   void pressOut(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
-    location.determinePosition(context);
-    if (location.currentPosition != null) {
-      showInAndOutDialog(
-        context: context,
-        content: StringConstants.instance.outText,
-        iconPath: ImageConstants.instance.stop,
-        color: context.colorScheme.errorContainer,
-        onPressed: () async {
-          Navigator.pop(context); // Dialog'u kapat
+    locationManager.determinePosition(context);
 
-          if (networkConnectivity.internet) {
-            await executeShiftProcedure(
-              type: 2, // Çıkış
-              longitude: location.currentPosition!.longitude,
-              latitude: location.currentPosition!.latitude,
-              deviceId: deviceInfo.deviceId,
-              deviceModel: deviceInfo.deviceModel,
-              isMockLocation: location.isMockLocation,
-              context: context,
-            );
-          } else {
-            CustomSnackBar(
-              context,
-              StringConstants.instance.networkMsg,
-              backgroundColor: context.colorScheme.error,
-            );
-          }
+    if (locationManager.currentPosition != null) {
+      DialogFactory.create(
+        context: context,
+        type: DialogType.inAndOut,
+        parameters: {
+          'content': StringConstants.instance.outText,
+          'iconPath': ImageConstants.instance.stop,
+          'color': context.colorScheme.primaryContainer,
+          'onPressed': () async {
+            Navigator.pop(context);
+
+            if (networkConnectivity.internet) {
+              await executeShiftProcedure(
+                type: 2, // Çıkış
+                longitude: locationManager.currentPosition!.longitude,
+                latitude: locationManager.currentPosition!.latitude,
+                deviceId: deviceInfo.deviceId,
+                deviceModel: deviceInfo.deviceModel,
+                isMockLocation: locationManager.isMockLocation,
+                context: context,
+              );
+            } else {
+              CustomSnackBar(
+                context,
+                StringConstants.instance.networkMsg,
+                backgroundColor: context.colorScheme.error,
+              );
+            }
+          },
         },
       );
     } else {
@@ -134,17 +166,20 @@ class InAndOutViewModel extends BaseViewModel {
     }
 
     if (isEarly) {
-      CustomIllegalDialog.instance.showIllegalDialog(
+      DialogFactory.create(
         context: context,
-        scaffoldKey: GlobalKey<ScaffoldState>(),
-        locationManager: location,
-        titleText: StringConstants.instance.confirmText2,
-        excuseText: StringConstants.instance.earlyDescription,
-        cancelText: StringConstants.instance.cancelText2,
-        controller: earlyNoteText,
-        message: 'message',
-        deviceInfo: deviceInfo,
-        situation: AlertCapabilitySituation.earlyOutEvent,
+        type: DialogType.illegal,
+        parameters: {
+          'scaffoldKey': GlobalKey<ScaffoldState>(),
+          'inAndOutViewModel': this,
+          'titleText': StringConstants.instance.confirmText2,
+          'excuseText': StringConstants.instance.earlyDescription,
+          'cancelText': StringConstants.instance.cancelText2,
+          'controller': earlyNoteText,
+          'message': 'message',
+          'deviceInfo': deviceInfo,
+          'situation': AlertCapabilitySituation.earlyOutEvent,
+        },
       );
     }
   }
@@ -169,17 +204,17 @@ class InAndOutViewModel extends BaseViewModel {
     }
 
     if (isMockLocation) {
-      CustomAlertDialog.locationPermissionAlert(
+      DialogFactory.create(
         context: context,
-        isEnabled: true,
-        isMock: isMockLocation,
+        type: DialogType.locationPermission,
+        parameters: {'isEnabled': true, 'isMock': isMockLocation},
       );
       return null;
     }
 
-    CustomLoader.showAlertDialog(context);
+    Loader.show(context);
     try {
-      data = await inAndOutService.sendShift(
+      data = await _inAndOutService.sendShift(
         type: type,
         longitude: longitude,
         latitude: latitude,
@@ -190,7 +225,7 @@ class InAndOutViewModel extends BaseViewModel {
       );
 
       if (!context.mounted) return null;
-      Navigator.pop(context);
+      Loader.hide();
 
       if (data.status!) {
         CustomSnackBar(context, data.message!);
@@ -217,7 +252,7 @@ class InAndOutViewModel extends BaseViewModel {
         }
       }
     } catch (e) {
-      Navigator.pop(context);
+      Loader.hide();
       CustomSnackBar(
         context,
         StringConstants.instance.errorMessage,
@@ -230,9 +265,21 @@ class InAndOutViewModel extends BaseViewModel {
 
   void pressQrArea(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
     if (networkConnectivity.internet) {
-      if (location.currentPosition != null) {
-        // QR işlem türü seçim popup'ı göster
-        showQrTypeSelectionDialog(context);
+      if (locationManager.currentPosition != null) {
+        DialogFactory.create(
+          context: context,
+          type: DialogType.qrTypeSelection,
+          parameters: {
+            'onInPressed': () {
+              Navigator.pop(context);
+              openQrScanner(context, 1); // Giriş
+            },
+            'onOutPressed': () {
+              Navigator.pop(context);
+              openQrScanner(context, 2); // Çıkış
+            },
+          },
+        );
       } else {
         CustomSnackBar(
           context,
@@ -249,90 +296,14 @@ class InAndOutViewModel extends BaseViewModel {
     }
   }
 
-  void showQrTypeSelectionDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            "İşlem Seçimi",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: context.colorScheme.onSurface,
-            ),
-          ),
-          content: Text(
-            "Yapmak istediğiniz işlemi seçin",
-            style: TextStyle(
-              fontSize: 16,
-              color: context.colorScheme.onSurface,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                // Giriş yap (type: 1)
-                openQrScanner(context, 1);
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: context.colorScheme.tertiaryContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  "Giriş Yap",
-                  style: TextStyle(
-                    color: context.colorScheme.onTertiaryContainer,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                // Çıkış yap (type: 2)
-                openQrScanner(context, 2);
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: context.colorScheme.errorContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  "Çıkış Yap",
-                  style: TextStyle(
-                    color: context.colorScheme.onErrorContainer,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void openQrScanner(BuildContext context, int selectedType) {
-    type = selectedType; // Seçilen type'ı sakla
+    type = selectedType;
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => QrScannerView(
           onQrScanned: (String qrCode) {
-            // QR kod okunduktan sonra API'ye gönder
             processQrCode(context, qrCode, selectedType);
           },
         ),
@@ -345,29 +316,32 @@ class InAndOutViewModel extends BaseViewModel {
     String qrCode,
     int type,
   ) async {
-    if (location.currentPosition != null) {
-      if (location.isMockLocation) {
-        CustomAlertDialog.locationPermissionAlert(
+    if (locationManager.currentPosition != null) {
+      if (locationManager.isMockLocation) {
+        DialogFactory.create(
           context: context,
-          isEnabled: true,
-          isMock: location.isMockLocation,
+          type: DialogType.locationPermission,
+          parameters: {
+            'isEnabled': true,
+            'isMock': locationManager.isMockLocation,
+          },
         );
         return;
       }
 
-      CustomLoader.showAlertDialog(context);
+      Loader.show(context);
 
       try {
-        var result = await inAndOutService.sendQrShift(
+        var result = await _inAndOutService.sendQrShift(
           qrStr: qrCode,
           type: type,
-          longitude: location.currentPosition!.longitude,
-          latitude: location.currentPosition!.latitude,
+          longitude: locationManager.currentPosition!.longitude,
+          latitude: locationManager.currentPosition!.latitude,
           deviceId: deviceInfo.deviceId,
           deviceModel: deviceInfo.deviceModel,
         );
         if (!context.mounted) return;
-        Navigator.pop(context);
+        Loader.hide();
         Navigator.pop(context);
 
         if (result.status!) {
@@ -380,7 +354,7 @@ class InAndOutViewModel extends BaseViewModel {
           );
         }
       } catch (e) {
-        Navigator.pop(context);
+        Loader.hide();
         Navigator.pop(context);
         CustomSnackBar(
           context,
@@ -441,50 +415,6 @@ class InAndOutViewModel extends BaseViewModel {
       }
     }
     return false;
-  }
-
-  void showInAndOutDialog({
-    required BuildContext context,
-    required String content,
-    required String iconPath,
-    required Color color,
-    required VoidCallback onPressed,
-  }) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: context.colorScheme.onError,
-          titleTextStyle: context.textTheme.titleLarge,
-          title: Text(content, textAlign: TextAlign.center),
-          actionsAlignment: MainAxisAlignment.center,
-          alignment: Alignment.center,
-          content: Padding(
-            padding: context.paddingLow,
-            child: SvgPicture.asset(
-              fit: BoxFit.contain,
-              colorFilter: ColorFilter.mode(
-                context.colorScheme.tertiaryContainer,
-                BlendMode.srcIn,
-              ),
-              ImageConstants.instance.start,
-              width: SizeConfig.instance.widthSize(context, 5),
-              height: SizeConfig.instance.heightSize(context, 35),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(StringConstants.instance.cancelButtonText),
-            ),
-            TextButton(
-              onPressed: onPressed,
-              child: Text(StringConstants.instance.okey),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override

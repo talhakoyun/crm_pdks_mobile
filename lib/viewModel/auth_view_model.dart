@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,19 +10,20 @@ import '../core/base/view_model/base_view_model.dart';
 import '../core/constants/device_constants.dart';
 import '../core/constants/navigation_constants.dart';
 import '../core/constants/string_constants.dart';
+import '../core/di/service_locator.dart';
 import '../core/enums/dialog_type.dart';
 import '../core/enums/preferences_keys.dart';
 import '../core/enums/sign_status.dart';
 import '../core/extension/context_extension.dart';
 import '../core/init/cache/locale_manager.dart';
 import '../core/init/network/connectivity/network_connectivity.dart';
-import '../core/widget/customize_dialog.dart';
+import '../core/factory/dialog_factory.dart';
 import '../core/widget/loader.dart';
 import '../models/base_model.dart';
 import '../models/logout_model.dart';
 import '../models/user_model.dart';
 import '../service/auth_service.dart';
-import '../widgets/dialog/snackbar.dart';
+import '../widgets/snackbar.dart';
 
 bool? registerStatus;
 
@@ -63,10 +63,15 @@ class AuthViewModel extends BaseViewModel {
     DeviceInfoManager? deviceService,
     NetworkConnectivity? networkConnectivity,
     LocaleManager? storageService,
-  }) : _authService = authService ?? AuthService(),
-       _deviceService = deviceService ?? DeviceInfoManager(),
-       networkConnectivity = networkConnectivity ?? NetworkConnectivity(),
-       _storageService = storageService ?? LocaleManager.instance {
+  }) : _authService = authService ?? ServiceLocator.instance.get<AuthService>(),
+       _deviceService =
+           deviceService ?? ServiceLocator.instance.get<DeviceInfoManager>(),
+       networkConnectivity =
+           networkConnectivity ??
+           ServiceLocator.instance.get<NetworkConnectivity>(),
+       _storageService =
+           storageService ?? ServiceLocator.instance.get<LocaleManager>(),
+       super(localeManager: storageService, navigationService: null) {
     if (accessToken == null) {
       _loadUserDataFromStorage();
     }
@@ -108,22 +113,10 @@ class AuthViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  /// Centralized error logging
-  void _logError(String operation, dynamic error, [StackTrace? stackTrace]) {
-    dev.log(
-      'AuthViewModel Error in $operation: $error',
-      name: 'AuthViewModel',
-      error: error,
-      stackTrace: stackTrace,
-    );
-  }
-
-  /// Safe network connectivity check
   bool _isNetworkConnected() {
     try {
       return networkConnectivity.internet;
     } catch (e) {
-      _logError('Network Check', e);
       return false;
     }
   }
@@ -150,7 +143,6 @@ class AuthViewModel extends BaseViewModel {
           );
         }
       } else {
-        // Offline durumda token varsa home'a git
         final token = _storageService.getStringValue(PreferencesKeys.TOKEN);
         if (token.isNotEmpty) {
           navigation.navigateToPageClear(path: NavigationConstants.HOME);
@@ -169,11 +161,10 @@ class AuthViewModel extends BaseViewModel {
     String message, {
     bool exitOnClose = true,
   }) {
-    CustomizeDialog.show(
+    DialogFactory.create(
       context: context,
       type: DialogType.error,
-      message: message,
-      exitOnClose: exitOnClose,
+      parameters: {'message': message, 'exitOnClose': exitOnClose},
     );
   }
 
@@ -182,11 +173,10 @@ class AuthViewModel extends BaseViewModel {
     String message, {
     required Function onConfirm,
   }) {
-    CustomizeDialog.show(
+    DialogFactory.create(
       context: context,
       type: DialogType.success,
-      message: message,
-      onConfirm: onConfirm,
+      parameters: {'message': message, 'onConfirm': onConfirm},
     );
   }
 
@@ -195,12 +185,19 @@ class AuthViewModel extends BaseViewModel {
       return;
     }
 
+    String deviceId;
+    try {
+      deviceId = await _deviceService.getDeviceIdSafe();
+    } catch (e) {
+      deviceId = 'unknown_device';
+    }
+
     Map bodyData = {
       'email': emailController?.text.trim(),
       'password': passController?.text.trim(),
-      'device_id': _deviceService.deviceId,
+      'device_id': deviceId,
     };
-
+    if (!context.mounted) return;
     await _login(context, bodyData);
   }
 
@@ -280,12 +277,10 @@ class AuthViewModel extends BaseViewModel {
       } else {
         final errorMessage =
             result.message ?? StringConstants.instance.errorMessage;
-        _logError('Login Failed', errorMessage);
         _showErrorDialog(context, errorMessage, exitOnClose: false);
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       if (!context.mounted) return;
-      _logError('Login Exception', e, stackTrace);
       _showErrorDialog(
         context,
         '${StringConstants.instance.errorMessage} ${StringConstants.instance.errorMessageContinue}',
@@ -397,11 +392,9 @@ class AuthViewModel extends BaseViewModel {
       } else {
         final errorMessage =
             result.message ?? StringConstants.instance.errorMessage;
-        _logError('Registration Failed', errorMessage);
         _showErrorDialog(context, errorMessage, exitOnClose: false);
       }
-    } catch (e, stackTrace) {
-      _logError('Registration Exception', e, stackTrace);
+    } catch (e) {
       _showErrorDialog(
         context,
         '${StringConstants.instance.errorMessage} ${StringConstants.instance.errorMessageContinue}',
@@ -462,8 +455,7 @@ class AuthViewModel extends BaseViewModel {
       } else if (Platform.isIOS) {
         await _handleIOSVersionCheck(context, currentVersion);
       }
-    } catch (e, stackTrace) {
-      _logError('Version Check', e, stackTrace);
+    } catch (e) {
       _navigateBasedOnUserStatus();
     }
   }
@@ -497,11 +489,13 @@ class AuthViewModel extends BaseViewModel {
   void _showUpdateDialog(BuildContext? context, String updateUrl) {
     if (context == null) return;
 
-    CustomizeDialog.show(
+    DialogFactory.create(
       context: context,
       type: DialogType.update,
-      message: StringConstants.instance.appMessage,
-      onConfirm: () => UrlLaunch.openUrl(context, updateUrl),
+      parameters: {
+        'message': StringConstants.instance.appMessage,
+        'onConfirm': () => UrlLaunch.openUrl(context, updateUrl),
+      },
     );
   }
 
@@ -557,17 +551,14 @@ class AuthViewModel extends BaseViewModel {
   ) async {
     await _storeUserData(profileModel.data);
 
-    // Company data varsa kaydet
     if (profileModel.data!.first.company != null) {
       await _storeCompanyData(profileModel.data!.first.company);
     }
 
-    // Department data varsa kaydet
     if (profileModel.data!.first.department != null) {
       await _storeDepartmentData(profileModel.data!.first.department);
     }
 
-    // Settings data varsa kaydet
     if (profileModel.data!.first.settings != null) {
       await _storeSettingsData(profileModel.data!.first.settings);
     }
@@ -576,10 +567,8 @@ class AuthViewModel extends BaseViewModel {
   }
 
   Future<void> _storeUserData(dynamic userData) async {
-    // userData bir List<UserModel>, ilk elemanını al
     final user = userData is List ? userData.first : userData;
 
-    // UserModel'deki field'lara göre kaydet
     await _storageService.setStringValue(
       PreferencesKeys.ID,
       user.id?.toString() ?? "",
@@ -605,11 +594,10 @@ class AuthViewModel extends BaseViewModel {
       user.role?.name ?? "",
     );
 
-    // Shift bilgilerini kaydet
     if (user.shift != null) {
       await _storageService.setStringValue(
         PreferencesKeys.SHIFTNAME,
-        "Default Shift", // API'de shift name yok, default değer
+        "Default Shift",
       );
       await _storageService.setStringValue(
         PreferencesKeys.STARTDATE,
@@ -669,7 +657,6 @@ class AuthViewModel extends BaseViewModel {
       PreferencesKeys.OUTSIDE,
       settingsData.outside ?? false,
     );
-    // Zone için default değer - model'de olmadığı için
     await _storageService.setBoolValue(PreferencesKeys.ZONE, false);
   }
 
@@ -677,18 +664,12 @@ class AuthViewModel extends BaseViewModel {
     if (loginModel.data != null &&
         loginModel.data!.isNotEmpty &&
         loginModel.data!.first.accessToken != null) {
-      // User değişkenini set et
       user = loginModel.data;
-
       final userModel = loginModel.data!.first;
-
-      // Token'ı kaydet
       await _storageService.setStringValue(
         PreferencesKeys.TOKEN,
         userModel.accessToken ?? "",
       );
-
-      // Kullanıcı bilgilerini kaydet
       await _storageService.setStringValue(
         PreferencesKeys.USERNAME,
         userModel.name ?? "",
@@ -714,7 +695,6 @@ class AuthViewModel extends BaseViewModel {
         userModel.role?.name ?? "",
       );
 
-      // Company bilgilerini kaydet
       if (userModel.company != null) {
         await _storageService.setStringValue(
           PreferencesKeys.COMPID,
@@ -730,7 +710,6 @@ class AuthViewModel extends BaseViewModel {
         );
       }
 
-      // Department bilgilerini kaydet
       if (userModel.department != null) {
         await _storageService.setStringValue(
           PreferencesKeys.DEPARTMENTID,
@@ -742,7 +721,6 @@ class AuthViewModel extends BaseViewModel {
         );
       }
 
-      // Shift bilgilerini kaydet
       if (userModel.shift != null) {
         await _storageService.setStringValue(
           PreferencesKeys.SHIFTNAME,
@@ -769,7 +747,6 @@ class AuthViewModel extends BaseViewModel {
         }
       }
 
-      // Settings bilgilerini kaydet
       if (userModel.settings != null) {
         await _storageService.setBoolValue(
           PreferencesKeys.OUTSIDE,
@@ -777,10 +754,6 @@ class AuthViewModel extends BaseViewModel {
         );
       }
       await _storageService.setBoolValue(PreferencesKeys.ZONE, false);
-
-      dev.log('Login data saved to storage', name: 'AuthViewModel');
-
-      // Verileri memory'e yükle
       await profileGetDataShared();
     }
   }
@@ -806,28 +779,15 @@ class AuthViewModel extends BaseViewModel {
   }
 
   _loadUserDataFromStorage() {
-    // Önce mevcut durumu koru, gereksiz loading'e set etme
     profileGetDataShared();
-
-    // Token kontrolü daha güvenli hale getir
     final storedToken = _storageService.getStringValue(PreferencesKeys.TOKEN);
-
     if (storedToken.isNotEmpty) {
       accessToken = storedToken;
       event = SignStatus.logined;
-      dev.log(
-        'Token loaded from storage, user logged in',
-        name: 'AuthViewModel',
-      );
     } else {
       accessToken = null;
       event = SignStatus.lyLogin;
-      dev.log(
-        'No token found in storage, user not logged in',
-        name: 'AuthViewModel',
-      );
     }
-
     notifyListeners();
   }
 }

@@ -7,11 +7,15 @@ import 'package:flutter/services.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'app.dart';
+import 'core/constants/device_constants.dart';
+import 'core/di/service_locator.dart';
 import 'core/init/cache/locale_manager.dart';
 import 'core/translations/translation_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  ServiceLocator.instance.registerCoreServices();
+  await ServiceLocator.instance.get<DeviceInfoManager>().initialize();
   await LocaleManager.prefrencesInit();
   await Future.wait([EasyLocalization.ensureInitialized()]);
   HttpOverrides.global = MyHttpOverrides();

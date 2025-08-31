@@ -136,6 +136,13 @@ class StringConstants {
   String get dialogAlertDescription => "dialog.alertDescription".tr();
   String get nonAppRedirect => "dialog.nonAppRedirect".tr();
   String get enterTheAdress => "dialog.enterTheAddress".tr();
+  String get qrTypeSelectionText => "dialog.qrTypeSelection".tr();
+  String get qrEntryActionText => "dialog.qrEntryAction".tr();
+  String get qrExitActionText => "dialog.qrExitAction".tr();
+  String get dialogErrorTitle => "dialog.error".tr();
+  String get dialogSuccessTitle => "dialog.success".tr();
+  String get dialogCloseText => "dialog.close".tr();
+  String get dialogUpdateText => "dialog.update".tr();
 
   // URLs - These should remain as static values
   String get mapUrl =>
