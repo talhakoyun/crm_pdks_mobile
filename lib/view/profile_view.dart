@@ -1,16 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../core/base/base_singleton.dart';
 import '../core/base/size_singleton.dart';
 import '../core/extension/context_extension.dart';
-import '../core/init/size/size_extension.dart';
-import '../core/init/size/size_setting.dart';
 import '../viewModel/auth_view_model.dart';
-import '../widgets/text_input/profile_text_input.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -34,95 +28,141 @@ class _ProfileViewState extends State<ProfileView>
     return Consumer<AuthViewModel>(
       builder: (context, value, _) {
         return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            leading: IconButton(
-              onPressed: () {
-                context.navigationOf.pop();
-              },
-              icon: Icon(
-                Icons.arrow_back_ios_new_outlined,
-                color: context.colorScheme.surface,
-              ),
-            ),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  Fluttertoast.showToast(msg: strCons.profileLoading);
-                  value.getProfile(context, false);
-                },
-                icon: Icon(Icons.refresh, color: context.colorScheme.surface),
-              ),
-            ],
-          ),
+          backgroundColor: Colors.grey[50],
           body: Container(
-            margin: const EdgeInsets.all(12),
+            margin: const EdgeInsets.all(20),
             child: ListView(
               children: [
-                Image.asset(
-                  value.gender == "Erkek" ? imgCons.male : imgCons.female,
-                  height: sizeConfig.widthSize(context, 90),
-                  width: sizeConfig.widthSize(context, 90),
+                const SizedBox(height: 20),
+                // Profile Avatar with subtle styling
+                Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: .1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        value.gender == "Erkek" ? imgCons.male : imgCons.female,
+                        height: sizeConfig.widthSize(context, 110),
+                        width: sizeConfig.widthSize(context, 110),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
                 ),
-                context.emptySizedHeightBoxLow2x,
+                const SizedBox(height: 24),
                 Text(
-                  value.userName!,
-                  style: context.textTheme.headlineSmall,
+                  value.userName ?? '',
+                  style: context.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[800],
+                  ),
                   textAlign: TextAlign.center,
                 ),
+                const SizedBox(height: 8),
                 Text(
-                  value.department!,
-                  style: context.textTheme.bodyLarge,
+                  value.department ?? '',
+                  style: context.textTheme.bodyLarge?.copyWith(
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w400,
+                  ),
                   textAlign: TextAlign.center,
                 ),
-                context.emptySizedHeightBoxHigh,
-                ProfileTextInput(
-                  title: strCons.phone,
-                  description: value.phone,
-                  heightCon: Platform.isIOS
-                      ? SizerUtil.height > 670
-                            ? sizeConfig.heightSize(context, 60)
-                            : sizeConfig.heightSize(context, 75)
-                      : SizerUtil.height > 535
-                      ? sizeConfig.heightSize(context, 65)
-                      : sizeConfig.heightSize(context, 80),
-                  icon: Icons.phone_iphone_rounded,
-                  iconSize: 22.scalablePixel,
+                const SizedBox(height: 40),
+                // Info cards with clean design
+                _buildCleanInfoCard(
+                  context,
+                  strCons.phone,
+                  value.phone,
+                  Icons.phone_outlined,
                 ),
-                context.emptySizedHeightBoxLow2x,
-                ProfileTextInput(
-                  title: strCons.email,
-                  description: value.email,
-                  heightCon: Platform.isIOS
-                      ? SizerUtil.height > 670
-                            ? sizeConfig.heightSize(context, 60)
-                            : sizeConfig.heightSize(context, 75)
-                      : SizerUtil.height > 535
-                      ? sizeConfig.heightSize(context, 65)
-                      : sizeConfig.heightSize(context, 80),
-                  icon: Icons.mail,
-                  iconSize: 22.scalablePixel,
+                const SizedBox(height: 16),
+                _buildCleanInfoCard(
+                  context,
+                  strCons.email,
+                  value.email,
+                  Icons.email_outlined,
                 ),
-                context.emptySizedHeightBoxLow2x,
-                ProfileTextInput(
-                  title: strCons.gender,
-                  description: value.gender,
-                  heightCon: Platform.isIOS
-                      ? SizerUtil.height > 670
-                            ? sizeConfig.heightSize(context, 60)
-                            : sizeConfig.heightSize(context, 75)
-                      : SizerUtil.height > 535
-                      ? sizeConfig.heightSize(context, 65)
-                      : sizeConfig.heightSize(context, 80),
-                  icon: Icons.transgender_sharp,
-                  iconSize: 22.scalablePixel,
+                const SizedBox(height: 16),
+                _buildCleanInfoCard(
+                  context,
+                  strCons.gender,
+                  value.gender,
+                  Icons.person_outline,
                 ),
-                context.emptySizedHeightBoxLow2x,
+                const SizedBox(height: 40),
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildCleanInfoCard(
+    BuildContext context,
+    String title,
+    String? description,
+    IconData icon,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: .09),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: Colors.grey[600], size: 20),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[500],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description ?? '',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[800],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

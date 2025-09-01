@@ -43,15 +43,7 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
             backgroundColor: context.colorScheme.onTertiaryContainer,
             appBar: AppBar(
               backgroundColor: Colors.transparent,
-              leading: IconButton(
-                onPressed: () {
-                  context.navigationOf.pop();
-                },
-                icon: Icon(
-                  Icons.arrow_back_ios_new_outlined,
-                  color: context.colorScheme.onTertiary,
-                ),
-              ),
+              automaticallyImplyLeading: false, // Geri butonu kaldır
               actions: [
                 GestureDetector(
                   onTap: () => permissionVM.navigation.navigateToPage(

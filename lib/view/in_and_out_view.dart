@@ -41,12 +41,7 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
     return listVM.shiftStatus == ShiftStatus.loaded
         ? Scaffold(
             appBar: AppBar(
-              leading: IconButton(
-                onPressed: () {
-                  context.navigationOf.pop();
-                },
-                icon: const Icon(Icons.arrow_back_ios_new_outlined),
-              ),
+              automaticallyImplyLeading: false, // Geri butonu kaldır
             ),
             body: GestureDetector(
               onTap: () {

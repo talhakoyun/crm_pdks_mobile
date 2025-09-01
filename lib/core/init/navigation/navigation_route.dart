@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../../../view/register_view.dart';
 import '../../../view/get_permisson_view.dart';
-import '../../../view/home_view.dart';
 import '../../../view/in_and_out_view.dart';
 import '../../../view/login_view.dart';
+import '../../../view/main_navigation_view.dart';
 import '../../../view/permission_procedure_view.dart';
-import '../../../view/profile_view.dart';
 import '../../../view/splash_view.dart';
 import '../../../widgets/hack_device_view.dart';
 import '../../constants/navigation_constants.dart';
@@ -39,7 +38,11 @@ class NavigationRoute {
           null,
         );
       case NavigationConstants.HOME:
-        return normalNavigate(HomeView(), NavigationConstants.HOME, null);
+        return normalNavigate(
+          const MainNavigationView(),
+          NavigationConstants.HOME,
+          null,
+        );
       case NavigationConstants.HACK:
         return normalNavigate(DeviceHackView(), NavigationConstants.HACK, null);
       case NavigationConstants.GETPERM:
@@ -48,8 +51,6 @@ class NavigationRoute {
           NavigationConstants.GETPERM,
           null,
         );
-      case NavigationConstants.PROFILE:
-        return normalNavigate(ProfileView(), NavigationConstants.PROFILE, null);
       case NavigationConstants.INANDOUTS:
         return normalNavigate(
           InAndOutsView(),

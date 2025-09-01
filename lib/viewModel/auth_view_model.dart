@@ -535,7 +535,7 @@ class AuthViewModel extends BaseViewModel {
     } catch (e) {
       _showErrorDialog(
         context,
-        "Çıkış işlemi sırasında bir hata oluştu: $e",
+        "Çıkış işlemi sırasında bir hata oluştu",
         exitOnClose: false,
       );
     }
@@ -595,26 +595,23 @@ class AuthViewModel extends BaseViewModel {
     );
 
     if (user.shift != null) {
-      await _storageService.setStringValue(
-        PreferencesKeys.SHIFTNAME,
-        "Default Shift",
-      );
+      await _storageService.setStringValue(PreferencesKeys.SHIFTNAME, "");
       await _storageService.setStringValue(
         PreferencesKeys.STARTDATE,
-        user.shift!.start ?? "belirtilmedi",
+        user.shift!.start ?? "-",
       );
       await _storageService.setStringValue(
         PreferencesKeys.ENDDATE,
-        user.shift!.end ?? "belirtilmedi",
+        user.shift!.end ?? "-",
       );
       if (user.shift!.tolerance != null) {
         await _storageService.setStringValue(
           PreferencesKeys.STARTTDATE,
-          user.shift!.tolerance!.start ?? "00:00",
+          user.shift!.tolerance!.start ?? "-",
         );
         await _storageService.setStringValue(
           PreferencesKeys.ENDTDATE,
-          user.shift!.tolerance!.end ?? "00:00",
+          user.shift!.tolerance!.end ?? "-",
         );
       }
     }
@@ -722,27 +719,24 @@ class AuthViewModel extends BaseViewModel {
       }
 
       if (userModel.shift != null) {
-        await _storageService.setStringValue(
-          PreferencesKeys.SHIFTNAME,
-          "Default Shift",
-        );
+        await _storageService.setStringValue(PreferencesKeys.SHIFTNAME, "-");
         await _storageService.setStringValue(
           PreferencesKeys.STARTDATE,
-          userModel.shift!.start ?? "belirtilmedi",
+          userModel.shift!.start ?? "-",
         );
         await _storageService.setStringValue(
           PreferencesKeys.ENDDATE,
-          userModel.shift!.end ?? "belirtilmedi",
+          userModel.shift!.end ?? "-",
         );
 
         if (userModel.shift!.tolerance != null) {
           await _storageService.setStringValue(
             PreferencesKeys.STARTTDATE,
-            userModel.shift!.tolerance!.start ?? "00:00",
+            userModel.shift!.tolerance!.start ?? "-",
           );
           await _storageService.setStringValue(
             PreferencesKeys.ENDTDATE,
-            userModel.shift!.tolerance!.end ?? "00:00",
+            userModel.shift!.tolerance!.end ?? "-",
           );
         }
       }

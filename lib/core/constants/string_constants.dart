@@ -162,7 +162,7 @@ class StringConstants {
   }
 
   // API URLs - These remain as static strings
-  final String baseUrl = "https://crm.mavihost.com.tr/api/";
+  final String baseUrl = "https://crm.bilmos.com/api/";
   final String loginUrl = 'auth/login';
   final String logout = 'auth/logout';
   final String profile = "user/profile";
