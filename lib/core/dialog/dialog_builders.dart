@@ -518,7 +518,7 @@ class IllegalDialogBuilder extends BaseDialogBuilder {
   Widget buildDialogWidget(BuildContext context) {
     return AlertDialog(
       shape: getShape(),
-      backgroundColor: getBackgroundColor(context),
+      backgroundColor: context.colorScheme.onError,
       elevation: elevation,
       title: buildTitle(context),
       content: buildContent(context),
@@ -602,17 +602,21 @@ class IllegalDialogBuilder extends BaseDialogBuilder {
       case AlertCapabilitySituation.lateInEvent:
         return () {
           Navigator.pop(context);
-          CustomSnackBar(
-            scaffoldKey.currentContext!,
-            StringConstants.instance.successMessage2,
+          final params = inAndOutViewModel;
+          params.handleNoteSubmission(
+            context: context,
+            type: 1,
+            note: controller.text.trim(),
           );
         };
       case AlertCapabilitySituation.earlyOutEvent:
         return () {
           Navigator.pop(context);
-          CustomSnackBar(
-            scaffoldKey.currentContext!,
-            StringConstants.instance.successMessage2,
+          final params = inAndOutViewModel;
+          params.handleNoteSubmission(
+            context: context,
+            type: 2,
+            note: controller.text.trim(),
           );
         };
     }

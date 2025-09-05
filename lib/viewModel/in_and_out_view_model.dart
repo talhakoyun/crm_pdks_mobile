@@ -103,24 +103,6 @@ class InAndOutViewModel extends BaseViewModel {
         backgroundColor: context.colorScheme.error,
       );
     }
-
-    if (isLate) {
-      DialogFactory.create(
-        context: context,
-        type: DialogType.illegal,
-        parameters: {
-          'scaffoldKey': GlobalKey<ScaffoldState>(),
-          'inAndOutViewModel': this,
-          'titleText': StringConstants.instance.confirmText,
-          'excuseText': StringConstants.instance.lateDescription,
-          'cancelText': StringConstants.instance.cancelText,
-          'controller': lateNoteText,
-          'message': StringConstants.instance.successMessage,
-          'deviceInfo': deviceInfo,
-          'situation': AlertCapabilitySituation.lateInEvent,
-        },
-      );
-    }
   }
 
   void pressOut(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
@@ -162,24 +144,6 @@ class InAndOutViewModel extends BaseViewModel {
         context,
         StringConstants.instance.locationErrorMsg,
         backgroundColor: context.colorScheme.error,
-      );
-    }
-
-    if (isEarly) {
-      DialogFactory.create(
-        context: context,
-        type: DialogType.illegal,
-        parameters: {
-          'scaffoldKey': GlobalKey<ScaffoldState>(),
-          'inAndOutViewModel': this,
-          'titleText': StringConstants.instance.confirmText2,
-          'excuseText': StringConstants.instance.earlyDescription,
-          'cancelText': StringConstants.instance.cancelText2,
-          'controller': earlyNoteText,
-          'message': 'message',
-          'deviceInfo': deviceInfo,
-          'situation': AlertCapabilitySituation.earlyOutEvent,
-        },
       );
     }
   }
@@ -233,15 +197,14 @@ class InAndOutViewModel extends BaseViewModel {
         if (data.data != null &&
             data.data!['note'] != null &&
             !data.data!['note']) {
-          if (type == 1) {
-            isLate = true;
-          } else {
-            isEarly = true;
-          }
-          CustomSnackBar(
-            context,
-            data.message!,
-            backgroundColor: context.colorScheme.error,
+          _showNoteDialog(
+            context: context,
+            type: type,
+            longitude: longitude,
+            latitude: latitude,
+            deviceId: deviceId,
+            deviceModel: deviceModel,
+            message: data.message!,
           );
         } else {
           CustomSnackBar(
@@ -358,7 +321,9 @@ class InAndOutViewModel extends BaseViewModel {
         Navigator.pop(context);
         CustomSnackBar(
           context,
-          StringConstants.instance.errorMessage,
+          e.toString().contains('Internet')
+              ? 'İnternet bağlantısı yok'
+              : StringConstants.instance.errorMessage,
           backgroundColor: context.colorScheme.error,
         );
       }
@@ -422,4 +387,105 @@ class InAndOutViewModel extends BaseViewModel {
 
   @override
   void init() {}
+
+  void _showNoteDialog({
+    required BuildContext context,
+    required int type,
+    required double longitude,
+    required double latitude,
+    required String message,
+    String? deviceId,
+    String? deviceModel,
+  }) {
+    final isLateEntry = type == 1;
+    final controller = isLateEntry ? lateNoteText : earlyNoteText;
+
+    DialogFactory.create(
+      context: context,
+      type: DialogType.illegal,
+      parameters: {
+        'scaffoldKey': scaffoldKey,
+        'inAndOutViewModel': this,
+        'titleText': isLateEntry
+            ? StringConstants.instance.confirmText
+            : StringConstants.instance.confirmText2,
+        'excuseText': isLateEntry
+            ? StringConstants.instance.lateDescription
+            : StringConstants.instance.earlyDescription,
+        'cancelText': isLateEntry
+            ? StringConstants.instance.cancelText
+            : StringConstants.instance.cancelText2,
+        'controller': controller,
+        'message': message,
+        'deviceInfo': deviceInfo,
+        'situation': isLateEntry
+            ? AlertCapabilitySituation.lateInEvent
+            : AlertCapabilitySituation.earlyOutEvent,
+        'longitude': longitude,
+        'latitude': latitude,
+        'type': type,
+        'deviceId': deviceId,
+        'deviceModel': deviceModel,
+      },
+    );
+  }
+
+  void handleNoteSubmission({
+    required BuildContext context,
+    required int type,
+    required String note,
+  }) async {
+    if (note.isEmpty || note.length < 5) {
+      CustomSnackBar(
+        context,
+        StringConstants.instance.dialogAlertDescription,
+        backgroundColor: context.colorScheme.error,
+      );
+      return;
+    }
+    Loader.show(context);
+
+    try {
+      var data = await _inAndOutService.sendShift(
+        type: type,
+        longitude: locationManager.currentPosition!.longitude,
+        latitude: locationManager.currentPosition!.latitude,
+        outside: outSide,
+        deviceId: deviceInfo.deviceId,
+        deviceModel: deviceInfo.deviceModel,
+        myNote: note,
+      );
+
+      Loader.hide();
+      BuildContext? targetContext = context.mounted
+          ? context
+          : scaffoldKey.currentContext;
+
+      if (targetContext == null) {
+        return;
+      }
+      if (!targetContext.mounted) return;
+      if (data.status!) {
+        CustomSnackBar(targetContext, data.message ?? 'İşlem başarılı');
+      } else {
+        CustomSnackBar(
+          targetContext,
+          data.message ?? 'Bilinmeyen hata',
+          backgroundColor: targetContext.colorScheme.error,
+        );
+      }
+    } catch (e) {
+      // Hata durumunda da loader'ı her durumda kapat
+      Loader.hide();
+
+      // Context kontrolü sonrası hata mesajı
+      if (context.mounted) {
+        CustomSnackBar(
+          context,
+          StringConstants.instance.errorMessage,
+          backgroundColor: context.colorScheme.error,
+        );
+      }
+    }
+  }
 }

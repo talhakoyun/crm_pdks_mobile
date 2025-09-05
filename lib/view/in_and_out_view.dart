@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
 
 import '../core/base/size_singleton.dart';
-import '../core/constants/image_constants.dart';
 import '../core/constants/string_constants.dart';
 import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
-import '../core/init/size/size_extension.dart';
-import '../core/init/size/size_setting.dart';
 import '../viewModel/auth_view_model.dart';
 import '../viewModel/inandout_list_view_model.dart';
-import '../widgets/error_widget.dart';
-import '../widgets/in_and_out_points_card.dart';
 
 class InAndOutsView extends StatefulWidget {
   const InAndOutsView({super.key});
@@ -35,231 +31,332 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
 
   @override
   Widget build(BuildContext context) {
-    // authVM = context.watch<AuthViewModel>();
     InAndOutListViewModel listVM = Provider.of<InAndOutListViewModel>(context);
 
-    return listVM.shiftStatus == ShiftStatus.loaded
-        ? Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false, // Geri butonu kaldır
-            ),
-            body: GestureDetector(
-              onTap: () {
-                FocusScope.of(context).requestFocus(FocusNode());
+    return Scaffold(
+      backgroundColor: context.colorScheme.onError,
+      appBar: AppBar(
+        title: Text(
+          StringConstants.instance.inAndOutTitle,
+          style: context.textTheme.headlineSmall!.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        backgroundColor: context.colorScheme.onError,
+        elevation: 0,
+        actions: [
+          if (listVM.shiftStatus == ShiftStatus.loaded)
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                listVM.fetchShiftList(context);
               },
-              child: SizedBox(
-                width: double.infinity,
-                height: double.infinity,
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxHeight: SizerUtil.height,
-                    minWidth: SizerUtil.width,
-                  ),
-                  child: Column(
-                    children: [
-                      buildTopArea(context, authVM),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          widthFactor: 2.75,
-                          child: Text(
-                            StringConstants.instance.monthlyData,
-                            style: context.textTheme.headlineSmall!.copyWith(
-                              color: context.colorScheme.surface,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: SizerUtil.height > 535 ? 7 : 5,
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: listVM.shiftListItems.isNotEmpty
-                              ? ListView.builder(
-                                  itemCount: listVM.shiftListItems.length,
-                                  shrinkWrap: true,
-                                  physics: const BouncingScrollPhysics(),
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                        return InAndOutsPointsCard(
-                                          startDate:
-                                              listVM
-                                                  .shiftListItems[index]
-                                                  .startTime!
-                                                  .isNotEmpty
-                                              ? listVM
-                                                    .shiftListItems[index]
-                                                    .startTime
-                                              : "--",
-                                          dateTime:
-                                              listVM
-                                                  .shiftListItems[index]
-                                                  .datetime!
-                                                  .isNotEmpty
-                                              ? listVM
-                                                    .shiftListItems[index]
-                                                    .datetime
-                                              : "--",
-                                          endDate:
-                                              listVM
-                                                  .shiftListItems[index]
-                                                  .endTime!
-                                                  .isNotEmpty
-                                              ? listVM
-                                                    .shiftListItems[index]
-                                                    .endTime
-                                              : "--",
-                                        );
-                                      },
-                                )
-                              : Padding(
-                                  padding: EdgeInsets.only(top: 20.0.height),
-                                  child: Center(
-                                    child: Text(
-                                      StringConstants.instance.noInAndOutText,
-                                      style: context.textTheme.bodyLarge!
-                                          .copyWith(
-                                            color: context.colorScheme.error,
-                                          ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
-          )
-        : listVM.shiftStatus == ShiftStatus.loadingFailed
-        ? errorPageView(
-            context: context,
-            imagePath: ImageConstants.instance.warning,
-            title: StringConstants.instance.unExpectedError,
-            subtitle: ' ',
-          )
-        : Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(
-                backgroundColor: context.colorScheme.primary,
-                valueColor: AlwaysStoppedAnimation(
-                  context.colorScheme.onPrimary,
-                ),
-                color: context.colorScheme.error,
-              ),
-            ),
-          );
+        ],
+      ),
+      body: _buildBody(context, listVM),
+    );
   }
 
-  Widget buildTopArea(BuildContext context, AuthViewModel authViewModel) {
-    return ChangeNotifierProvider<AuthViewModel>(
-      create: (BuildContext context) => authViewModel,
-      child: Consumer<AuthViewModel>(
-        builder: (context, value, _) {
-          return Expanded(
-            flex: 4,
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: context.colorScheme.primary,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(25),
-                  bottomRight: Radius.circular(25),
+  Widget _buildBody(BuildContext context, InAndOutListViewModel listVM) {
+    switch (listVM.shiftStatus) {
+      case ShiftStatus.loaded:
+        return _buildLoadedContent(context, listVM);
+      case ShiftStatus.loadingFailed:
+        return _buildErrorContent(context, listVM);
+      default:
+        return _buildLoadingContent(context);
+    }
+  }
+
+  Widget _buildLoadedContent(
+    BuildContext context,
+    InAndOutListViewModel listVM,
+  ) {
+    if (listVM.shiftListItems.isEmpty) {
+      return _buildEmptyContent(context, listVM);
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        await listVM.fetchShiftList(context);
+      },
+      child: Column(
+        children: [
+          // İstatistik kartı
+          Container(
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: context.colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: context.colorScheme.onTertiary.withValues(alpha: .2),
+                  spreadRadius: 1,
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
                 ),
-              ),
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  children: [
-                    SafeArea(
-                      child: Column(
-                        children: [
-                          Image(
-                            image: value.gender == 'Erkek'
-                                ? AssetImage(ImageConstants.instance.male)
-                                : AssetImage(ImageConstants.instance.female),
-                            fit: BoxFit.contain,
-                            height: sizeConfig.heightSize(context, 80),
-                            width: sizeConfig.widthSize(context, 80),
-                          ),
-                          context.emptySizedHeightBoxLow,
-                          Text(
-                            value.userName!,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: context.primaryTextTheme.headlineSmall,
-                          ),
-                          Text(
-                            value.department!,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: context.primaryTextTheme.bodyLarge,
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: SizerUtil.width,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            buildTextArea(
-                              context,
-                              StringConstants.instance.inTime,
-                              value.startDate ??
-                                  StringConstants.instance.unSpecified,
-                            ),
-                            buildTextArea(
-                              context,
-                              StringConstants.instance.shift,
-                              value.shiftName!,
-                            ),
-                            buildTextArea(
-                              context,
-                              StringConstants.instance.outTime,
-                              value.endDate ??
-                                  StringConstants.instance.unSpecified,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              ],
             ),
-          );
-        },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildStatItem(
+                  context,
+                  StringConstants.instance.totalRecord,
+                  '${listVM.shiftListItems.length}',
+                  Icons.calendar_today,
+                ),
+                Container(
+                  height: 40,
+                  width: 1,
+                  color: context.colorScheme.outline.withOpacity(0.3),
+                ),
+                _buildStatItem(
+                  context,
+                  StringConstants.instance.thisMonth,
+                  '${listVM.shiftListItems.length}',
+                  Icons.access_time,
+                ),
+              ],
+            ),
+          ),
+          // Liste başlığı
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.history,
+                  color: context.colorScheme.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  StringConstants.instance.inAndOutTitle,
+                  style: context.textTheme.titleMedium!.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Kayıt listesi
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: listVM.shiftListItems.length,
+              itemBuilder: (context, index) {
+                final item = listVM.shiftListItems[index];
+                return _buildAttendanceCard(context, item, index);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget buildTextArea(BuildContext context, String title, String description) {
-    return Expanded(
-      flex: 4,
-      child: Text.rich(
-        TextSpan(
+  Widget _buildStatItem(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+  ) {
+    return Column(
+      children: [
+        Icon(icon, color: context.colorScheme.onError, size: 24),
+        Text(title, style: context.primaryTextTheme.bodySmall!),
+        Text(value, style: context.primaryTextTheme.headlineSmall!),
+      ],
+    );
+  }
+
+  Widget _buildAttendanceCard(BuildContext context, dynamic item, int index) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: context.colorScheme.onTertiaryContainer,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: context.colorScheme.outline.withValues(alpha: .2),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: context.colorScheme.onTertiary.withValues(alpha: .05),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
           children: [
-            TextSpan(
-              text: '$title\n',
-              style: context.primaryTextTheme.headlineSmall!.copyWith(
-                fontWeight: FontWeight.w300,
-              ),
-            ),
-            TextSpan(
-              text: description,
-              style: context.primaryTextTheme.headlineSmall!.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+            // Tarih başlığı
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTimeInfo(
+                    context,
+                    StringConstants.instance.entryTime,
+                    item.startTime?.isNotEmpty == true
+                        ? item.startTime!
+                        : '--:--',
+                    Icons.login,
+                    Colors.green,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: context.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    item.datetime?.isNotEmpty == true
+                        ? Jiffy.parse(
+                            item.datetime!,
+                          ).format(pattern: 'dd/MM/yyyy')
+                        : '--',
+                    style: context.primaryTextTheme.bodySmall!,
+                  ),
+                ),
+                // Çıkış
+                Expanded(
+                  child: _buildTimeInfo(
+                    context,
+                    StringConstants.instance.exitTime,
+                    item.endTime?.isNotEmpty == true ? item.endTime! : '--:--',
+                    Icons.logout,
+                    Colors.orange,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildTimeInfo(
+    BuildContext context,
+    String label,
+    String time,
+    IconData icon,
+    Color color,
+  ) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 20),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: context.textTheme.bodySmall!.copyWith(
+            color: context.colorScheme.outline,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          time,
+          style: context.textTheme.titleMedium!.copyWith(
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyContent(
+    BuildContext context,
+    InAndOutListViewModel listVM,
+  ) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.access_time_outlined,
+              size: 80,
+              color: context.colorScheme.outline.withOpacity(0.5),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              StringConstants.instance.recordNotFound,
+              style: context.textTheme.headlineSmall!.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              StringConstants.instance.noInAndOutText,
+              style: context.textTheme.bodyMedium!.copyWith(
+                color: context.colorScheme.outline,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                listVM.fetchShiftList(context);
+              },
+              icon: const Icon(Icons.refresh),
+              label: Text(StringConstants.instance.refresh),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingContent(BuildContext context) {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  Widget _buildErrorContent(
+    BuildContext context,
+    InAndOutListViewModel listVM,
+  ) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 80,
+              color: context.colorScheme.error,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              StringConstants.instance.unExpectedError,
+              style: context.textTheme.headlineSmall!.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                listVM.fetchShiftList(context);
+              },
+              icon: const Icon(Icons.refresh),
+              label: Text(StringConstants.instance.tryAgain),
+            ),
+          ],
+        ),
       ),
     );
   }

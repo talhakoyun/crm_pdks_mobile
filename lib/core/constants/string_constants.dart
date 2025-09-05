@@ -65,11 +65,14 @@ class StringConstants {
   String get leavelProsedureText => "menu.leavelProcedure".tr();
 
   // Time
-  String get inTime => "time.in".tr();
-  String get outTime => "time.out".tr();
-  String get checkInTime => "time.checkIn".tr();
-  String get checkOutTime => "time.checkOut".tr();
-  String get monthlyData => "time.monthly".tr();
+  String get inAndOutTitle => "time.in-and-out".tr();
+  String get totalRecord => "time.totalRecord".tr();
+  String get thisMonth => "time.thisMonth".tr();
+  String get entryTime => "time.entryTime".tr();
+  String get exitTime => "time.exitTime".tr();
+  String get recordNotFound => "time.recordNotFound".tr();
+  String get refresh => "time.refresh".tr();
+  String get tryAgain => "time.tryAgain".tr();
 
   // Leave
   String get leaveText => "leave.type".tr();

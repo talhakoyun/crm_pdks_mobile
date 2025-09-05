@@ -4,6 +4,7 @@ import '../core/constants/string_constants.dart';
 import '../core/enums/enums.dart';
 import '../core/init/cache/locale_manager.dart';
 import '../core/init/network/service/network_api_service.dart';
+import '../core/init/network/exception/app_exception.dart';
 import '../models/base_model.dart';
 import '../models/shift_model.dart';
 
@@ -43,20 +44,46 @@ class InAndOutService {
         return BaseModel<Map<String, dynamic>>(
           status: true,
           message: "İşlem başarılı",
-          data: {"status": true, "message": "İşlem başarılı"},
+          data: {
+            "status": true,
+            "message": "İşlem başarılı",
+            "note": response['note'],
+          },
         );
       } else {
         return BaseModel<Map<String, dynamic>>(
           status: false,
           message: response['message'] ?? strCons.errorMessage,
-          data: {"status": false, "message": response['message']},
+          data: {
+            "status": false,
+            "message": response['message'],
+            "note": response['note'],
+          },
         );
       }
     } catch (e) {
+      String errorMessage = strCons.errorMessage;
+      bool? noteValue;
+
+      if (e is BadRequestException) {
+        try {
+          final errorResponse = json.decode(e.toString());
+          errorMessage = errorResponse['message'] ?? e.toString();
+          noteValue = errorResponse['note'];
+        } catch (_) {
+          errorMessage = e.toString();
+        }
+      } else if (e is FetchDataException &&
+          e.toString().contains('No Internet Connection')) {
+        errorMessage = 'İnternet bağlantısı yok';
+      } else if (e.toString().isNotEmpty && e.toString() != 'Exception') {
+        errorMessage = e.toString();
+      }
+
       return BaseModel<Map<String, dynamic>>(
         status: false,
-        message: strCons.errorMessage,
-        data: {"status": false, "message": strCons.errorMessage},
+        message: errorMessage,
+        data: {"status": false, "message": errorMessage, "note": noteValue},
       );
     }
   }
@@ -92,20 +119,43 @@ class InAndOutService {
           data: {
             "status": true,
             "message": response['message'] ?? "İşlem başarılı",
+            "note": response['note'],
           },
         );
       } else {
         return BaseModel<Map<String, dynamic>>(
           status: false,
           message: response['message'] ?? strCons.errorMessage,
-          data: {"status": false, "message": response['message']},
+          data: {
+            "status": false,
+            "message": response['message'],
+            "note": response['note'],
+          },
         );
       }
     } catch (e) {
+      String errorMessage = strCons.errorMessage;
+      bool? noteValue;
+
+      if (e is BadRequestException) {
+        try {
+          final errorResponse = json.decode(e.toString());
+          errorMessage = errorResponse['message'] ?? e.toString();
+          noteValue = errorResponse['note'];
+        } catch (_) {
+          errorMessage = e.toString();
+        }
+      } else if (e is FetchDataException &&
+          e.toString().contains('No Internet Connection')) {
+        errorMessage = 'İnternet bağlantısı yok';
+      } else if (e.toString().isNotEmpty && e.toString() != 'Exception') {
+        errorMessage = e.toString();
+      }
+
       return BaseModel<Map<String, dynamic>>(
         status: false,
-        message: strCons.errorMessage,
-        data: {"status": false, "message": strCons.errorMessage},
+        message: errorMessage,
+        data: {"status": false, "message": errorMessage, "note": noteValue},
       );
     }
   }
@@ -133,9 +183,17 @@ class InAndOutService {
         );
       }
     } catch (e) {
+      String errorMessage = strCons.errorMessage;
+
+      if (e.toString().contains('No Internet Connection')) {
+        errorMessage = 'İnternet bağlantısı yok';
+      } else if (e.toString().isNotEmpty && e.toString() != 'Exception') {
+        errorMessage = e.toString();
+      }
+
       return BaseModel<List<ShiftDataModel>>(
         status: false,
-        message: strCons.errorMessage,
+        message: errorMessage,
         data: null,
       );
     }

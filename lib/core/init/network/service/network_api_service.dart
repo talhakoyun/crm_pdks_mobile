@@ -62,13 +62,14 @@ class NetworkApiServices extends BaseApiServices {
     var responseJson = jsonDecode(response.body);
     switch (response.statusCode) {
       case 200:
+      case 201: // Created - başarılı response
         return responseJson;
       case 302:
-        throw BadRequestException("response.body.toString()");
+        throw BadRequestException(response.body.toString());
       case 400:
-        throw BadRequestException(responseJson['message']);
+        throw BadRequestException(response.body.toString());
       case 401:
-        throw BadRequestException(responseJson['message']);
+        throw BadRequestException(response.body.toString());
       case 404:
         throw BadRequestException(response.body.toString());
       case 500:

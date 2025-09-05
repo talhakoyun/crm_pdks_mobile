@@ -215,7 +215,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
         Expanded(
           child: _buildTimeCard(
             context,
-            strCons.checkInTime,
+            strCons.entryTime,
             inAndOutViewModel.authVM.startDate ?? strCons.unSpecified,
             Icons.login_rounded,
             Colors.green,
@@ -225,7 +225,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
         Expanded(
           child: _buildTimeCard(
             context,
-            strCons.checkOutTime,
+            strCons.exitTime,
             inAndOutViewModel.authVM.endDate ?? strCons.unSpecified,
             Icons.logout_rounded,
             Colors.orange,

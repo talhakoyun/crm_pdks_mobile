@@ -113,15 +113,19 @@ class _GetPermissionViewState extends State<GetPermissionView>
               padding: const EdgeInsets.only(left: 8.0),
               child: Text(
                 StringConstants.instance.description,
-                style: context.textTheme.bodyLarge!.copyWith(
-                  fontWeight: FontWeight.w400,
-                  color: context.colorScheme.surface,
-                ),
+                style: context.textTheme.bodyLarge!,
               ),
             ),
             context.emptySizedHeightBoxLow,
             permissionReason(permissionVM),
             context.emptySizedHeightBoxLow2x,
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                StringConstants.instance.moveAddressText,
+                style: context.textTheme.bodyLarge!,
+              ),
+            ),
             permissonAddress(permissionVM),
             context.emptySizedHeightBoxLow2x,
             _sendBtn(context, permissionVM),
@@ -173,10 +177,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
           padding: const EdgeInsets.only(left: 8.0),
           child: Text(
             StringConstants.instance.begining,
-            style: context.textTheme.titleMedium!.copyWith(
-              fontWeight: FontWeight.w400,
-              color: context.colorScheme.surface,
-            ),
+            style: context.textTheme.titleMedium!,
           ),
         ),
         context.emptySizedHeightBoxLow,
@@ -216,10 +217,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
           padding: const EdgeInsets.only(left: 8.0),
           child: Text(
             StringConstants.instance.finish,
-            style: context.textTheme.titleMedium!.copyWith(
-              fontWeight: FontWeight.w400,
-              color: context.colorScheme.surface,
-            ),
+            style: context.textTheme.titleMedium!,
           ),
         ),
         context.emptySizedHeightBoxLow,

@@ -57,11 +57,14 @@
     "leavelProcedure": "İzinlerim"
   },
   "time": {
-    "in": "Giriş Saati",
-    "out": "Çıkış Saati",
-    "checkIn": "Giriş Saati",
-    "checkOut": "Çıkış Saati",
-    "monthly": "Aylık Verilerim"
+    "in-and-out":"Giriş-Çıkış Kayıtları",
+    "totalRecord": "Toplam Kayıt",
+    "thisMonth": "Bu Ay",
+    "entryTime": "Giriş Saati",
+    "exitTime": "Çıkış Saati",
+    "recordNotFound": "Kayıt Bulunamadı",
+    "refresh": "Yenile",
+    "tryAgain": "Tekrar Dene"
   },
   "leave": {
     "type": "İzin Tipi",

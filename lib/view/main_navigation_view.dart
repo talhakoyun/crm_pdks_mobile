@@ -44,8 +44,7 @@ class _MainNavigationViewState extends State<MainNavigationView>
         backgroundColor: context.colorScheme.onTertiaryContainer,
         body: PageView(
           controller: _pageController,
-          physics:
-              const NeverScrollableScrollPhysics(), // Disable swipe navigation
+          physics: const NeverScrollableScrollPhysics(),
           children: _buildPages(),
         ),
         bottomNavigationBar: _buildBottomNavigationBar(context),
@@ -55,7 +54,7 @@ class _MainNavigationViewState extends State<MainNavigationView>
 
   List<Widget> _buildPages() {
     return [
-      const HomeView(showAppBar: false), // Home page without drawer
+      const HomeView(showAppBar: false),
       const InAndOutsView(),
       const PermissionProceduresView(),
       const ProfileView(),
@@ -83,11 +82,8 @@ class _MainNavigationViewState extends State<MainNavigationView>
       ),
       child: SafeArea(
         child: Container(
-          height: 82, // Yüksekliği biraz daha artırdık
-          padding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 10,
-          ), // Padding'i ayarladık
+          height: 82,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: BottomNavigationItem.values.asMap().entries.map((entry) {
@@ -131,18 +127,13 @@ class _MainNavigationViewState extends State<MainNavigationView>
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(16),
             ),
-            padding: const EdgeInsets.symmetric(
-              vertical: 4,
-              horizontal: 4,
-            ), // Padding'i daha da azalttık
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: EdgeInsets.all(
-                    isSelected ? 6 : 4,
-                  ), // Padding'i azalttık
+                  padding: EdgeInsets.all(isSelected ? 6 : 4),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? Colors.white.withValues(alpha: 0.3)
@@ -163,14 +154,14 @@ class _MainNavigationViewState extends State<MainNavigationView>
                     color: isSelected
                         ? Colors.white
                         : Colors.white.withValues(alpha: 0.7),
-                    size: isSelected ? 24 : 20, // Icon boyutlarını küçülttük
+                    size: isSelected ? 24 : 20,
                   ),
                 ),
-                const SizedBox(height: 1), // Yüksekliği daha da azalttık
+                const SizedBox(height: 1),
                 AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 200),
                   style: TextStyle(
-                    fontSize: isSelected ? 10 : 8, // Font boyutunu azalttık
+                    fontSize: isSelected ? 10 : 8,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     color: isSelected
                         ? Colors.white
@@ -212,38 +203,37 @@ class _MainNavigationViewState extends State<MainNavigationView>
         _currentIndex = index;
       });
       _pageController.jumpToPage(index);
+      _handlePageChange(index);
+    }
+  }
 
-      // Trigger necessary actions for each page
-      switch (index) {
-        case 0: // Home
-          // Refresh user profile and shift data for Home tab
-          final authVM = Provider.of<AuthViewModel>(context, listen: false);
-          // Refresh profile data silently (without navigation side effects)
-          authVM.getProfile(
-            context,
-            true,
-          ); // isSplash: true prevents navigation
-          break;
-        case 1: // In and Out
-          // Fetch in and out list when navigating to this tab
-          final listVM = Provider.of<InAndOutListViewModel>(
-            context,
-            listen: false,
-          );
-          listVM.fetchList(context);
-          break;
-        case 2: // Permissions
-          // Fetch permissions when navigating to this tab
-          final permissionVM = Provider.of<PermissionViewModel>(
-            context,
-            listen: false,
-          );
-          permissionVM.fetchList(context);
-          break;
-        case 3: // Profile
-          // Profile verileri zaten Provider'da mevcut, yenileme yapma
-          break;
-      }
+  Future<void> _handlePageChange(int index) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    if (!mounted) return;
+
+    switch (index) {
+      case 0:
+        final authVM = Provider.of<AuthViewModel>(context, listen: false);
+        if (authVM.userName == null || authVM.userName!.isEmpty) {
+          authVM.getProfile(context, true);
+        }
+        break;
+      case 1:
+        final listVM = Provider.of<InAndOutListViewModel>(
+          context,
+          listen: false,
+        );
+        listVM.fetchList(context);
+        break;
+      case 2:
+        final permissionVM = Provider.of<PermissionViewModel>(
+          context,
+          listen: false,
+        );
+        permissionVM.fetchList(context);
+        break;
+      case 3:
+        break;
     }
   }
 }

@@ -57,11 +57,14 @@
     "leavelProcedure": "My Leaves"
   },
   "time": {
-    "in": "Entry Time",
-    "out": "Exit Time",
-    "checkIn": "Check In Time",
-    "checkOut": "Check Out Time",
-    "monthly": "My Monthly Data"
+    "in-and-out": "Entry-Exit Records",
+    "totalRecord": "Total Records",
+    "thisMonth": "This Month",
+    "entryTime": "Entry Time",
+    "exitTime": "Exit Time",
+    "recordNotFound": "No Records Found",
+    "refresh": "Refresh",
+    "tryAgain": "Try Again"
   },
   "leave": {
     "type": "Leave Type",
