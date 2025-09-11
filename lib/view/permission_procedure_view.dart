@@ -54,6 +54,7 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
             body: permissionVM.permissionListItems.isNotEmpty
                 ? SafeArea(
                     child: RefreshIndicator(
+                      backgroundColor: context.colorScheme.onError,
                       onRefresh: () async {
                         await permissionVM.fetchList(context);
                       },

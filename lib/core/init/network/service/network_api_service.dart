@@ -6,18 +6,12 @@ import 'package:http/http.dart' as http;
 
 import '../../../init/network/exception/app_exception.dart';
 import '../../../init/network/service/base_service.dart';
-import '../../cache/locale_manager.dart';
-import '../../../enums/preferences_keys.dart';
-import '../../../constants/service_locator.dart';
-import '../../network/service/network_api_service.dart';
 
 // Refresh token fonksiyonu için typedef
-typedef Future<String?> RefreshTokenFunction();
+typedef RefreshTokenFunction = Future<String?> Function();
 
 class NetworkApiServices extends BaseApiServices {
   dynamic jsonResponse;
-  final LocaleManager _localeManager = LocaleManager.instance;
-  // AuthService bağımlılığını kaldırıp yerine doğrudan refresh token fonksiyonunu kullanacağız
   final RefreshTokenFunction? _refreshTokenFunction;
 
   // Constructor'a refreshToken fonksiyonunu enjekte ediyoruz
@@ -36,7 +30,7 @@ class NetworkApiServices extends BaseApiServices {
       );
 
       if (response.statusCode == 401 && _refreshTokenFunction != null) {
-        final newToken = await _refreshTokenFunction!();
+        final newToken = await _refreshTokenFunction();
         if (newToken != null) {
           return await getApiResponse(url, token: newToken);
         } else {
@@ -74,7 +68,7 @@ class NetworkApiServices extends BaseApiServices {
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 401 && _refreshTokenFunction != null) {
-        final newToken = await _refreshTokenFunction!();
+        final newToken = await _refreshTokenFunction();
         if (newToken != null) {
           return await postApiResponse(url, data, newToken);
         } else {

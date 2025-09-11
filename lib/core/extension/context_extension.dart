@@ -43,6 +43,7 @@ extension PaddingExtension on BuildContext {
 }
 
 extension SizedBoxExtension on BuildContext {
+  Widget get emptySizedWidthBoxLow => const SpaceSizedWidthBox(width: 0.01);
   Widget get emptySizedWidthBoxLow2x => const SpaceSizedWidthBox(width: 0.02);
   Widget get emptySizedWidthBoxLow3x => const SpaceSizedWidthBox(width: 0.03);
 

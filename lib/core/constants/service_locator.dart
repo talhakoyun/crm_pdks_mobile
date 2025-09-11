@@ -8,7 +8,6 @@ import '../init/navigation/navigation_service.dart';
 import '../init/network/connectivity/network_connectivity.dart';
 import '../init/cache/location_manager.dart';
 import '../init/network/service/network_api_service.dart';
-import '../../service/auth_service.dart';
 import '../enums/preferences_keys.dart';
 
 class ServiceLocator {
@@ -53,9 +52,7 @@ class ServiceLocator {
     registerSingleton<NavigationService>(NavigationService.instance);
     registerSingleton<DeviceInfoManager>(DeviceInfoManager.instance);
     registerSingleton<NetworkConnectivity>(NetworkConnectivity());
-    // AuthService için factory register ediyoruz
     registerFactory<AuthService>(() => AuthService());
-    // NetworkApiServices için singleton register ediyoruz ve AuthService'in refresh token metodunu enjekte ediyoruz
     registerSingleton<NetworkApiServices>(
       NetworkApiServices(
         refreshTokenFunction: () async {

@@ -83,6 +83,7 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
     }
 
     return RefreshIndicator(
+      backgroundColor: context.colorScheme.onError,
       onRefresh: () async {
         await listVM.fetchShiftList(context);
       },

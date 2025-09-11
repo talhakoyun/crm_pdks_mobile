@@ -75,7 +75,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
               context: context,
               imagePath: imgCons.warning,
               title: strCons.unExpectedError,
-              subtitle: ' ',
+              subtitle: '',
             )
           : const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
@@ -95,13 +95,12 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildUserInfoCard(context),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
           _buildStatusCards(context),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
           _buildActionButtons(context, locationValue),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
           _buildDailyDashboard(context),
-          const SizedBox(height: 24),
         ],
       ),
     );
@@ -147,26 +146,20 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            context.emptySizedWidthBoxLow,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "Hoş Geldin!",
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: context.primaryTextTheme.titleLarge,
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    inAndOutViewModel.authVM.userName ?? 'Kullanıcı',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                    inAndOutViewModel.authVM.userName ?? '',
+                    style: context.primaryTextTheme.headlineSmall!.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -183,17 +176,17 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                     ),
                     child: Text(
                       inAndOutViewModel.authVM.department ?? 'Departman',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: context.primaryTextTheme.bodyMedium,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
               ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: _buildOutsideToggle(),
             ),
           ],
         ),
@@ -421,48 +414,34 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
       initialData: false,
       builder: (context, snapshot) {
         final isActive = snapshot.data ?? false;
-        return Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: InkWell(
-            onTap: () {
-              isOutSide.sink.add(!isActive);
-              inAndOutViewModel.outSide = isActive ? 0 : 1;
-            },
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: isActive
-                    ? context.colorScheme.primary.withValues(alpha: 0.3)
-                    : context.colorScheme.primary,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: context.colorScheme.primary.withValues(alpha: 0.3),
-                  width: 1,
+        return ElevatedButton(
+          onPressed: () {
+            isOutSide.sink.add(!isActive);
+            inAndOutViewModel.outSide = isActive ? 0 : 1;
+          },
+          style: ElevatedButton.styleFrom(
+            shape: CircleBorder(),
+            padding: EdgeInsets.all(16),
+            backgroundColor: context.colorScheme.secondary,
+            foregroundColor: context.colorScheme.onSecondary,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isActive
+                    ? Icons.location_on_rounded
+                    : Icons.location_off_rounded,
+                color: context.colorScheme.onError,
+                size: 14,
+              ),
+              Text(
+                strCons.outSideText,
+                style: context.primaryTextTheme.bodySmall!.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isActive
-                        ? Icons.location_on_rounded
-                        : Icons.location_off_rounded,
-                    color: context.colorScheme.onError,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    strCons.outSideText,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: context.colorScheme.onError,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            ],
           ),
         );
       },
