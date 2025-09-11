@@ -1,3 +1,4 @@
+import 'package:crm_pdks_mobile/core/constants/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -41,64 +42,57 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
     return permissionVM.permissionStatus == PermissionStatus.loaded
         ? Scaffold(
             backgroundColor: context.colorScheme.onTertiaryContainer,
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              automaticallyImplyLeading: false, // Geri butonu kaldır
-              actions: [
-                GestureDetector(
-                  onTap: () => permissionVM.navigation.navigateToPage(
-                    path: NavigationConstants.GETPERM,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: Image.asset(
-                      ImageConstants.instance.logo,
-                      width: 24.5.scalablePixel,
-                    ),
-                  ),
-                ),
-              ],
-              title: Text(
-                strCons.leavelProsedureText,
-                style: context.textTheme.headlineMedium!.copyWith(
-                  color: context.colorScheme.onTertiary,
-                  fontWeight: FontWeight.w500,
-                ),
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: context.colorScheme.primary,
+              onPressed: () => permissionVM.navigation.navigateToPage(
+                path: NavigationConstants.GETPERM,
+              ),
+              child: Icon(
+                Icons.add,
+                color: context.colorScheme.onError,
+                size: 35,
               ),
             ),
             body: permissionVM.permissionListItems.isNotEmpty
-                ? ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    padding: context.paddingLow,
-                    itemCount: permissionVM.permissionListItems.length,
-                    itemBuilder: (context, int index) => PermissionListTile(
-                      type: permissionVM.permissionListItems[index].type?.id,
-                      confirmText:
-                          permissionVM.permissionListItems[index].statusText ??
-                          strCons.unSpecified,
-                      endDate:
-                          permissionVM.permissionListItems[index].endDate ??
-                          strCons.unSpecified,
-                      startDate:
-                          permissionVM.permissionListItems[index].startDate ??
-                          strCons.unSpecified,
-                      typeText:
-                          permissionVM.permissionListItems[index].type?.title ??
-                          strCons.unSpecified,
-                      approvalStatus:
-                          permissionVM.permissionListItems[index].status ?? 0,
-                      address:
-                          permissionVM.permissionListItems[index].note ??
-                          strCons.unSpecified,
-                      reasonText:
-                          permissionVM.permissionListItems[index].note ??
-                          strCons.unSpecified,
-                      iconName:
-                          permissionVM
-                              .permissionListItems[index]
-                              .type
-                              ?.iconName ??
-                          '',
+                ? SafeArea(
+                    child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      padding: context.paddingLow,
+                      itemCount: permissionVM.permissionListItems.length,
+                      itemBuilder: (context, int index) => PermissionListTile(
+                        type: permissionVM.permissionListItems[index].type?.id,
+                        confirmText:
+                            permissionVM
+                                .permissionListItems[index]
+                                .statusText ??
+                            strCons.unSpecified,
+                        endDate:
+                            permissionVM.permissionListItems[index].endDate ??
+                            strCons.unSpecified,
+                        startDate:
+                            permissionVM.permissionListItems[index].startDate ??
+                            strCons.unSpecified,
+                        typeText:
+                            permissionVM
+                                .permissionListItems[index]
+                                .type
+                                ?.title ??
+                            strCons.unSpecified,
+                        approvalStatus:
+                            permissionVM.permissionListItems[index].status ?? 0,
+                        address:
+                            permissionVM.permissionListItems[index].note ??
+                            strCons.unSpecified,
+                        reasonText:
+                            permissionVM.permissionListItems[index].note ??
+                            strCons.unSpecified,
+                        iconName:
+                            permissionVM
+                                .permissionListItems[index]
+                                .type
+                                ?.iconName ??
+                            '',
+                      ),
                     ),
                   )
                 : Center(

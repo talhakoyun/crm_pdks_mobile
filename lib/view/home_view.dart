@@ -52,14 +52,6 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
           ? Scaffold(
               key: inAndOutViewModel.scaffoldKey,
               backgroundColor: context.colorScheme.onTertiaryContainer,
-              appBar: widget.showAppBar
-                  ? AppBar(
-                      elevation: 0,
-                      backgroundColor: context.colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      actions: [_buildOutsideToggle()],
-                    )
-                  : null,
               body: ChangeNotifierProvider<LocationManager>(
                 create: (BuildContext context) => locationManager,
                 child: Consumer<LocationManager>(
@@ -441,11 +433,11 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: isActive
-                    ? Colors.white.withValues(alpha: 0.3)
-                    : Colors.transparent,
+                    ? context.colorScheme.primary.withValues(alpha: 0.3)
+                    : context.colorScheme.primary,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: context.colorScheme.primary.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
@@ -456,16 +448,16 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                     isActive
                         ? Icons.location_on_rounded
                         : Icons.location_off_rounded,
-                    color: Colors.white,
+                    color: context.colorScheme.onError,
                     size: 16,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     strCons.outSideText,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                      color: context.colorScheme.onError,
                     ),
                   ),
                 ],

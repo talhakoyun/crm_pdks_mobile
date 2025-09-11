@@ -33,30 +33,33 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
   Widget build(BuildContext context) {
     InAndOutListViewModel listVM = Provider.of<InAndOutListViewModel>(context);
 
-    return Scaffold(
-      backgroundColor: context.colorScheme.onError,
-      appBar: AppBar(
-        title: Text(
-          StringConstants.instance.inAndOutTitle,
-          style: context.textTheme.headlineSmall!.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
         backgroundColor: context.colorScheme.onError,
-        elevation: 0,
-        actions: [
-          if (listVM.shiftStatus == ShiftStatus.loaded)
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () {
-                listVM.fetchShiftList(context);
-              },
-            ),
-        ],
+        // appBar: AppBar(
+        //   title: Text(
+        //     StringConstants.instance.inAndOutTitle,
+        //     style: context.textTheme.headlineSmall!.copyWith(
+        //       fontWeight: FontWeight.bold,
+        //     ),
+        //   ),
+        //   centerTitle: true,
+        //   automaticallyImplyLeading: false,
+        //   backgroundColor: context.colorScheme.onError,
+        //   elevation: 0,
+        //   actions: [
+        //     if (listVM.shiftStatus == ShiftStatus.loaded)
+        //       IconButton(
+        //         icon: const Icon(Icons.refresh),
+        //         onPressed: () {
+        //           listVM.fetchShiftList(context);
+        //         },
+        //       ),
+        //   ],
+        // ),
+        body: SafeArea(child: _buildBody(context, listVM)),
       ),
-      body: _buildBody(context, listVM),
     );
   }
 
@@ -85,12 +88,11 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
       },
       child: Column(
         children: [
-          // İstatistik kartı
           Container(
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: context.colorScheme.primaryContainer,
+              color: context.colorScheme.primary,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
@@ -113,7 +115,7 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
                 Container(
                   height: 40,
                   width: 1,
-                  color: context.colorScheme.outline.withOpacity(0.3),
+                  color: context.colorScheme.outline..withValues(alpha: 0.3),
                 ),
                 _buildStatItem(
                   context,
@@ -124,27 +126,6 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
               ],
             ),
           ),
-          // Liste başlığı
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.history,
-                  color: context.colorScheme.primary,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  StringConstants.instance.inAndOutTitle,
-                  style: context.textTheme.titleMedium!.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Kayıt listesi
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -217,7 +198,7 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: context.colorScheme.primaryContainer,
+                    color: context.colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -226,7 +207,9 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
                             item.datetime!,
                           ).format(pattern: 'dd/MM/yyyy')
                         : '--',
-                    style: context.primaryTextTheme.bodySmall!,
+                    style: context.primaryTextTheme.bodySmall!.copyWith(
+                      color: context.colorScheme.primary,
+                    ),
                   ),
                 ),
                 // Çıkış
