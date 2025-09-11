@@ -57,7 +57,7 @@ class PermissionViewModel extends BaseViewModel {
     }
   }
 
-  void fetchList(BuildContext context) async {
+  Future<void> fetchList(BuildContext context) async {
     permissionStatus = PermissionStatus.loading;
     HolidayListModel holidayListModel = await _permissionServices.holidayList();
     if (holidayListModel.status!) {

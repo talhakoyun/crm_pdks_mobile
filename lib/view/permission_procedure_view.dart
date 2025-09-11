@@ -1,16 +1,14 @@
-import 'package:crm_pdks_mobile/core/constants/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../core/base/base_singleton.dart';
-import '../core/constants/image_constants.dart';
 import '../core/constants/navigation_constants.dart';
 import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
-import '../core/init/size/size_extension.dart';
 import '../viewModel/permissions_view_model.dart';
 import '../widgets/error_widget.dart';
-import '../widgets/permission_listtile.dart';
+import '../widgets/permission_card.dart';
 
 class PermissionProceduresView extends StatefulWidget {
   const PermissionProceduresView({super.key});
@@ -55,55 +53,23 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
             ),
             body: permissionVM.permissionListItems.isNotEmpty
                 ? SafeArea(
-                    child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      padding: context.paddingLow,
-                      itemCount: permissionVM.permissionListItems.length,
-                      itemBuilder: (context, int index) => PermissionListTile(
-                        type: permissionVM.permissionListItems[index].type?.id,
-                        confirmText:
-                            permissionVM
-                                .permissionListItems[index]
-                                .statusText ??
-                            strCons.unSpecified,
-                        endDate:
-                            permissionVM.permissionListItems[index].endDate ??
-                            strCons.unSpecified,
-                        startDate:
-                            permissionVM.permissionListItems[index].startDate ??
-                            strCons.unSpecified,
-                        typeText:
-                            permissionVM
-                                .permissionListItems[index]
-                                .type
-                                ?.title ??
-                            strCons.unSpecified,
-                        approvalStatus:
-                            permissionVM.permissionListItems[index].status ?? 0,
-                        address:
-                            permissionVM.permissionListItems[index].note ??
-                            strCons.unSpecified,
-                        reasonText:
-                            permissionVM.permissionListItems[index].note ??
-                            strCons.unSpecified,
-                        iconName:
-                            permissionVM
-                                .permissionListItems[index]
-                                .type
-                                ?.iconName ??
-                            '',
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        await permissionVM.fetchList(context);
+                      },
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
+                        ),
+                        padding: context.paddingNormal,
+                        itemCount: permissionVM.permissionListItems.length,
+                        itemBuilder: (context, int index) => PermissionCard(
+                          item: permissionVM.permissionListItems[index],
+                        ),
                       ),
                     ),
                   )
-                : Center(
-                    child: Text(
-                      strCons.noLeaveText,
-                      style: context.textTheme.bodyLarge!.copyWith(
-                        color: context.colorScheme.error,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
+                : _buildEmptyState(context),
           )
         : permissionVM.permissionStatus == PermissionStatus.loadingFailed
         ? errorPageView(
@@ -123,5 +89,44 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
               ),
             ),
           );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(
+            imgCons.permission,
+            width: 80,
+            height: 80,
+            placeholderBuilder: (context) {
+              return Icon(
+                Icons.assignment_outlined,
+                size: 80,
+                color: context.colorScheme.onTertiary.withValues(alpha: 0.3),
+              );
+            },
+          ),
+          SizedBox(height: context.normalValue),
+          Text(
+            strCons.noLeaveText,
+            style: context.textTheme.headlineSmall!.copyWith(
+              color: context.colorScheme.onTertiary,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: context.normalValue),
+          Text(
+            'İzin talebi oluşturmak için + butonuna tıklayın',
+            style: context.textTheme.bodyLarge!.copyWith(
+              color: context.colorScheme.onTertiary.withValues(alpha: 0.7),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 }
