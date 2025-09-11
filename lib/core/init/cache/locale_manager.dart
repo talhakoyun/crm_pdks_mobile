@@ -78,4 +78,33 @@ class LocaleManager {
 
   bool getBoolValue(PreferencesKeys key) =>
       _preferences?.getBool(key.toString()) ?? false;
+
+  // Yeni eklenen metod
+  Future<void> setIntValue(PreferencesKeys key, int value) async {
+    if (_preferences == null) {
+      return;
+    }
+
+    try {
+      await _preferences?.setString(key.toString(), value.toString());
+    } catch (e) {
+      debugPrint('❌ LocaleManager: Error setting ${key.toString()}: $e');
+    }
+  }
+
+  // Yeni eklenen metod
+  int getIntValue(PreferencesKeys key) {
+    if (_preferences == null) {
+      _initializePreferences();
+      return 0;
+    }
+
+    try {
+      final value = _preferences?.getString(key.toString()) ?? '0';
+      return int.parse(value);
+    } catch (e) {
+      debugPrint('❌ LocaleManager: Error getting ${key.toString()}: $e');
+      return 0;
+    }
+  }
 }

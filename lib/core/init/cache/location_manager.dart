@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../enums/enums.dart';
-import '../factory/dialog_factory.dart';
+import '../../enums/enums.dart';
+import '../../widget/dialog/dialog_factory.dart';
 
 class LocationManager extends ChangeNotifier {
   Position? currentPosition;

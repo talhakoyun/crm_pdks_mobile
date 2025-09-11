@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../di/service_locator.dart';
+import '../../constants/service_locator.dart';
 import '../../init/cache/locale_manager.dart';
 import '../../init/navigation/navigation_service.dart';
 

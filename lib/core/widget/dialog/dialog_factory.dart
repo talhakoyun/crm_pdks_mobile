@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../constants/device_constants.dart';
-import '../enums/enums.dart';
-import '../../viewModel/in_and_out_view_model.dart';
-import '../dialog/dialog_builders.dart';
-import '../dialog/base_dialog_builder.dart';
+import '../../constants/device_constants.dart';
+import '../../enums/enums.dart';
+import '../../../viewModel/in_and_out_view_model.dart';
+import 'dialog_builders.dart';
+import 'base_dialog_builder.dart';
 
 class DialogFactory {
   static final Map<DialogType, BaseDialogBuilder Function(Map<String, dynamic>)>

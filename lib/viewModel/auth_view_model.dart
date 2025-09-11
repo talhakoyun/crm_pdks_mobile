@@ -10,14 +10,14 @@ import '../core/base/view_model/base_view_model.dart';
 import '../core/constants/device_constants.dart';
 import '../core/constants/navigation_constants.dart';
 import '../core/constants/string_constants.dart';
-import '../core/di/service_locator.dart';
+import '../core/constants/service_locator.dart';
 import '../core/enums/dialog_type.dart';
 import '../core/enums/preferences_keys.dart';
 import '../core/enums/sign_status.dart';
 import '../core/extension/context_extension.dart';
 import '../core/init/cache/locale_manager.dart';
 import '../core/init/network/connectivity/network_connectivity.dart';
-import '../core/factory/dialog_factory.dart';
+import '../core/widget/dialog/dialog_factory.dart';
 import '../core/widget/loader.dart';
 import '../models/base_model.dart';
 import '../models/logout_model.dart';
@@ -594,6 +594,14 @@ class AuthViewModel extends BaseViewModel {
       user.role?.name ?? "",
     );
 
+    // Refresh token'ı güncelle
+    if (user.refreshToken != null) {
+      await _storageService.setStringValue(
+        PreferencesKeys.REFRESH_TOKEN,
+        user.refreshToken ?? "",
+      );
+    }
+
     if (user.shift != null) {
       await _storageService.setStringValue(PreferencesKeys.SHIFTNAME, "");
       await _storageService.setStringValue(
@@ -666,6 +674,10 @@ class AuthViewModel extends BaseViewModel {
       await _storageService.setStringValue(
         PreferencesKeys.TOKEN,
         userModel.accessToken ?? "",
+      );
+      await _storageService.setStringValue(
+        PreferencesKeys.REFRESH_TOKEN,
+        userModel.refreshToken ?? "",
       );
       await _storageService.setStringValue(
         PreferencesKeys.USERNAME,

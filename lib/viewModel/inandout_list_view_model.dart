@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 import '../core/base/view_model/base_view_model.dart';
-import '../core/di/service_locator.dart';
+import '../core/constants/service_locator.dart';
 import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
 import '../models/shift_model.dart';

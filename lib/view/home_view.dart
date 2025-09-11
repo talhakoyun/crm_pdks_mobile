@@ -11,7 +11,7 @@ import '../core/base/size_singleton.dart';
 import '../core/enums/preferences_keys.dart';
 import '../core/enums/sign_status.dart';
 import '../core/extension/context_extension.dart';
-import '../core/position/location_manager.dart';
+import '../core/init/cache/location_manager.dart';
 import '../viewModel/in_and_out_view_model.dart';
 import '../widgets/error_widget.dart';
 

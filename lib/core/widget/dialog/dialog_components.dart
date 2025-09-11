@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../extension/context_extension.dart';
-import '../init/size/size_extension.dart';
+import '../../extension/context_extension.dart';
+import '../../init/size/size_extension.dart';
 
 class DialogTitleWidget extends StatelessWidget {
   final String iconPath;

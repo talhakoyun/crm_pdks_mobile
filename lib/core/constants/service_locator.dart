@@ -2,11 +2,14 @@ import '../../service/auth_service.dart';
 import '../../service/permission_service.dart';
 import '../../service/in_and_out_service.dart';
 import '../../viewModel/auth_view_model.dart';
-import '../constants/device_constants.dart';
+import 'device_constants.dart';
 import '../init/cache/locale_manager.dart';
 import '../init/navigation/navigation_service.dart';
 import '../init/network/connectivity/network_connectivity.dart';
-import '../position/location_manager.dart';
+import '../init/cache/location_manager.dart';
+import '../init/network/service/network_api_service.dart';
+import '../../service/auth_service.dart';
+import '../enums/preferences_keys.dart';
 
 class ServiceLocator {
   static final ServiceLocator _instance = ServiceLocator._internal();
@@ -50,14 +53,28 @@ class ServiceLocator {
     registerSingleton<NavigationService>(NavigationService.instance);
     registerSingleton<DeviceInfoManager>(DeviceInfoManager.instance);
     registerSingleton<NetworkConnectivity>(NetworkConnectivity());
+    // AuthService için factory register ediyoruz
     registerFactory<AuthService>(() => AuthService());
+    // NetworkApiServices için singleton register ediyoruz ve AuthService'in refresh token metodunu enjekte ediyoruz
+    registerSingleton<NetworkApiServices>(
+      NetworkApiServices(
+        refreshTokenFunction: () async {
+          final authService = ServiceLocator.instance.get<AuthService>();
+          final refreshToken = LocaleManager.instance.getStringValue(
+            PreferencesKeys.REFRESH_TOKEN,
+          );
+          if (refreshToken.isEmpty) {
+            return null;
+          }
+          return await authService.refreshAccessToken(
+            refreshToken: refreshToken,
+          );
+        },
+      ),
+    );
     registerFactory<PermissionService>(() => PermissionService());
     registerFactory<InAndOutService>(() => InAndOutService());
     registerFactory<LocationManager>(() => LocationManager());
     registerFactory<AuthViewModel>(() => AuthViewModel());
   }
-}
-
-extension ServiceLocatorExtension on Object {
-  T getService<T>() => ServiceLocator.instance.get<T>();
 }

@@ -6,9 +6,23 @@ import 'package:http/http.dart' as http;
 
 import '../../../init/network/exception/app_exception.dart';
 import '../../../init/network/service/base_service.dart';
+import '../../cache/locale_manager.dart';
+import '../../../enums/preferences_keys.dart';
+import '../../../constants/service_locator.dart';
+import '../../network/service/network_api_service.dart';
+
+// Refresh token fonksiyonu için typedef
+typedef Future<String?> RefreshTokenFunction();
 
 class NetworkApiServices extends BaseApiServices {
   dynamic jsonResponse;
+  final LocaleManager _localeManager = LocaleManager.instance;
+  // AuthService bağımlılığını kaldırıp yerine doğrudan refresh token fonksiyonunu kullanacağız
+  final RefreshTokenFunction? _refreshTokenFunction;
+
+  // Constructor'a refreshToken fonksiyonunu enjekte ediyoruz
+  NetworkApiServices({RefreshTokenFunction? refreshTokenFunction})
+    : _refreshTokenFunction = refreshTokenFunction;
 
   @override
   Future getApiResponse(String url, {String? token}) async {
@@ -20,6 +34,16 @@ class NetworkApiServices extends BaseApiServices {
             ? {'Accept': 'application/json', 'Authorization': 'Bearer $token'}
             : {'Accept': 'application/json'},
       );
+
+      if (response.statusCode == 401 && _refreshTokenFunction != null) {
+        final newToken = await _refreshTokenFunction!();
+        if (newToken != null) {
+          return await getApiResponse(url, token: newToken);
+        } else {
+          throw UnauthorisedException('Token refresh failed');
+        }
+      }
+
       jsonResponse = returnResponse(response);
       debugPrint(response.body.toString());
     } on SocketException {
@@ -48,6 +72,16 @@ class NetworkApiServices extends BaseApiServices {
                 : {'Accept': 'application/json'},
           )
           .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 401 && _refreshTokenFunction != null) {
+        final newToken = await _refreshTokenFunction!();
+        if (newToken != null) {
+          return await postApiResponse(url, data, newToken);
+        } else {
+          throw UnauthorisedException('Token refresh failed');
+        }
+      }
+
       jsonResponse = returnResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet Connection');
@@ -62,14 +96,14 @@ class NetworkApiServices extends BaseApiServices {
     var responseJson = jsonDecode(response.body);
     switch (response.statusCode) {
       case 200:
-      case 201: // Created - başarılı response
+      case 201:
         return responseJson;
       case 302:
         throw BadRequestException(response.body.toString());
       case 400:
         throw BadRequestException(response.body.toString());
       case 401:
-        throw BadRequestException(response.body.toString());
+        throw UnauthorisedException(response.body.toString());
       case 404:
         throw BadRequestException(response.body.toString());
       case 500:

@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 enum PreferencesKeys {
   TOKEN,
+  REFRESH_TOKEN,
   IS_FIRST_APP,
   ID,
   USERNAME,

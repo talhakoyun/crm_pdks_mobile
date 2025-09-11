@@ -9,11 +9,43 @@ import '../models/is_available_model.dart';
 import '../models/logout_model.dart';
 import '../models/register_model.dart';
 import '../models/user_model.dart';
+import '../core/constants/service_locator.dart';
 
 class AuthService {
   StringConstants get strCons => StringConstants.instance;
-  final _apiServices = NetworkApiServices();
+  // NetworkApiServices instance'ını ServiceLocator'dan alıyoruz
+  final NetworkApiServices _apiServices = ServiceLocator.instance
+      .get<NetworkApiServices>();
   LocaleManager localeManager = LocaleManager.instance;
+
+  // Refresh token metodunu dışa aktarıyoruz
+  Future<String?> refreshAccessToken({required String refreshToken}) async {
+    try {
+      dynamic response = await _apiServices.postApiResponse(
+        strCons.baseUrl + strCons.refreshToken,
+        null, // Body boş
+        refreshToken, // Refresh token header olarak gönderiliyor
+      );
+
+      if (response['status']) {
+        final userModel = UserModel.fromJson(response['data']);
+        // Token'ları güncelle
+        await localeManager.setStringValue(
+          PreferencesKeys.TOKEN,
+          userModel.accessToken ?? "",
+        );
+        await localeManager.setStringValue(
+          PreferencesKeys.REFRESH_TOKEN,
+          userModel.refreshToken ?? "",
+        );
+        return userModel.accessToken;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
 
   Future<BaseModel<List<UserModel>>> login({required Map body}) async {
     try {

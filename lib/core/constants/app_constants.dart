@@ -3,8 +3,8 @@ import 'package:provider/single_child_widget.dart';
 
 import '../../core/init/navigation/navigation_route.dart';
 import '../../core/init/navigation/navigation_service.dart';
-import '../../core/di/service_locator.dart';
-import '../../core/position/location_manager.dart';
+import 'service_locator.dart';
+import '../init/cache/location_manager.dart';
 import '../../viewModel/auth_view_model.dart';
 import '../../viewModel/in_and_out_view_model.dart';
 import '../../viewModel/inandout_list_view_model.dart';
