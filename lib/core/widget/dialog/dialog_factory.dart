@@ -15,7 +15,6 @@ class DialogFactory {
       buttonText: params['buttonText'],
       onConfirm: params['onConfirm'],
     ),
-
     DialogType.error: (params) => ErrorDialogBuilder(
       message: params['message'] ?? '',
       title: params['title'],
@@ -23,7 +22,6 @@ class DialogFactory {
       exitOnClose: params['exitOnClose'] ?? false,
       onConfirm: params['onConfirm'],
     ),
-
     DialogType.warning: (params) => ErrorDialogBuilder(
       message: params['message'] ?? '',
       title: params['title'],
@@ -31,26 +29,22 @@ class DialogFactory {
       exitOnClose: params['exitOnClose'] ?? false,
       onConfirm: params['onConfirm'],
     ),
-
     DialogType.update: (params) => UpdateDialogBuilder(
       message: params['message'] ?? '',
       title: params['title'],
       buttonText: params['buttonText'],
       onConfirm: params['onConfirm'],
     ),
-
     DialogType.inAndOut: (params) => InAndOutDialogBuilder(
       content: params['content'] ?? '',
       iconPath: params['iconPath'] ?? '',
       color: params['color'] ?? Colors.blue,
       onPressed: params['onPressed'] ?? () {},
     ),
-
     DialogType.qrTypeSelection: (params) => QrTypeSelectionDialogBuilder(
       onInPressed: params['onInPressed'] ?? () {},
       onOutPressed: params['onOutPressed'] ?? () {},
     ),
-
     DialogType.illegal: (params) {
       final inAndOutViewModel =
           params['inAndOutViewModel'] as InAndOutViewModel?;
@@ -77,10 +71,27 @@ class DialogFactory {
         situation: situation,
       );
     },
-
     DialogType.locationPermission: (params) => LocationPermissionDialogBuilder(
       isEnabled: params['isEnabled'] ?? false,
       isMock: params['isMock'] ?? false,
+    ),
+    // Yeni eklenen dialog türleri
+    DialogType.logoutConfirmation: (params) => LogoutConfirmationDialogBuilder(
+      onConfirm: params['onConfirm'] ?? () {},
+      onCancel: params['onCancel'] ?? () {},
+    ),
+    DialogType.changePassword: (params) => ChangePasswordDialogBuilder(
+      currentPasswordController:
+          params['currentPasswordController'] as TextEditingController? ??
+          TextEditingController(),
+      newPasswordController:
+          params['newPasswordController'] as TextEditingController? ??
+          TextEditingController(),
+      confirmNewPasswordController:
+          params['confirmNewPasswordController'] as TextEditingController? ??
+          TextEditingController(),
+      onConfirm: params['onConfirm'] ?? () {},
+      onCancel: params['onCancel'] ?? () {},
     ),
   };
 

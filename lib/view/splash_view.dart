@@ -280,7 +280,6 @@ class PulseRingsPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
-// Pulse loading painter
 class PulseLoadingPainter extends CustomPainter {
   final double animationValue;
 
@@ -292,8 +291,6 @@ class PulseLoadingPainter extends CustomPainter {
     final paint = Paint()
       ..color = const Color(0xFFF97316)
       ..style = PaintingStyle.fill;
-
-    // Pulse dots
     for (int i = 0; i < 8; i++) {
       final angle = (i * 45.0 + animationValue * 360) * math.pi / 180;
       final x = center.dx + 15 * math.cos(angle);

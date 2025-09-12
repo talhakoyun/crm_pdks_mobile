@@ -246,7 +246,7 @@ class _RegisterViewState extends State<RegisterView>
   }
 
   Widget passWidget(BuildContext context) {
-    context.watch<AuthViewModel>().changeObsure;
+    context.watch<AuthViewModel>().togglePasswordVisibility(fieldType: 'main');
     return CustomTextInput(
       labelText: strCons.password,
       obscureText: authVM.obscureText,
@@ -273,7 +273,9 @@ class _RegisterViewState extends State<RegisterView>
       ),
       suffixIcon: InkWell(
         onTap: () {
-          context.read<AuthViewModel>().changeObsure();
+          context.read<AuthViewModel>().togglePasswordVisibility(
+            fieldType: 'main',
+          );
         },
         child: Icon(
           authVM.obscureText
@@ -286,7 +288,7 @@ class _RegisterViewState extends State<RegisterView>
   }
 
   Widget passConfirmWidget(BuildContext context) {
-    context.watch<AuthViewModel>().changeObsure;
+    context.watch<AuthViewModel>().togglePasswordVisibility(fieldType: 'main');
     return CustomTextInput(
       labelText: strCons.passwordConfirm,
       obscureText: authVM.obscureText,
@@ -313,7 +315,9 @@ class _RegisterViewState extends State<RegisterView>
       ),
       suffixIcon: InkWell(
         onTap: () {
-          context.read<AuthViewModel>().changeObsure();
+          context.read<AuthViewModel>().togglePasswordVisibility(
+            fieldType: 'main',
+          );
         },
         child: Icon(
           authVM.obscureText

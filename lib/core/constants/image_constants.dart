@@ -15,7 +15,6 @@ class ImageConstants {
   String get splashBG => toPNG('splashBG');
   String get splashLogo => toPNG('splashLogo');
   String get success => toPNG('success');
-  String get userWhite => toPNG('userWhite'); //xx
   String get warning => toPNG('warning');
 
   // SVG ALANI
@@ -24,7 +23,6 @@ class ImageConstants {
   String get approved => toSVG('approved');
   String get birthperm => toSVG('birthPerm');
   String get breastfeeding => toSVG('breastfeeding');
-  String get ddIcon => toSVG('ddIcon'); //xx
   String get death => toSVG('death');
   String get denied => toSVG('denied');
   String get description => toSVG('description');
@@ -42,7 +40,6 @@ class ImageConstants {
   String get stop => toSVG('stop');
   String get user => toSVG('user');
   String get wedding => toSVG('wedding');
-  String get zoneQR => toSVG('zoneQR');
 
   String toPNG(String name) => 'assets/images/png/ic_$name.png';
   String toSVG(String name) => 'assets/images/svg/ic_$name.svg';

@@ -77,7 +77,7 @@ class InAndOutViewModel extends BaseViewModel {
             if (locationManager.currentPosition != null) {
               if (networkConnectivity.internet) {
                 await executeShiftProcedure(
-                  type: 1, // Giriş
+                  type: 1,
                   longitude: locationManager.currentPosition!.longitude,
                   latitude: locationManager.currentPosition!.latitude,
                   deviceId: deviceInfo.deviceId,

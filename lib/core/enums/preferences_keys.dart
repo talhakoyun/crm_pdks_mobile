@@ -7,7 +7,6 @@ enum PreferencesKeys {
   USERNAME,
   GENDER,
   OUTSIDE,
-  ZONE,
   PHONE,
   EMAIL,
   DEPARTMENT,

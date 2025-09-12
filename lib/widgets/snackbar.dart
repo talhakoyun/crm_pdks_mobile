@@ -9,6 +9,7 @@ class CustomSnackBar {
     SnackBarAction? snackBarAction,
     Color backgroundColor = Colors.green,
   }) {
+    if (!context.mounted) return;
     final SnackBar snackBar = SnackBar(
       action: snackBarAction,
       duration: const Duration(seconds: 3),

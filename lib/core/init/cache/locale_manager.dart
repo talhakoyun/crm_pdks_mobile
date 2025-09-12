@@ -107,4 +107,17 @@ class LocaleManager {
       return 0;
     }
   }
+
+  // Remove value metodu eklendi
+  Future<void> removeValue(PreferencesKeys key) async {
+    if (_preferences == null) {
+      return;
+    }
+
+    try {
+      await _preferences?.remove(key.toString());
+    } catch (e) {
+      debugPrint('❌ LocaleManager: Error removing ${key.toString()}: $e');
+    }
+  }
 }

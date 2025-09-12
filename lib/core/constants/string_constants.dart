@@ -124,6 +124,7 @@ class StringConstants {
   String get emailValidMsg => "errors.emailValid".tr();
   String get passwordValidMsg => "errors.passwordValid".tr();
   String get registerNameErrorMsg => "errors.registerNameError".tr();
+  String get passwordChangeErrorMsg => "errors.passwordChangeError".tr();
 
   // Location
   String get isEnableLocationAlertText => "location.isEnableAlert".tr();
@@ -167,6 +168,7 @@ class StringConstants {
   // API URLs - These remain as static strings
   final String baseUrl = "https://crm.bilmos.com/api/";
   final String loginUrl = 'auth/login';
+  final String changePassword = 'user/password/update';
   final String logout = 'auth/logout';
   final String profile = "user/profile";
   final String permissionList = "holidays/list";

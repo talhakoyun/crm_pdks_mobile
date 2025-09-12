@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
+import '../../../viewModel/auth_view_model.dart';
 import '../../constants/device_constants.dart';
 import '../../constants/image_constants.dart';
 import '../../constants/string_constants.dart';
@@ -28,6 +30,9 @@ class SuccessDialogBuilder extends BaseDialogBuilder {
     this.buttonText,
     this.onConfirm,
   });
+
+  @override
+  Color? getBackgroundColor(BuildContext context) => Colors.white;
 
   @override
   Widget buildTitle(BuildContext context) {
@@ -71,6 +76,9 @@ class ErrorDialogBuilder extends BaseDialogBuilder {
     this.exitOnClose = false,
     this.onConfirm,
   });
+
+  @override
+  Color? getBackgroundColor(BuildContext context) => Colors.white;
 
   @override
   Widget buildTitle(BuildContext context) {
@@ -482,7 +490,7 @@ class IllegalDialogBuilder extends BaseDialogBuilder {
       ),
       suffixIcon: const Icon(Icons.edit),
       maxLength: 150,
-      textInputType: TextInputType.emailAddress,
+      textInputType: TextInputType.text,
     );
   }
 
@@ -620,5 +628,249 @@ class IllegalDialogBuilder extends BaseDialogBuilder {
           );
         };
     }
+  }
+}
+
+class LogoutConfirmationDialogBuilder extends BaseDialogBuilder {
+  final VoidCallback onConfirm;
+  final VoidCallback onCancel;
+
+  LogoutConfirmationDialogBuilder({
+    required this.onConfirm,
+    required this.onCancel,
+  });
+
+  @override
+  Color? getBackgroundColor(BuildContext context) =>
+      context.colorScheme.onError;
+
+  @override
+  Widget buildTitle(BuildContext context) {
+    return const Text(
+      'Çıkış Yap',
+      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    );
+  }
+
+  @override
+  Widget buildContent(BuildContext context) {
+    return const Text('Çıkış yapmak istediğinize emin misiniz?');
+  }
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      DialogActionsRow(
+        alignment: MainAxisAlignment.spaceAround,
+        actions: [
+          DialogActionButton(
+            text: 'İptal',
+            onPressed: onCancel,
+            isPrimary: false,
+            isDestructive: false,
+          ),
+          DialogActionButton(
+            text: 'Çıkış Yap',
+            onPressed: onConfirm,
+            isPrimary: true,
+            isDestructive: true,
+          ),
+        ],
+      ),
+    ];
+  }
+}
+
+class ChangePasswordDialogBuilder extends BaseDialogBuilder {
+  final TextEditingController currentPasswordController;
+  final TextEditingController newPasswordController;
+  final TextEditingController confirmNewPasswordController;
+  final VoidCallback onConfirm;
+  final VoidCallback onCancel;
+
+  ChangePasswordDialogBuilder({
+    required this.currentPasswordController,
+    required this.newPasswordController,
+    required this.confirmNewPasswordController,
+    required this.onConfirm,
+    required this.onCancel,
+  });
+
+  @override
+  Color? getBackgroundColor(BuildContext context) => Colors.white;
+
+  @override
+  Widget buildTitle(BuildContext context) {
+    return const Text(
+      'Şifre Değiştir',
+      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    );
+  }
+
+  @override
+  Widget buildContent(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.8,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Consumer<AuthViewModel>(
+            builder: (context, authViewModel, child) {
+              return CustomTextInput(
+                autofocus: true,
+                labelText: "Mevcut Şifre",
+                obscureText: authViewModel.currentObscureText,
+                controller: currentPasswordController,
+                prefixIcon: Container(
+                  margin: const EdgeInsets.all(5.0),
+                  padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        style: BorderStyle.solid,
+                        color: context.colorScheme.surface,
+                        width: 0.75,
+                      ),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.lock_outlined,
+                    color: context.colorScheme.surface,
+                    size: 20.scalablePixel,
+                  ),
+                ),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    authViewModel.togglePasswordVisibility(
+                      fieldType: 'current',
+                    );
+                  },
+                  icon: Icon(
+                    authViewModel.currentObscureText
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    color: context.colorScheme.surface,
+                    size: 20,
+                  ),
+                ),
+                maxLength: 150,
+                textInputType: TextInputType.visiblePassword,
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          Consumer<AuthViewModel>(
+            builder: (context, authViewModel, child) {
+              return CustomTextInput(
+                autofocus: true,
+                labelText: "Yeni Şifre",
+                obscureText: authViewModel.newObscureText,
+                controller: newPasswordController,
+                prefixIcon: Container(
+                  margin: const EdgeInsets.all(5.0),
+                  padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        style: BorderStyle.solid,
+                        color: context.colorScheme.surface,
+                        width: 0.75,
+                      ),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.lock_outlined,
+                    color: context.colorScheme.surface,
+                    size: 20.scalablePixel,
+                  ),
+                ),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    authViewModel.togglePasswordVisibility(fieldType: 'new');
+                  },
+                  icon: Icon(
+                    authViewModel.newObscureText
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    color: context.colorScheme.surface,
+                    size: 20,
+                  ),
+                ),
+                maxLength: 150,
+                textInputType: TextInputType.emailAddress,
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          Consumer<AuthViewModel>(
+            builder: (context, authViewModel, child) {
+              return CustomTextInput(
+                autofocus: true,
+                labelText: "Yeni Şifre (Tekrar)",
+                obscureText: authViewModel.newConfirmObscureText,
+                controller: confirmNewPasswordController,
+                prefixIcon: Container(
+                  margin: const EdgeInsets.all(5.0),
+                  padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        style: BorderStyle.solid,
+                        color: context.colorScheme.surface,
+                        width: 0.75,
+                      ),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.lock_outlined,
+                    color: context.colorScheme.surface,
+                    size: 20.scalablePixel,
+                  ),
+                ),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    authViewModel.togglePasswordVisibility(
+                      fieldType: 'newConfirm',
+                    );
+                  },
+                  icon: Icon(
+                    authViewModel.newConfirmObscureText
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    color: context.colorScheme.surface,
+                    size: 20,
+                  ),
+                ),
+                maxLength: 150,
+                textInputType: TextInputType.emailAddress,
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      DialogActionsRow(
+        alignment: MainAxisAlignment.spaceAround,
+        actions: [
+          DialogActionButton(
+            text: 'İptal',
+            onPressed: onCancel,
+            isPrimary: false,
+            isDestructive: false,
+          ),
+          DialogActionButton(
+            text: 'Değiştir',
+            onPressed: onConfirm,
+            isPrimary: true,
+            isDestructive: false,
+          ),
+        ],
+      ),
+    ];
   }
 }

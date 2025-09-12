@@ -120,7 +120,8 @@
     "loginError2": "Please enter the requested information completely.",
     "emailValid": "Please enter a valid email address.",
     "passwordValid": "Password length cannot be less than 6 characters!",
-    "registerNameError": "Name - Surname field must consist of at least 5 characters."
+    "registerNameError": "Name - Surname field must consist of at least 5 characters.",
+    "passwordChangeError": "Password change failed. Please check your information and try again."
   },
   "location": {
     "isEnableAlert": "Phone Location Appears to be Off\nPlease Turn On Your Location",

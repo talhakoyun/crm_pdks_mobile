@@ -47,7 +47,6 @@ class PermissionViewModel extends BaseViewModel {
   Future<void> fetchHolidayTypes() async {
     try {
       final response = await _permissionServices.holidayTypeList();
-      debugPrint('Holiday types response: ${response.status}');
       if (response.status!) {
         typeItems = response.data!;
         notifyListeners();

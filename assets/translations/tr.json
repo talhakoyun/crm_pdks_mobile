@@ -120,7 +120,8 @@
     "loginError2": "Lütfen sizden istenilen bilgileri eksiksizce giriniz.",
     "emailValid": "Lütfen geçerli bir email adresi giriniz.",
     "passwordValid": "Şifre uzunluğu 6 karakterden az olamaz!",
-    "registerNameError": "Ad - Soyad alanı en az 5 karakterden oluşmalıdır."
+    "registerNameError": "Ad - Soyad alanı en az 5 karakterden oluşmalıdır.",
+    "passwordChangeError": "Şifre değiştirme başarısız oldu. Lütfen bilgilerinizi kontrol edip tekrar deneyiniz."
   },
   "location": {
     "isEnableAlert": "Telefonun Konumu Kapalı Görünüyor\nLütfen Konumunuzu Açın",

@@ -7,4 +7,6 @@ enum DialogType {
   qrTypeSelection,
   illegal,
   locationPermission,
+  logoutConfirmation,
+  changePassword,
 }

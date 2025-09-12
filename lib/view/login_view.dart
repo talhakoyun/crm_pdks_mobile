@@ -349,7 +349,7 @@ class _LoginViewState extends State<LoginView>
           ),
           suffixIcon: IconButton(
             onPressed: () {
-              authVM.changeObsure();
+              authVM.togglePasswordVisibility(fieldType: 'main');
             },
             icon: Icon(
               authVM.obscureText
@@ -360,7 +360,6 @@ class _LoginViewState extends State<LoginView>
             ),
           ),
           onFieldSubmitted: (value) {
-            // Password field'den login işlemi
             authVM.controllerCheck(context);
           },
         );

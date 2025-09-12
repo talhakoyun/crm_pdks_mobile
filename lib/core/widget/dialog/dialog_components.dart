@@ -65,7 +65,7 @@ class DialogActionButton extends StatelessWidget {
 
     return SizedBox(
       height: 5.height,
-      width: isPrimary ? 27.width : null,
+      width: isPrimary ? 28.width : null,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(backgroundColor: buttonColor),

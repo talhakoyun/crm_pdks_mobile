@@ -1,3 +1,5 @@
+import 'package:crm_pdks_mobile/core/init/network/exception/app_exception.dart';
+
 import '../core/constants/string_constants.dart';
 import '../core/enums/enums.dart';
 import '../core/init/cache/locale_manager.dart';
@@ -32,6 +34,13 @@ class PermissionService {
           data: null,
         );
       }
+    } on BadRequestException catch (e) {
+      // 422 hata kodu BadRequestException olarak gelecek
+      return BaseModel<List<HolidayDataModel>>(
+        status: false,
+        message: e.msg ?? strCons.errorMessage,
+        data: null,
+      );
     } catch (e) {
       return BaseModel<List<HolidayDataModel>>(
         status: false,
@@ -62,6 +71,13 @@ class PermissionService {
           data: null,
         );
       }
+    } on BadRequestException catch (e) {
+      // 422 hata kodu BadRequestException olarak gelecek
+      return BaseModel<List<HolidayTypeDataModel>>(
+        status: false,
+        message: e.msg ?? strCons.errorMessage,
+        data: null,
+      );
     } catch (e) {
       return BaseModel<List<HolidayTypeDataModel>>(
         status: false,
@@ -107,6 +123,13 @@ class PermissionService {
           data: {"status": false, "message": response['message']},
         );
       }
+    } on BadRequestException catch (e) {
+      // 422 hata kodu BadRequestException olarak gelecek
+      return BaseModel<Map<String, dynamic>>(
+        status: false,
+        message: e.msg ?? strCons.errorMessage,
+        data: {"status": false, "message": e.msg ?? strCons.errorMessage},
+      );
     } catch (e) {
       return BaseModel<Map<String, dynamic>>(
         status: false,
