@@ -251,7 +251,6 @@ class _SplashViewState extends State<SplashView>
   }
 }
 
-// Pulse rings painter
 class PulseRingsPainter extends CustomPainter {
   final double animationValue;
 
@@ -264,7 +263,6 @@ class PulseRingsPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
-    // Çoklu pulse rings
     for (int i = 0; i < 3; i++) {
       final radius = (50 + i * 30) * animationValue;
       final opacity = (1.0 - animationValue) * 0.3;
