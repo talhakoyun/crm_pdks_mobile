@@ -101,6 +101,7 @@
     "confirm2": "Confirm"
   },
   "messages": {
+    "error": "Error",
     "success": "Transaction Successful",
     "success2": "Your Transaction is Successful",
     "outSuccess": "Check out transaction successful",

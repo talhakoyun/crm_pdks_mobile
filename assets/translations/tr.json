@@ -101,6 +101,7 @@
     "confirm2": "Onayla"
   },
   "messages": {
+    "error": "Hata",
     "success": "İşlem Başarılı",
     "success2": "İşleminiz Başarılı",
     "outSuccess": "Çıkış işlemi başarılı",

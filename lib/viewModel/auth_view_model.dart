@@ -151,7 +151,7 @@ class AuthViewModel extends BaseViewModel {
   void splashCheck(BuildContext context) async {
     bool? isRealDevice = await _deviceService.isRealDevice();
 
-    if (isRealDevice! != false) {
+    if (isRealDevice! == false) {
       navigation.navigateToPageClear(path: NavigationConstants.HACK);
     } else {
       if (networkConnectivity.internet) {
