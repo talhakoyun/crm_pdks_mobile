@@ -4,50 +4,37 @@ import 'package:provider/provider.dart';
 import '../core/base/base_singleton.dart';
 import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
-import '../viewModel/inandout_list_view_model.dart';
-import '../viewModel/permissions_view_model.dart';
-import '../viewModel/auth_view_model.dart';
+import '../viewModel/main_navigation_view_model.dart';
 import 'home_view.dart';
 import 'in_and_out_view.dart';
 import 'permission_procedure_view.dart';
 import 'profile_view.dart';
 
-class MainNavigationView extends StatefulWidget {
+class MainNavigationView extends StatelessWidget with BaseSingleton {
   const MainNavigationView({super.key});
 
   @override
-  State<MainNavigationView> createState() => _MainNavigationViewState();
-}
-
-class _MainNavigationViewState extends State<MainNavigationView>
-    with BaseSingleton {
-  int _currentIndex = 0;
-  late PageController _pageController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      child: Scaffold(
-        backgroundColor: context.colorScheme.onTertiaryContainer,
-        body: PageView(
-          controller: _pageController,
-          physics: const NeverScrollableScrollPhysics(),
-          children: _buildPages(),
-        ),
-        bottomNavigationBar: _buildBottomNavigationBar(context),
+    return ChangeNotifierProvider(
+      create: (context) => MainNavigationViewModel()..init(),
+      child: Consumer<MainNavigationViewModel>(
+        builder: (context, viewModel, child) {
+          return PopScope(
+            canPop: false,
+            child: Scaffold(
+              backgroundColor: context.colorScheme.onTertiaryContainer,
+              body: PageView(
+                controller: viewModel.pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: _buildPages(),
+              ),
+              bottomNavigationBar: _buildBottomNavigationBar(
+                context,
+                viewModel,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -61,7 +48,10 @@ class _MainNavigationViewState extends State<MainNavigationView>
     ];
   }
 
-  Widget _buildBottomNavigationBar(BuildContext context) {
+  Widget _buildBottomNavigationBar(
+    BuildContext context,
+    MainNavigationViewModel viewModel,
+  ) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -89,13 +79,13 @@ class _MainNavigationViewState extends State<MainNavigationView>
             children: BottomNavigationItem.values.asMap().entries.map((entry) {
               final index = entry.key;
               final item = entry.value;
-              final isSelected = _currentIndex == index;
+              final isSelected = viewModel.currentIndex == index;
 
               return _buildNavigationItem(
                 context,
                 item,
                 isSelected,
-                () => _onItemTapped(index),
+                () => _onItemTapped(context, viewModel, index),
               );
             }).toList(),
           ),
@@ -197,43 +187,12 @@ class _MainNavigationViewState extends State<MainNavigationView>
     }
   }
 
-  void _onItemTapped(int index) {
-    if (_currentIndex != index) {
-      setState(() {
-        _currentIndex = index;
-      });
-      _pageController.jumpToPage(index);
-      _handlePageChange(index);
-    }
-  }
-
-  Future<void> _handlePageChange(int index) async {
-    await Future.delayed(const Duration(milliseconds: 100));
-    if (!mounted) return;
-
-    switch (index) {
-      case 0:
-        final authVM = Provider.of<AuthViewModel>(context, listen: false);
-        if (authVM.userName == null || authVM.userName!.isEmpty) {
-          authVM.getProfile(context, true);
-        }
-        break;
-      case 1:
-        final listVM = Provider.of<InAndOutListViewModel>(
-          context,
-          listen: false,
-        );
-        listVM.fetchList(context);
-        break;
-      case 2:
-        final permissionVM = Provider.of<PermissionViewModel>(
-          context,
-          listen: false,
-        );
-        permissionVM.fetchList(context);
-        break;
-      case 3:
-        break;
-    }
+  void _onItemTapped(
+    BuildContext context,
+    MainNavigationViewModel viewModel,
+    int index,
+  ) {
+    viewModel.onItemTapped(index);
+    viewModel.handlePageChange(context, index);
   }
 }

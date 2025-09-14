@@ -235,7 +235,6 @@ class _GetPermissionViewState extends State<GetPermissionView>
     );
   }
 
-  // Helper Methods
   void _handleBack(BuildContext context, PermissionViewModel permissionVM) {
     permissionVM.holidayAddress.clear();
     permissionVM.holidayReason.clear();
@@ -275,7 +274,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
         border: Border.all(
           color: context.colorScheme.surface.withValues(alpha: 0.3),
         ),
-        color: Colors.grey[50],
+        color: context.colorScheme.surface.withValues(alpha: 0.05),
       ),
       child: InkWell(
         onTap: permissionVM.typeItems.isNotEmpty
@@ -584,12 +583,13 @@ class _GetPermissionViewState extends State<GetPermissionView>
     );
   }
 
-  // Picker Methods
   void _showTypePicker(BuildContext ctx, PermissionViewModel permissionVM) {
     if (permissionVM.typeItems.isEmpty) {
       permissionVM.fetchHolidayTypes();
       return;
     }
+
+    int selectedIndex = 0;
 
     showCupertinoModalPopup(
       context: ctx,
@@ -604,7 +604,6 @@ class _GetPermissionViewState extends State<GetPermissionView>
         ),
         child: Column(
           children: [
-            // Header
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -628,7 +627,6 @@ class _GetPermissionViewState extends State<GetPermissionView>
                 ],
               ),
             ),
-            // Picker
             Expanded(
               child: CupertinoPicker(
                 backgroundColor: Colors.white,
@@ -668,28 +666,56 @@ class _GetPermissionViewState extends State<GetPermissionView>
                     ),
                 ],
                 onSelectedItemChanged: (int index) {
-                  final selectedType = permissionVM.typeItems[index];
-                  permissionVM.holidayType.text = selectedType.title ?? '';
-                  type = selectedType.id ?? 0;
+                  selectedIndex = index;
                 },
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Colors.grey[300]!, width: 1),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      if (permissionVM.typeItems.isNotEmpty) {
+                        final selectedType =
+                            permissionVM.typeItems[selectedIndex];
+                        permissionVM.setHolidayType(
+                          selectedType.title ?? '',
+                          selectedType.id ?? 0,
+                        );
+                        type = selectedType.id ?? 0;
+                      }
+                      Navigator.pop(ctx);
+                    },
+                    child: Text(
+                      StringConstants.instance.okey,
+                      style: context.textTheme.titleMedium!.copyWith(
+                        color: context.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
-    ).whenComplete(() {
-      if (type == 0 && permissionVM.typeItems.isNotEmpty) {
-        final firstType = permissionVM.typeItems.first;
-        type = firstType.id ?? 0;
-        permissionVM.holidayType.text = firstType.title ?? '';
-      }
-    });
+    );
   }
 
   void _showStartDatePicker(
     BuildContext ctx,
     PermissionViewModel permissionVM,
   ) {
+    DateTime selectedDate = startDt;
+
     showCupertinoModalPopup(
       context: ctx,
       builder: (_) => Container(
@@ -703,7 +729,6 @@ class _GetPermissionViewState extends State<GetPermissionView>
         ),
         child: Column(
           children: [
-            // Header
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -727,7 +752,6 @@ class _GetPermissionViewState extends State<GetPermissionView>
                 ],
               ),
             ),
-            // Date Picker
             Expanded(
               child: CupertinoDatePicker(
                 minimumDate: DateTime.now(),
@@ -735,32 +759,55 @@ class _GetPermissionViewState extends State<GetPermissionView>
                 use24hFormat: true,
                 initialDateTime: DateTime.now(),
                 onDateTimeChanged: (val) {
-                  endDt = DateTime(1890);
-                  permissionVM.holidayEndDt.text = "";
-                  startDt = val;
-                  permissionVM.holidayStartDt.text = Jiffy.parseFromDateTime(
-                    startDt,
-                  ).format(pattern: 'dd.MM.yyyy, HH:mm');
+                  selectedDate = val;
                 },
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Colors.grey[300]!, width: 1),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      endDt = DateTime(1890);
+                      permissionVM.setHolidayEndDate("");
+                      startDt = selectedDate;
+                      permissionVM.setHolidayStartDate(
+                        Jiffy.parseFromDateTime(
+                          startDt,
+                        ).format(pattern: 'dd.MM.yyyy, HH:mm'),
+                      );
+                      Navigator.pop(ctx);
+                    },
+                    child: Text(
+                      StringConstants.instance.okey,
+                      style: context.textTheme.titleMedium!.copyWith(
+                        color: context.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
-    ).whenComplete(() {
-      if (permissionVM.holidayStartDt.text.isEmpty) {
-        permissionVM.holidayStartDt.text = Jiffy.parseFromDateTime(
-          DateTime.now(),
-        ).format(pattern: 'dd.MM.yyyy, HH:mm');
-        startDt = DateTime.now();
-      }
-    });
+    );
   }
 
   void _showEndDatePicker(BuildContext ctx, PermissionViewModel permissionVM) {
     final minimumDate = startDt.isAfter(DateTime.now())
         ? startDt
         : DateTime.now();
+
+    DateTime selectedDate = endDt.isAfter(minimumDate) ? endDt : minimumDate;
 
     showCupertinoModalPopup(
       context: ctx,
@@ -775,7 +822,6 @@ class _GetPermissionViewState extends State<GetPermissionView>
         ),
         child: Column(
           children: [
-            // Header
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -799,7 +845,6 @@ class _GetPermissionViewState extends State<GetPermissionView>
                 ],
               ),
             ),
-            // Date Picker
             Expanded(
               child: CupertinoDatePicker(
                 minimumDate: minimumDate,
@@ -807,28 +852,44 @@ class _GetPermissionViewState extends State<GetPermissionView>
                 use24hFormat: true,
                 initialDateTime: minimumDate,
                 onDateTimeChanged: (val) {
-                  endDt = val;
-                  permissionVM.holidayEndDt.text = Jiffy.parseFromDateTime(
-                    endDt,
-                  ).format(pattern: 'dd.MM.yyyy, HH:mm');
+                  selectedDate = val;
                 },
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Colors.grey[300]!, width: 1),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      endDt = selectedDate;
+                      permissionVM.setHolidayEndDate(
+                        Jiffy.parseFromDateTime(
+                          endDt,
+                        ).format(pattern: 'dd.MM.yyyy, HH:mm'),
+                      );
+                      Navigator.pop(ctx);
+                    },
+                    child: Text(
+                      StringConstants.instance.okey,
+                      style: context.textTheme.titleMedium!.copyWith(
+                        color: context.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
-    ).whenComplete(() {
-      if (permissionVM.holidayEndDt.text.isEmpty) {
-        final defaultEndDate = DateTime(
-          minimumDate.year,
-          minimumDate.month,
-          minimumDate.day + 1,
-        );
-        permissionVM.holidayEndDt.text = Jiffy.parseFromDateTime(
-          defaultEndDate,
-        ).format(pattern: 'dd.MM.yyyy, HH:mm');
-        endDt = defaultEndDate;
-      }
-    });
+    );
   }
 }

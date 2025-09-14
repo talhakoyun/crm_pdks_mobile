@@ -36,6 +36,22 @@ class PermissionViewModel extends BaseViewModel {
     permissionStatus = PermissionStatus.loading;
   }
 
+  // UI güncellemesi için setter metotları
+  void setHolidayType(String title, int id) {
+    holidayType.text = title;
+    notifyListeners();
+  }
+
+  void setHolidayStartDate(String date) {
+    holidayStartDt.text = date;
+    notifyListeners();
+  }
+
+  void setHolidayEndDate(String date) {
+    holidayEndDt.text = date;
+    notifyListeners();
+  }
+
   @override
   void init() {
     fetchHolidayTypes();
