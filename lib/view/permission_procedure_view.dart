@@ -77,7 +77,7 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
             context: context,
             imagePath: imgCons.warning,
             title: strCons.unExpectedError,
-            subtitle: strCons.spaceSubtitle,
+            subtitle: "",
           )
         : Scaffold(
             body: Center(

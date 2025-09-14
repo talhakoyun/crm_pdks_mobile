@@ -75,7 +75,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
               context: context,
               imagePath: imgCons.warning,
               title: strCons.unExpectedError,
-              subtitle: strCons.emptySubtitle,
+              subtitle: "",
             )
           : const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
