@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../core/base/base_singleton.dart';
 import '../core/base/size_singleton.dart';
+import '../core/constants/string_constants.dart';
 import '../core/extension/context_extension.dart';
 import '../core/widget/dialog/dialog_factory.dart';
 import '../core/enums/dialog_type.dart';
@@ -123,7 +124,7 @@ class _ProfileViewState extends State<ProfileView>
               ),
             ),
             child: Text(
-              'Şifre Değiştir',
+              strCons.permissionChangePassword,
               style: context.primaryTextTheme.titleMedium,
             ),
           ),
@@ -143,7 +144,7 @@ class _ProfileViewState extends State<ProfileView>
               ),
             ),
             child: Text(
-              'Çıkış Yap',
+              StringConstants.instance.permissionLogout,
               style: context.textTheme.titleMedium?.copyWith(
                 color: context.colorScheme.error,
               ),
@@ -176,7 +177,7 @@ class _ProfileViewState extends State<ProfileView>
             if (context.mounted) {
               CustomSnackBar(
                 context,
-                'Yeni şifreler eşleşmiyor',
+                strCons.permissionPasswordMismatch,
                 backgroundColor: context.colorScheme.error,
               );
             }
@@ -187,7 +188,7 @@ class _ProfileViewState extends State<ProfileView>
             if (context.mounted) {
               CustomSnackBar(
                 context,
-                'Yeni şifre en az 6 karakter olmalıdır',
+                strCons.permissionPasswordLength,
                 backgroundColor: context.colorScheme.error,
               );
             }
@@ -207,13 +208,13 @@ class _ProfileViewState extends State<ProfileView>
               if (result.status!) {
                 CustomSnackBar(
                   context,
-                  result.message ?? 'Şifre başarıyla değiştirildi',
+                  result.message ?? strCons.permissionPasswordSuccess,
                   backgroundColor: context.colorScheme.tertiaryContainer,
                 );
               } else {
                 CustomSnackBar(
                   context,
-                  result.message ?? 'Şifre değiştirme işlemi başarısız oldu',
+                  result.message ?? strCons.permissionPasswordFailed,
                   backgroundColor: context.colorScheme.error,
                 );
               }

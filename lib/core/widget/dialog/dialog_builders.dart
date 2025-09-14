@@ -646,15 +646,15 @@ class LogoutConfirmationDialogBuilder extends BaseDialogBuilder {
 
   @override
   Widget buildTitle(BuildContext context) {
-    return const Text(
-      'Çıkış Yap',
-      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    return Text(
+      StringConstants.instance.permissionLogout,
+      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
     );
   }
 
   @override
   Widget buildContent(BuildContext context) {
-    return const Text('Çıkış yapmak istediğinize emin misiniz?');
+    return Text(StringConstants.instance.permissionConfirmLogout);
   }
 
   @override
@@ -664,13 +664,13 @@ class LogoutConfirmationDialogBuilder extends BaseDialogBuilder {
         alignment: MainAxisAlignment.spaceAround,
         actions: [
           DialogActionButton(
-            text: 'İptal',
+            text: StringConstants.instance.permissionCancel,
             onPressed: onCancel,
             isPrimary: false,
             isDestructive: false,
           ),
           DialogActionButton(
-            text: 'Çıkış Yap',
+            text: StringConstants.instance.permissionLogout,
             onPressed: onConfirm,
             isPrimary: true,
             isDestructive: true,
@@ -701,9 +701,9 @@ class ChangePasswordDialogBuilder extends BaseDialogBuilder {
 
   @override
   Widget buildTitle(BuildContext context) {
-    return const Text(
-      'Şifre Değiştir',
-      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    return Text(
+      StringConstants.instance.permissionChangePassword,
+      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
     );
   }
 
@@ -718,7 +718,7 @@ class ChangePasswordDialogBuilder extends BaseDialogBuilder {
             builder: (context, authViewModel, child) {
               return CustomTextInput(
                 autofocus: true,
-                labelText: "Mevcut Şifre",
+                labelText: StringConstants.instance.permissionCurrentPassword,
                 obscureText: authViewModel.currentObscureText,
                 controller: currentPasswordController,
                 prefixIcon: Container(
@@ -763,7 +763,7 @@ class ChangePasswordDialogBuilder extends BaseDialogBuilder {
             builder: (context, authViewModel, child) {
               return CustomTextInput(
                 autofocus: true,
-                labelText: "Yeni Şifre",
+                labelText: StringConstants.instance.permissionNewPassword,
                 obscureText: authViewModel.newObscureText,
                 controller: newPasswordController,
                 prefixIcon: Container(
@@ -806,7 +806,8 @@ class ChangePasswordDialogBuilder extends BaseDialogBuilder {
             builder: (context, authViewModel, child) {
               return CustomTextInput(
                 autofocus: true,
-                labelText: "Yeni Şifre (Tekrar)",
+                labelText:
+                    StringConstants.instance.permissionConfirmNewPassword,
                 obscureText: authViewModel.newConfirmObscureText,
                 controller: confirmNewPasswordController,
                 prefixIcon: Container(
@@ -858,13 +859,13 @@ class ChangePasswordDialogBuilder extends BaseDialogBuilder {
         alignment: MainAxisAlignment.spaceAround,
         actions: [
           DialogActionButton(
-            text: 'İptal',
+            text: StringConstants.instance.permissionCancel,
             onPressed: onCancel,
             isPrimary: false,
             isDestructive: false,
           ),
           DialogActionButton(
-            text: 'Değiştir',
+            text: StringConstants.instance.permissionChange,
             onPressed: onConfirm,
             isPrimary: true,
             isDestructive: false,

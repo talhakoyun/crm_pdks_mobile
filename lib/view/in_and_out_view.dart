@@ -273,7 +273,7 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
             Icon(
               Icons.access_time_outlined,
               size: 80,
-              color: context.colorScheme.outline.withOpacity(0.5),
+              color: context.colorScheme.outline.withValues(alpha: .5),
             ),
             const SizedBox(height: 24),
             Text(

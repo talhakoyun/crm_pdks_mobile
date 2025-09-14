@@ -235,11 +235,11 @@ class InAndOutViewModel extends BaseViewModel {
           parameters: {
             'onInPressed': () {
               Navigator.pop(context);
-              openQrScanner(context, 1); // Giriş
+              openQrScanner(context, 1);
             },
             'onOutPressed': () {
               Navigator.pop(context);
-              openQrScanner(context, 2); // Çıkış
+              openQrScanner(context, 2);
             },
           },
         );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../constants/image_constants.dart';
+import '../constants/string_constants.dart';
 import '../extension/context_extension.dart';
 import '../init/size/size_extension.dart';
 
@@ -21,7 +22,7 @@ class NotFoundNavigationWidget extends StatelessWidget {
                 image: AssetImage(ImageConstants.instance.error),
               ),
               Text(
-                'Aradığınız sayfa bulunamıyor',
+                StringConstants.instance.notFoundPageNotFound,
                 style: context.textTheme.bodyLarge,
               ),
             ],

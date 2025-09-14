@@ -77,7 +77,7 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
             context: context,
             imagePath: imgCons.warning,
             title: strCons.unExpectedError,
-            subtitle: ' ',
+            subtitle: strCons.spaceSubtitle,
           )
         : Scaffold(
             body: Center(
@@ -120,7 +120,7 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
           ),
           SizedBox(height: context.normalValue),
           Text(
-            'İzin talebi oluşturmak için + butonuna tıklayın',
+            strCons.permissionCreateRequest,
             style: context.textTheme.bodyLarge!.copyWith(
               color: context.colorScheme.onTertiary.withValues(alpha: 0.7),
             ),

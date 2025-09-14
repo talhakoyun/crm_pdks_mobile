@@ -75,7 +75,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
               context: context,
               imagePath: imgCons.warning,
               title: strCons.unExpectedError,
-              subtitle: '',
+              subtitle: strCons.emptySubtitle,
             )
           : const Scaffold(body: Center(child: CircularProgressIndicator())),
     );
@@ -152,7 +152,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Hoş Geldin!",
+                    strCons.homeWelcome,
                     style: context.primaryTextTheme.titleLarge,
                   ),
                   const SizedBox(height: 4),
@@ -175,7 +175,8 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      inAndOutViewModel.authVM.department ?? 'Departman',
+                      inAndOutViewModel.authVM.department ??
+                          strCons.homeDepartment,
                       style: context.primaryTextTheme.bodyMedium,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -201,7 +202,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
           child: _buildTimeCard(
             context,
             strCons.entryTime,
-            inAndOutViewModel.authVM.startDate ?? strCons.unSpecified,
+            inAndOutViewModel.authVM.startDate ?? "-",
             Icons.login_rounded,
             Colors.green,
           ),
@@ -211,7 +212,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
           child: _buildTimeCard(
             context,
             strCons.exitTime,
-            inAndOutViewModel.authVM.endDate ?? strCons.unSpecified,
+            inAndOutViewModel.authVM.endDate ?? "-",
             Icons.logout_rounded,
             Colors.orange,
           ),
@@ -291,7 +292,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
             Expanded(
               child: _buildActionButton(
                 context,
-                "Giriş Yap",
+                strCons.homeLogin,
                 Icons.login_rounded,
                 Colors.green,
                 () => inAndOutViewModel.pressLogin(
@@ -304,7 +305,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
             Expanded(
               child: _buildActionButton(
                 context,
-                "QR Kod",
+                strCons.homeQrCode,
                 Icons.qr_code_scanner_rounded,
                 Colors.blue,
                 () => inAndOutViewModel.pressQrArea(
@@ -317,7 +318,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
             Expanded(
               child: _buildActionButton(
                 context,
-                "Çıkış Yap",
+                strCons.homeLogout,
                 Icons.logout_rounded,
                 Colors.orange,
                 () => inAndOutViewModel.pressOut(
@@ -388,7 +389,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
           SvgPicture.asset(imgCons.offMode, width: 120, height: 120),
           const SizedBox(height: 24),
           Text(
-            "İnternet bağlantısı yok",
+            strCons.homeNoInternet,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -397,7 +398,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
           ),
           const SizedBox(height: 8),
           Text(
-            "Lütfen internet bağlantınızı kontrol edin",
+            strCons.homeCheckInternet,
             style: TextStyle(
               fontSize: 14,
               color: context.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -453,11 +454,138 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
     final DateTime now = DateTime.now();
     final String currentTime =
         "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
-    const String shiftStart = "09:00";
-    const String shiftEnd = "18:00";
-    const int remainingHours = 3;
-    const int remainingMinutes = 45;
-    const String todayStatus = "Zamanında"; // Geç/Zamanında
+
+    // ViewModel'den gelen saat bilgilerini kullan
+    final String? shiftStart = inAndOutViewModel.authVM.startDate;
+    final String? shiftEnd = inAndOutViewModel.authVM.endDate;
+
+    // Eğer saat bilgileri boşsa "Belirtilmemiş" göster
+    if (shiftStart == null || shiftEnd == null) {
+      return Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: context.colorScheme.onTertiaryContainer,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.dashboard_rounded,
+                      color: Colors.blue,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    strCons.homeDailyDashboard,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: context.colorScheme.onSurface,
+                    ),
+                  ),
+                  const Spacer(),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDashboardItem(
+                      context,
+                      strCons.entryTime,
+                      shiftStart ?? strCons.unSpecified,
+                      Icons.login_rounded,
+                      Colors.green,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildDashboardItem(
+                      context,
+                      strCons.homeCurrentTime,
+                      currentTime,
+                      Icons.access_time_rounded,
+                      Colors.blue,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDashboardItem(
+                      context,
+                      strCons.homeRemainingTime,
+                      strCons.unSpecified,
+                      Icons.timer_rounded,
+                      Colors.orange,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildDashboardItem(
+                      context,
+                      strCons.exitTime,
+                      shiftEnd ?? strCons.unSpecified,
+                      Icons.logout_rounded,
+                      Colors.purple,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final List<String> shiftStartTimeParts = shiftStart.split(':');
+    if (shiftStartTimeParts.length < 2) {
+      return _buildDefaultDashboard(context, currentTime);
+    }
+
+    final List<String> shiftEndTimeParts = shiftEnd.split(':');
+    if (shiftEndTimeParts.length < 2) {
+      return _buildDefaultDashboard(context, currentTime);
+    }
+
+    final int shiftEndHour = int.tryParse(shiftEndTimeParts[0]) ?? 18;
+    final int shiftEndMinute = int.tryParse(shiftEndTimeParts[1]) ?? 0;
+    int remainingHours = shiftEndHour - now.hour;
+    int remainingMinutes = shiftEndMinute - now.minute;
+
+    if (remainingMinutes < 0) {
+      remainingHours--;
+      remainingMinutes += 60;
+    }
+
+    if (remainingHours < 0) {
+      remainingHours = 0;
+      remainingMinutes = 0;
+    }
+
+    final String remainingTime = "$remainingHours sa. $remainingMinutes dk.";
+    final String todayStatus =
+        now.isAfter(
+          DateTime(now.year, now.month, now.day, shiftEndHour, shiftEndMinute),
+        )
+        ? strCons.lateText
+        : strCons.earlyText;
 
     return Card(
       elevation: 2,
@@ -488,7 +616,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  "Günlük Dashboard",
+                  strCons.homeDailyDashboard,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -502,7 +630,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: todayStatus == "Zamanında"
+                    color: todayStatus == strCons.earlyText
                         ? Colors.green.withValues(alpha: 0.1)
                         : Colors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -512,7 +640,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: todayStatus == "Zamanında"
+                      color: todayStatus == strCons.earlyText
                           ? Colors.green
                           : Colors.red,
                     ),
@@ -526,7 +654,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                 Expanded(
                   child: _buildDashboardItem(
                     context,
-                    "Giriş Saati",
+                    strCons.entryTime,
                     shiftStart,
                     Icons.login_rounded,
                     Colors.green,
@@ -536,7 +664,7 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                 Expanded(
                   child: _buildDashboardItem(
                     context,
-                    "Şu An",
+                    strCons.homeCurrentTime,
                     currentTime,
                     Icons.access_time_rounded,
                     Colors.blue,
@@ -550,8 +678,8 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                 Expanded(
                   child: _buildDashboardItem(
                     context,
-                    "Kalan Süre",
-                    "${remainingHours}s ${remainingMinutes}dk",
+                    strCons.homeRemainingTime,
+                    remainingTime,
                     Icons.timer_rounded,
                     Colors.orange,
                   ),
@@ -560,8 +688,102 @@ class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
                 Expanded(
                   child: _buildDashboardItem(
                     context,
-                    "Çıkış Saati",
+                    strCons.exitTime,
                     shiftEnd,
+                    Icons.logout_rounded,
+                    Colors.purple,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDefaultDashboard(BuildContext context, String currentTime) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: context.colorScheme.onTertiaryContainer,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.dashboard_rounded,
+                    color: Colors.blue,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  strCons.homeDailyDashboard,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: context.colorScheme.onSurface,
+                  ),
+                ),
+                const Spacer(),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildDashboardItem(
+                    context,
+                    strCons.entryTime,
+                    strCons.unSpecified,
+                    Icons.login_rounded,
+                    Colors.green,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildDashboardItem(
+                    context,
+                    strCons.homeCurrentTime,
+                    currentTime,
+                    Icons.access_time_rounded,
+                    Colors.blue,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildDashboardItem(
+                    context,
+                    strCons.homeRemainingTime,
+                    strCons.unSpecified,
+                    Icons.timer_rounded,
+                    Colors.orange,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildDashboardItem(
+                    context,
+                    strCons.exitTime,
+                    strCons.unSpecified,
                     Icons.logout_rounded,
                     Colors.purple,
                   ),

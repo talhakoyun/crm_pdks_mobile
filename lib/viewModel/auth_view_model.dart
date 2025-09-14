@@ -516,7 +516,9 @@ class AuthViewModel extends BaseViewModel {
       } else if (Platform.isIOS) {
         await _handleIOSVersionCheck(context, currentVersion);
       }
-    } catch (e) {}
+    } catch (e) {
+      //test
+    }
   }
 
   Future<void> _handleAndroidVersionCheck(

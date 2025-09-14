@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../core/constants/string_constants.dart';
+
 class QrScannerView extends StatefulWidget {
   final Function(String) onQrScanned;
 
@@ -18,7 +20,7 @@ class _QrScannerViewState extends State<QrScannerView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('QR Kod Okut'),
+        title: Text(StringConstants.instance.permissionScanQr),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         actions: [
@@ -78,8 +80,8 @@ class _QrScannerViewState extends State<QrScannerView> {
                 color: Colors.black.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
-                'QR kodu çerçeve içine alın',
+              child: Text(
+                StringConstants.instance.permissionQrFrame,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,

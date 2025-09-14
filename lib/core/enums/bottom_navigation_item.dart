@@ -1,18 +1,20 @@
 // ignore_for_file: constant_identifier_names
 
+import '../constants/string_constants.dart';
+
 enum BottomNavigationItem { HOME, IN_AND_OUT, PERMISSIONS, PROFILE }
 
 extension BottomNavigationItemExtension on BottomNavigationItem {
   String get title {
     switch (this) {
       case BottomNavigationItem.HOME:
-        return 'Ana Sayfa';
+        return StringConstants.instance.bottomNavigationHome;
       case BottomNavigationItem.IN_AND_OUT:
-        return 'Giriş/Çıkış';
+        return StringConstants.instance.bottomNavigationInAndOut;
       case BottomNavigationItem.PERMISSIONS:
-        return 'İzinler';
+        return StringConstants.instance.bottomNavigationPermissions;
       case BottomNavigationItem.PROFILE:
-        return 'Profil';
+        return StringConstants.instance.bottomNavigationProfile;
     }
   }
 

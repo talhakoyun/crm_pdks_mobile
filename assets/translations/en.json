@@ -143,5 +143,66 @@
     "success": "Success",
     "close": "Close",
     "update": "Update"
+  },
+  "home": {
+    "welcome": "Welcome!",
+    "department": "Department",
+    "login": "Check In",
+    "qrCode": "QR Code",
+    "logout": "Check Out",
+    "noInternet": "No internet connection",
+    "checkInternet": "Please check your internet connection",
+    "dailyDashboard": "Daily Dashboard",
+    "currentTime": "Current Time",
+    "remainingTime": "Remaining Time"
+  },
+  "permission": {
+    "createRequest": "Click the + button to create a leave request",
+    "scanQr": "Scan QR Code",
+    "qrFrame": "Place the QR code in the frame",
+    "leaveRequest": "Leave Request",
+    "fillInfo": "Please fill in your leave information completely",
+    "leaveType": "Leave Type",
+    "loading": "Loading...",
+    "selectType": "Select leave type",
+    "startDate": "Start",
+    "endDate": "End",
+    "selectDate": "Select date",
+    "leaveReason": "Please explain your leave reason in detail...",
+    "leaveAddress": "Please enter the address where you can be reached during leave...",
+    "selectLeaveType": "Select Leave Type",
+    "endDateTime": "End Date",
+    "changePassword": "Change Password",
+    "passwordMismatch": "New passwords do not match",
+    "passwordLength": "New password must be at least 6 characters",
+    "passwordSuccess": "Password changed successfully",
+    "passwordFailed": "Password change failed",
+    "confirmLogout": "Are you sure you want to log out?",
+    "cancel": "Cancel",
+    "change": "Change",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "dateRange": "Date Range",
+    "reason": "Reason",
+    "address": "Address",
+    "startDateTime": "Start Date",
+    "logout": "Log Out"
+  },
+  "launchUrl": {
+    "buttonText": "Go"
+  },
+  "bottomNavigation": {
+    "home": "Home",
+    "inAndOut": "Entry/Exit",
+    "permissions": "Leaves",
+    "profile": "Profile"
+  },
+  "notFound": {
+    "pageNotFound": "The page you are looking for could not be found"
+  },
+  "empty": {
+    "subtitle": "",
+    "spaceSubtitle": " "
   }
 }

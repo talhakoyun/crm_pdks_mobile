@@ -143,5 +143,66 @@
     "success": "Başarılı",
     "close": "Kapat",
     "update": "Güncelle"
+  },
+  "home": {
+    "welcome": "Hoş Geldin!",
+    "department": "Departman",
+    "login": "Giriş Yap",
+    "qrCode": "QR Kod",
+    "logout": "Çıkış Yap",
+    "noInternet": "İnternet bağlantısı yok",
+    "checkInternet": "Lütfen internet bağlantınızı kontrol edin",
+    "dailyDashboard": "Günlük Dashboard",
+    "currentTime": "Şu An",
+    "remainingTime": "Kalan Süre"
+  },
+  "permission": {
+    "createRequest": "İzin talebi oluşturmak için + butonuna tıklayın",
+    "scanQr": "QR Kod Okut",
+    "qrFrame": "QR kodu çerçeve içine alın",
+    "leaveRequest": "İzin Talebi",
+    "fillInfo": "Lütfen izin bilgilerinizi eksiksiz doldurun",
+    "leaveType": "İzin Türü",
+    "loading": "Yükleniyor...",
+    "selectType": "İzin türünü seçin",
+    "startDate": "Başlangıç",
+    "endDate": "Bitiş",
+    "selectDate": "Tarih seçin",
+    "leaveReason": "İzin sebebinizi detaylı bir şekilde açıklayın...",
+    "leaveAddress": "İzin süresince ulaşılabileceğiniz adres bilgilerini girin...",
+    "selectLeaveType": "İzin Türü Seçin",
+    "endDateTime": "Bitiş Tarihi",
+    "changePassword": "Şifre Değiştir",
+    "passwordMismatch": "Yeni şifreler eşleşmiyor",
+    "passwordLength": "Yeni şifre en az 6 karakter olmalıdır",
+    "passwordSuccess": "Şifre başarıyla değiştirildi",
+    "passwordFailed": "Şifre değiştirme işlemi başarısız oldu",
+    "confirmLogout": "Çıkış yapmak istediğinize emin misiniz?",
+    "cancel": "İptal",
+    "change": "Değiştir",
+    "currentPassword": "Mevcut Şifre",
+    "newPassword": "Yeni Şifre",
+    "confirmNewPassword": "Yeni Şifre (Tekrar)",
+    "dateRange": "Tarih Aralığı",
+    "reason": "Açıklama",
+    "address": "İletişim Adresi",
+    "startDateTime": "Başlangıç Tarihi",
+    "logout": "Çıkış Yap"
+  },
+  "launchUrl": {
+    "buttonText": "Git"
+  },
+  "bottomNavigation": {
+    "home": "Ana Sayfa",
+    "inAndOut": "Giriş/Çıkış",
+    "permissions": "İzinler",
+    "profile": "Profil"
+  },
+  "notFound": {
+    "pageNotFound": "Aradığınız sayfa bulunamıyor"
+  },
+  "empty": {
+    "subtitle": "",
+    "spaceSubtitle": " "
   }
 }

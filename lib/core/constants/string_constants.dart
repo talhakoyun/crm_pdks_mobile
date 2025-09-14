@@ -148,6 +148,62 @@ class StringConstants {
   String get dialogCloseText => "dialog.close".tr();
   String get dialogUpdateText => "dialog.update".tr();
 
+  // Home
+  String get homeWelcome => "home.welcome".tr();
+  String get homeDepartment => "home.department".tr();
+  String get homeLogin => "home.login".tr();
+  String get homeQrCode => "home.qrCode".tr();
+  String get homeLogout => "home.logout".tr();
+  String get homeNoInternet => "home.noInternet".tr();
+  String get homeCheckInternet => "home.checkInternet".tr();
+  String get homeDailyDashboard => "home.dailyDashboard".tr();
+  String get homeCurrentTime => "home.currentTime".tr();
+  String get homeRemainingTime => "home.remainingTime".tr();
+
+  // Permission
+  String get permissionCreateRequest => "permission.createRequest".tr();
+  String get permissionScanQr => "permission.scanQr".tr();
+  String get permissionQrFrame => "permission.qrFrame".tr();
+  String get permissionLeaveRequest => "permission.leaveRequest".tr();
+  String get permissionFillInfo => "permission.fillInfo".tr();
+  String get permissionLeaveType => "permission.leaveType".tr();
+  String get permissionLoading => "permission.loading".tr();
+  String get permissionSelectType => "permission.selectType".tr();
+  String get permissionStartDate => "permission.startDate".tr();
+  String get permissionEndDate => "permission.endDate".tr();
+  String get permissionSelectDate => "permission.selectDate".tr();
+  String get permissionLeaveReason => "permission.leaveReason".tr();
+  String get permissionLeaveAddress => "permission.leaveAddress".tr();
+  String get permissionSelectLeaveType => "permission.selectLeaveType".tr();
+  String get permissionEndDateTime => "permission.endDateTime".tr();
+  String get permissionChangePassword => "permission.changePassword".tr();
+  String get permissionPasswordMismatch => "permission.passwordMismatch".tr();
+  String get permissionPasswordLength => "permission.passwordLength".tr();
+  String get permissionPasswordSuccess => "permission.passwordSuccess".tr();
+  String get permissionPasswordFailed => "permission.passwordFailed".tr();
+  String get permissionConfirmLogout => "permission.confirmLogout".tr();
+  String get permissionCancel => "permission.cancel".tr();
+  String get permissionChange => "permission.change".tr();
+  String get permissionCurrentPassword => "permission.currentPassword".tr();
+  String get permissionNewPassword => "permission.newPassword".tr();
+  String get permissionConfirmNewPassword =>
+      "permission.confirmNewPassword".tr();
+  String get permissionDateRange => "permission.dateRange".tr();
+  String get permissionReason => "permission.reason".tr();
+  String get permissionAddress => "permission.address".tr();
+  String get permissionStartDateTime => "permission.startDateTime".tr();
+  String get permissionLogout => "permission.logout".tr();
+  String get launchUrlButtonText => "launchUrl.buttonText".tr();
+  String get bottomNavigationHome => "bottomNavigation.home".tr();
+  String get bottomNavigationInAndOut => "bottomNavigation.inAndOut".tr();
+  String get bottomNavigationPermissions => "bottomNavigation.permissions".tr();
+  String get bottomNavigationProfile => "bottomNavigation.profile".tr();
+  String get notFoundPageNotFound => "notFound.pageNotFound".tr();
+
+  // Empty strings for subtitles
+  String get emptySubtitle => "".tr();
+  String get spaceSubtitle => " ".tr();
+
   // URLs - These should remain as static values
   String get mapUrl =>
       "https://mt0.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&s=Ga";

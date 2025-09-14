@@ -91,7 +91,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
       automaticallyImplyLeading: false,
       backgroundColor: context.colorScheme.primary,
       title: Text(
-        "İzin Talebi",
+        StringConstants.instance.permissionLeaveRequest,
         style: context.primaryTextTheme.headlineMedium!.copyWith(
           fontWeight: FontWeight.bold,
         ),
@@ -131,7 +131,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
                     ),
                   ),
                   Text(
-                    "Lütfen izin bilgilerinizi eksiksiz doldurun",
+                    StringConstants.instance.permissionFillInfo,
                     style: context.primaryTextTheme.bodyMedium!.copyWith(
                       color: context.colorScheme.onError.withValues(alpha: 0.9),
                       fontSize: 11,
@@ -199,19 +199,31 @@ class _GetPermissionViewState extends State<GetPermissionView>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle("İzin Türü", Icons.category_outlined),
+            _buildSectionTitle(
+              StringConstants.instance.permissionLeaveType,
+              Icons.category_outlined,
+            ),
             context.emptySizedHeightBoxLow,
             _buildModernHolidayType(permissionVM),
             context.emptySizedHeightBoxLow3x,
-            _buildSectionTitle("Tarih Aralığı", Icons.date_range_outlined),
+            _buildSectionTitle(
+              StringConstants.instance.permissionDateRange,
+              Icons.date_range_outlined,
+            ),
             context.emptySizedHeightBoxLow,
             _buildDateRangeSection(permissionVM),
             context.emptySizedHeightBoxLow3x,
-            _buildSectionTitle("Açıklama", Icons.description_outlined),
+            _buildSectionTitle(
+              StringConstants.instance.permissionReason,
+              Icons.description_outlined,
+            ),
             context.emptySizedHeightBoxLow,
             _buildModernPermissionReason(permissionVM),
             context.emptySizedHeightBoxLow3x,
-            _buildSectionTitle("İletişim Adresi", Icons.location_on_outlined),
+            _buildSectionTitle(
+              StringConstants.instance.permissionAddress,
+              Icons.location_on_outlined,
+            ),
             context.emptySizedHeightBoxLow,
             _buildModernPermissionAddress(permissionVM),
             context.emptySizedHeightBoxLow3x,
@@ -292,7 +304,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "İzin Türü",
+                      StringConstants.instance.permissionLeaveType,
                       style: context.textTheme.bodySmall!.copyWith(
                         color: Colors.grey[600],
                         fontWeight: FontWeight.w500,
@@ -302,8 +314,8 @@ class _GetPermissionViewState extends State<GetPermissionView>
                     Text(
                       permissionVM.holidayType.text.isEmpty
                           ? (permissionVM.typeItems.isEmpty
-                                ? 'Yükleniyor...'
-                                : 'İzin türünü seçin')
+                                ? StringConstants.instance.permissionLoading
+                                : StringConstants.instance.permissionSelectType)
                           : permissionVM.holidayType.text,
                       style: context.textTheme.bodyLarge!.copyWith(
                         fontWeight: FontWeight.w500,
@@ -351,7 +363,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
                 Expanded(
                   flex: 5,
                   child: _buildDateField(
-                    label: "Başlangıç",
+                    label: StringConstants.instance.permissionStartDate,
                     value: permissionVM.holidayStartDt.text,
                     icon: Icons.play_arrow,
                     onTap: () => _showStartDatePicker(context, permissionVM),
@@ -374,7 +386,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
                 Expanded(
                   flex: 5,
                   child: _buildDateField(
-                    label: "Bitiş",
+                    label: StringConstants.instance.permissionEndDate,
                     value: permissionVM.holidayEndDt.text,
                     icon: Icons.stop,
                     onTap: () => _showEndDatePicker(context, permissionVM),
@@ -428,7 +440,9 @@ class _GetPermissionViewState extends State<GetPermissionView>
             ),
             const SizedBox(height: 8),
             Text(
-              value.isEmpty ? 'Tarih seçin' : value,
+              value.isEmpty
+                  ? StringConstants.instance.permissionSelectDate
+                  : value,
               style: context.textTheme.bodyMedium!.copyWith(
                 fontWeight: FontWeight.w500,
                 fontSize: 11,
@@ -458,7 +472,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
         controller: permissionVM.holidayReason,
         maxLines: 3,
         decoration: InputDecoration(
-          hintText: 'İzin sebebinizi detaylı bir şekilde açıklayın...',
+          hintText: StringConstants.instance.permissionLeaveReason,
           hintStyle: context.textTheme.bodyMedium!.copyWith(
             color: Colors.grey[500],
           ),
@@ -492,8 +506,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
         controller: permissionVM.holidayAddress,
         maxLines: 3,
         decoration: InputDecoration(
-          hintText:
-              'İzin süresince ulaşılabileceğiniz adres bilgilerini girin...',
+          hintText: StringConstants.instance.permissionLeaveAddress,
           hintStyle: context.textTheme.bodyMedium!.copyWith(
             color: Colors.grey[500],
           ),
@@ -603,7 +616,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "İzin Türü Seçin",
+                    StringConstants.instance.permissionSelectLeaveType,
                     style: context.textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -702,7 +715,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Başlangıç Tarihi",
+                    StringConstants.instance.permissionStartDateTime,
                     style: context.textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -774,7 +787,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Bitiş Tarihi",
+                    StringConstants.instance.permissionEndDateTime,
                     style: context.textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
