@@ -200,10 +200,6 @@ class StringConstants {
   String get bottomNavigationProfile => "bottomNavigation.profile".tr();
   String get notFoundPageNotFound => "notFound.pageNotFound".tr();
 
-  // Empty strings for subtitles
-  String get emptySubtitle => "".tr();
-  String get spaceSubtitle => " ".tr();
-
   // URLs - These should remain as static values
   String get mapUrl =>
       "https://mt0.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&s=Ga";

@@ -200,9 +200,5 @@
   },
   "notFound": {
     "pageNotFound": "The page you are looking for could not be found"
-  },
-  "empty": {
-    "subtitle": "",
-    "spaceSubtitle": " "
   }
 }

@@ -1,4 +1,4 @@
-package com.example.crm_pdks_mobile
+package com.bilmos.pdks
 
 
 import android.content.Context
