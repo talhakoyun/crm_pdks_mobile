@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../core/base/base_singleton.dart';
-import '../core/base/size_singleton.dart';
-import '../core/extension/context_extension.dart';
-import '../core/init/size/size_extension.dart';
-import '../core/init/size/size_setting.dart';
+import '../core/init/theme/theme_extensions.dart';
+import '../core/init/theme/app_constants.dart';
 import '../viewModel/auth_view_model.dart';
 import '../widgets/text_input/custom_text_input.dart';
 
@@ -16,9 +15,15 @@ class RegisterView extends StatefulWidget {
   State<RegisterView> createState() => _RegisterViewState();
 }
 
+<<<<<<< Updated upstream
 class _RegisterViewState extends State<RegisterView>
     with BaseSingleton, SizeSingleton {
   final AuthViewModel authVM = AuthViewModel();
+=======
+class _RegisterViewState extends State<RegisterView> with BaseSingleton {
+  late AuthViewModel authVM;
+
+>>>>>>> Stashed changes
   @override
   void initState() {
     super.initState();
@@ -85,8 +90,19 @@ class _RegisterViewState extends State<RegisterView>
               ),
             ),
           ),
+<<<<<<< Updated upstream
         );
       },
+=======
+          child: Container(
+            constraints: BoxConstraints(maxHeight: 1.sh, minWidth: 1.sw),
+            child: Column(
+              children: [buildLogoArea(context), buildFormArea(context)],
+            ),
+          ),
+        ),
+      ),
+>>>>>>> Stashed changes
     );
   }
 
@@ -98,11 +114,7 @@ class _RegisterViewState extends State<RegisterView>
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            imgCons.logo,
-            width: sizeConfig.widthSize(context, 100),
-            height: sizeConfig.heightSize(context, 100),
-          ),
+          Image.asset(imgCons.logo, width: 100.w, height: 100.h),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Align(
@@ -113,7 +125,7 @@ class _RegisterViewState extends State<RegisterView>
                       "${strCons.splashText1} "
                       "${strCons.splashText2}",
                 ),
-                style: context.primaryTextTheme.bodyMedium!.copyWith(
+                style: Theme.of(context).primaryTextTheme.bodyMedium!.copyWith(
                   letterSpacing: 0.75,
                   fontWeight: FontWeight.w400,
                 ),
@@ -131,17 +143,17 @@ class _RegisterViewState extends State<RegisterView>
       flex: 6,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.only(
-          left: 34,
-          top: 20,
-          right: 34,
-          bottom: 20,
+        padding: EdgeInsets.only(
+          left: AppConstants.spacingLG,
+          top: AppConstants.spacingMD,
+          right: AppConstants.spacingLG,
+          bottom: AppConstants.spacingMD,
         ),
         decoration: BoxDecoration(
           color: context.colorScheme.onError,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(AppConstants.radiusXL),
+            topRight: Radius.circular(AppConstants.radiusXL),
           ),
         ),
         child: SingleChildScrollView(
@@ -149,15 +161,15 @@ class _RegisterViewState extends State<RegisterView>
           child: Column(
             children: [
               textArea(context),
-              context.emptySizedHeightBoxLow2x,
+              context.gapSM,
               nameWidget(context),
-              context.emptySizedHeightBoxLow2x,
+              context.gapSM,
               emailWidget(context),
-              context.emptySizedHeightBoxLow2x,
+              context.gapSM,
               passWidget(context),
-              context.emptySizedHeightBoxLow2x,
+              context.gapSM,
               passConfirmWidget(context),
-              context.emptySizedHeightBoxLow2x,
+              context.gapSM,
               btnWidget(context),
             ],
           ),
@@ -174,8 +186,8 @@ class _RegisterViewState extends State<RegisterView>
         TextSpan(
           text: "${strCons.signUp}\n",
           style: context.textTheme.headlineLarge!.copyWith(
-            fontSize: sizeConfig.scalablePixel(context, 30),
-            color: const Color(0xffE75F0D), //context.colorScheme.onSecondary,
+            fontSize: 30.sp,
+            color: context.colorScheme.tertiary,
             fontWeight: FontWeight.w500,
           ),
           children: <TextSpan>[
@@ -198,8 +210,8 @@ class _RegisterViewState extends State<RegisterView>
       obscureText: false,
       controller: authVM.nameController,
       prefixIcon: Container(
-        margin: const EdgeInsets.all(5.0),
-        padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
+        margin: EdgeInsets.all(AppConstants.spacingXS),
+        padding: EdgeInsets.symmetric(vertical: AppConstants.spacingXS),
         decoration: BoxDecoration(
           border: Border(
             right: BorderSide(
@@ -212,7 +224,7 @@ class _RegisterViewState extends State<RegisterView>
         child: Icon(
           Icons.person,
           color: context.colorScheme.surface,
-          size: 20.scalablePixel,
+          size: 20.sp,
         ),
       ),
       maxLength: 150,
@@ -226,8 +238,8 @@ class _RegisterViewState extends State<RegisterView>
       obscureText: false,
       controller: authVM.emailController,
       prefixIcon: Container(
-        margin: const EdgeInsets.all(5.0),
-        padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
+        margin: EdgeInsets.all(AppConstants.spacingXS),
+        padding: EdgeInsets.symmetric(vertical: AppConstants.spacingXS),
         decoration: BoxDecoration(
           border: Border(
             right: BorderSide(
@@ -240,7 +252,7 @@ class _RegisterViewState extends State<RegisterView>
         child: Icon(
           Icons.email,
           color: context.colorScheme.surface,
-          size: 20.scalablePixel,
+          size: 20.sp,
         ),
       ),
       maxLength: 150,
@@ -257,8 +269,8 @@ class _RegisterViewState extends State<RegisterView>
       textInputType: TextInputType.text,
       maxLength: 30,
       prefixIcon: Container(
-        margin: const EdgeInsets.all(5.0),
-        padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
+        margin: EdgeInsets.all(AppConstants.spacingXS),
+        padding: EdgeInsets.symmetric(vertical: AppConstants.spacingXS),
         decoration: BoxDecoration(
           border: Border(
             right: BorderSide(
@@ -271,7 +283,7 @@ class _RegisterViewState extends State<RegisterView>
         child: Icon(
           Icons.lock,
           color: context.colorScheme.surface,
-          size: 20.scalablePixel,
+          size: 20.sp,
         ),
       ),
       suffixIcon: InkWell(
@@ -297,8 +309,8 @@ class _RegisterViewState extends State<RegisterView>
       textInputType: TextInputType.text,
       maxLength: 30,
       prefixIcon: Container(
-        margin: const EdgeInsets.all(5.0),
-        padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
+        margin: EdgeInsets.all(AppConstants.spacingXS),
+        padding: EdgeInsets.symmetric(vertical: AppConstants.spacingXS),
         decoration: BoxDecoration(
           border: Border(
             right: BorderSide(
@@ -311,7 +323,7 @@ class _RegisterViewState extends State<RegisterView>
         child: Icon(
           Icons.lock,
           color: context.colorScheme.surface,
-          size: 20.scalablePixel,
+          size: 20.sp,
         ),
       ),
       suffixIcon: InkWell(
@@ -334,14 +346,14 @@ class _RegisterViewState extends State<RegisterView>
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: context.colorScheme.onSecondary,
-          fixedSize: Size(double.infinity, sizeConfig.heightSize(context, 50)),
+          fixedSize: Size(double.infinity, AppConstants.buttonHeight),
         ),
         onPressed: () {
           authVM.registerInputCheck(context);
         },
         child: Text(
           strCons.signUp,
-          style: context.primaryTextTheme.bodyLarge!.copyWith(
+          style: Theme.of(context).primaryTextTheme.bodyLarge!.copyWith(
             letterSpacing: 1.0,
             color: context.colorScheme.onError,
             fontWeight: FontWeight.w600,

@@ -5,8 +5,13 @@ import '../core/base/base_singleton.dart';
 import '../core/constants/image_constants.dart';
 import '../core/constants/navigation_constants.dart';
 import '../core/enums/enums.dart';
+<<<<<<< Updated upstream
 import '../core/extension/context_extension.dart';
 import '../core/init/size/size_extension.dart';
+=======
+import '../core/init/theme/theme_extensions.dart';
+import '../core/init/theme/app_constants.dart';
+>>>>>>> Stashed changes
 import '../viewModel/permissions_view_model.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/permission_listtile.dart';
@@ -75,6 +80,7 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
               ),
             ),
             body: permissionVM.permissionListItems.isNotEmpty
+<<<<<<< Updated upstream
                 ? ListView.builder(
                     physics: const BouncingScrollPhysics(),
                     padding: context.paddingLow,
@@ -107,6 +113,24 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
                               .type
                               ?.iconName ??
                           '',
+=======
+                ? SafeArea(
+                    child: RefreshIndicator(
+                      backgroundColor: context.colorScheme.onError,
+                      onRefresh: () async {
+                        await permissionVM.fetchList(context);
+                      },
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
+                        ),
+                        padding: EdgeInsets.all(AppConstants.spacingMD),
+                        itemCount: permissionVM.permissionListItems.length,
+                        itemBuilder: (context, int index) => PermissionCard(
+                          item: permissionVM.permissionListItems[index],
+                        ),
+                      ),
+>>>>>>> Stashed changes
                     ),
                   )
                 : Center(
@@ -138,4 +162,46 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
             ),
           );
   }
+<<<<<<< Updated upstream
+=======
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(
+            imgCons.permission,
+            width: 80,
+            height: 80,
+            placeholderBuilder: (context) {
+              return Icon(
+                Icons.assignment_outlined,
+                size: 80,
+                color: context.colorScheme.onTertiary.withValues(alpha: 0.3),
+              );
+            },
+          ),
+          SizedBox(height: AppConstants.spacingMD),
+          Text(
+            strCons.noLeaveText,
+            style: context.textTheme.headlineSmall!.copyWith(
+              color: context.colorScheme.onTertiary,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: AppConstants.spacingMD),
+          Text(
+            'İzin talebi oluşturmak için + butonuna tıklayın',
+            style: context.textTheme.bodyLarge!.copyWith(
+              color: context.colorScheme.onTertiary.withValues(alpha: 0.7),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+>>>>>>> Stashed changes
 }

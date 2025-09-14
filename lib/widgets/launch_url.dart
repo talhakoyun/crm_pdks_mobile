@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../core/init/theme/theme_extensions.dart';
+
 import '../core/constants/string_constants.dart';
-import '../core/extension/context_extension.dart';
 
 class UrlLaunch {
   static openUrl(BuildContext context, String link) async {
@@ -29,7 +30,12 @@ class UrlLaunch {
                   ),
                 ),
                 const SizedBox(height: 5),
-                Text(link, style: const TextStyle(color: Colors.black54)),
+                Text(
+                  link,
+                  style: context.textTheme.bodyMedium!.copyWith(
+                    color: context.colorScheme.outline,
+                  ),
+                ),
                 Text(StringConstants.instance.enterTheAdress),
                 const SizedBox(height: 5),
                 Divider(
@@ -47,8 +53,8 @@ class UrlLaunch {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(80.0),
                       ),
-                      color: Colors.green,
-                      child: const Text('Git', style: TextStyle(fontSize: 16)),
+                      color: context.colorScheme.tertiary,
+                      child: Text('Git', style: context.textTheme.bodyLarge),
                     ),
                     MaterialButton(
                       onPressed: () async {
@@ -58,11 +64,8 @@ class UrlLaunch {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(80.0),
                       ),
-                      color: Colors.red,
-                      child: const Text(
-                        'Vazgeç',
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      color: context.colorScheme.error,
+                      child: Text('Vazgeç', style: context.textTheme.bodyLarge),
                     ),
                   ],
                 ),

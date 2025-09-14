@@ -7,8 +7,15 @@ import '../core/constants/device_constants.dart';
 import '../core/constants/image_constants.dart';
 import '../core/constants/size_config.dart';
 import '../core/constants/string_constants.dart';
+<<<<<<< Updated upstream
 import '../core/enums/alert_capability_situation.dart';
 import '../core/extension/context_extension.dart';
+=======
+import '../core/constants/service_locator.dart';
+import '../core/enums/enums.dart';
+import '../core/init/theme/theme_extensions.dart';
+import '../core/widget/dialog/dialog_factory.dart';
+>>>>>>> Stashed changes
 import '../core/init/network/connectivity/network_connectivity.dart';
 import '../models/last_event_model.dart';
 import '../service/in_and_out_service.dart';

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../core/extension/context_extension.dart';
-import '../../core/init/size/size_setting.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DialogButton extends StatelessWidget {
   final String buttonText;
@@ -38,7 +36,7 @@ class DialogButton extends StatelessWidget {
     return Container(
       padding: padding,
       margin: margin,
-      width: SizerUtil.width > 350 ? 120 : 90,
+      width: 1.sw > 350 ? 120 : 90,
       height: height,
       decoration: BoxDecoration(
         color: color,
@@ -55,8 +53,8 @@ class DialogButton extends StatelessWidget {
           child: Center(
             child: Text(
               buttonText,
-              style: context.primaryTextTheme.bodyMedium!.copyWith(
-                fontSize: SizerUtil.width > 350 ? 20 : 16,
+              style: Theme.of(context).primaryTextTheme.bodyMedium!.copyWith(
+                fontSize: 1.sw > 350 ? 20.sp : 16.sp,
               ),
             ),
           ),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../core/extension/context_extension.dart';
-
 class PermButton extends StatelessWidget {
   const PermButton({
     super.key,
@@ -23,9 +21,9 @@ class PermButton extends StatelessWidget {
       child: Text(
         buttonTex,
         textScaler: TextScaler.linear(1.1),
-        style: context.primaryTextTheme.headlineSmall!.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
+        style: Theme.of(
+          context,
+        ).primaryTextTheme.headlineSmall!.copyWith(fontWeight: FontWeight.w600),
       ),
     );
   }

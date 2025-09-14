@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+<<<<<<< Updated upstream
 import '../core/base/size_singleton.dart';
 import '../core/constants/image_constants.dart';
 import '../core/constants/string_constants.dart';
@@ -8,6 +9,11 @@ import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
 import '../core/init/size/size_extension.dart';
 import '../core/init/size/size_setting.dart';
+=======
+import '../core/constants/string_constants.dart';
+import '../core/enums/enums.dart';
+import '../core/init/theme/theme_extensions.dart';
+>>>>>>> Stashed changes
 import '../viewModel/auth_view_model.dart';
 import '../viewModel/inandout_list_view_model.dart';
 import '../widgets/error_widget.dart';
@@ -20,7 +26,7 @@ class InAndOutsView extends StatefulWidget {
   State<InAndOutsView> createState() => _InAndOutsViewState();
 }
 
-class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
+class _InAndOutsViewState extends State<InAndOutsView> {
   AuthViewModel authVM = AuthViewModel();
   bool expanded = false;
 
@@ -52,6 +58,7 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
               onTap: () {
                 FocusScope.of(context).requestFocus(FocusNode());
               },
+<<<<<<< Updated upstream
               child: SizedBox(
                 width: double.infinity,
                 height: double.infinity,
@@ -254,6 +261,96 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
                   ],
                 ),
               ),
+=======
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+  ) {
+    return Column(
+      children: [
+        Icon(icon, color: context.colorScheme.onError, size: 24),
+        Text(title, style: Theme.of(context).primaryTextTheme.bodySmall!),
+        Text(value, style: Theme.of(context).primaryTextTheme.headlineSmall!),
+      ],
+    );
+  }
+
+  Widget _buildAttendanceCard(BuildContext context, dynamic item, int index) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: context.colorScheme.onTertiaryContainer,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: context.colorScheme.outline.withValues(alpha: .2),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: context.colorScheme.onTertiary.withValues(alpha: .05),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Tarih başlığı
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTimeInfo(
+                    context,
+                    StringConstants.instance.entryTime,
+                    item.startTime?.isNotEmpty == true
+                        ? item.startTime!
+                        : '--:--',
+                    Icons.login,
+                    context.colorScheme.tertiary,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: context.colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    item.datetime?.isNotEmpty == true
+                        ? Jiffy.parse(
+                            item.datetime!,
+                          ).format(pattern: 'dd/MM/yyyy')
+                        : '--',
+                    style: Theme.of(context).primaryTextTheme.bodySmall!
+                        .copyWith(color: context.colorScheme.primary),
+                  ),
+                ),
+                // Çıkış
+                Expanded(
+                  child: _buildTimeInfo(
+                    context,
+                    StringConstants.instance.exitTime,
+                    item.endTime?.isNotEmpty == true ? item.endTime! : '--:--',
+                    Icons.logout,
+                    context.colorScheme.secondary,
+                  ),
+                ),
+              ],
+>>>>>>> Stashed changes
             ),
           );
         },
@@ -267,6 +364,7 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
       child: Text.rich(
         TextSpan(
           children: [
+<<<<<<< Updated upstream
             TextSpan(
               text: '$title\n',
               style: context.primaryTextTheme.headlineSmall!.copyWith(
@@ -279,6 +377,77 @@ class _InAndOutsViewState extends State<InAndOutsView> with SizeSingleton {
                 fontWeight: FontWeight.w600,
               ),
             ),
+=======
+            Icon(
+              Icons.access_time_outlined,
+              size: 80,
+              color: context.colorScheme.outline.withValues(alpha: .5),
+            ),
+            context.gapLG,
+            Text(
+              StringConstants.instance.recordNotFound,
+              style: context.textTheme.headlineSmall!.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            context.gapSM,
+            Text(
+              StringConstants.instance.noInAndOutText,
+              style: context.textTheme.bodyMedium!.copyWith(
+                color: context.colorScheme.outline,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            context.gapLG,
+            ElevatedButton.icon(
+              onPressed: () {
+                listVM.fetchShiftList(context);
+              },
+              icon: const Icon(Icons.refresh),
+              label: Text(StringConstants.instance.refresh),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingContent(BuildContext context) {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  Widget _buildErrorContent(
+    BuildContext context,
+    InAndOutListViewModel listVM,
+  ) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 80,
+              color: context.colorScheme.error,
+            ),
+            context.gapLG,
+            Text(
+              StringConstants.instance.unExpectedError,
+              style: context.textTheme.headlineSmall!.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            context.gapLG,
+            ElevatedButton.icon(
+              onPressed: () {
+                listVM.fetchShiftList(context);
+              },
+              icon: const Icon(Icons.refresh),
+              label: Text(StringConstants.instance.tryAgain),
+            ),
+>>>>>>> Stashed changes
           ],
         ),
         textAlign: TextAlign.center,

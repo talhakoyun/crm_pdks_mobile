@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/extension/context_extension.dart';
+import '../../core/init/theme/theme_extensions.dart';
 
 class GetPermissionInput extends StatelessWidget {
   final TextEditingController? controller;
@@ -43,9 +43,9 @@ class GetPermissionInput extends StatelessWidget {
       keyboardType: textInputType,
       style:
           textStyle ??
-          context.primaryTextTheme.bodyLarge!.copyWith(
-            fontWeight: FontWeight.w400,
-          ),
+          Theme.of(
+            context,
+          ).primaryTextTheme.bodyLarge!.copyWith(fontWeight: FontWeight.w400),
       showCursor: showCursor,
       readOnly: readOnly!,
       onTap: onTap,

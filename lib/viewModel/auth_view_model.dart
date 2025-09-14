@@ -14,7 +14,7 @@ import '../core/constants/string_constants.dart';
 import '../core/enums/dialog_type.dart';
 import '../core/enums/preferences_keys.dart';
 import '../core/enums/sign_status.dart';
-import '../core/extension/context_extension.dart';
+import '../core/init/theme/theme_extensions.dart';
 import '../core/init/cache/locale_manager.dart';
 import '../core/init/network/connectivity/network_connectivity.dart';
 import '../core/widget/customize_dialog.dart';
@@ -427,10 +427,19 @@ class AuthViewModel extends BaseViewModel {
       if (profileResult.isSuccess && profileResult.hasData) {
         user = profileResult.data;
         if (isSplash == null || isSplash == false) {
+<<<<<<< Updated upstream
           Fluttertoast.showToast(
             msg: StringConstants.instance.successMessage,
             backgroundColor: const Color(0xffFF981A),
           );
+=======
+          if (context != null && context.mounted) {
+            Fluttertoast.showToast(
+              msg: StringConstants.instance.successMessage,
+              backgroundColor: context.colorScheme.tertiary,
+            );
+          }
+>>>>>>> Stashed changes
         }
         await profileSetDataShared(profileResult);
       } else {
@@ -462,9 +471,14 @@ class AuthViewModel extends BaseViewModel {
       } else if (Platform.isIOS) {
         await _handleIOSVersionCheck(context, currentVersion);
       }
+<<<<<<< Updated upstream
     } catch (e, stackTrace) {
       _logError('Version Check', e, stackTrace);
       _navigateBasedOnUserStatus();
+=======
+    } catch (e) {
+      //
+>>>>>>> Stashed changes
     }
   }
 

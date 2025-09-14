@@ -4,8 +4,14 @@ import '../core/base/view_model/base_view_model.dart';
 import '../core/constants/navigation_constants.dart';
 import '../core/constants/string_constants.dart';
 import '../core/enums/enums.dart';
+<<<<<<< Updated upstream
 import '../core/extension/context_extension.dart';
 import '../core/widget/customize_dialog.dart';
+=======
+import '../core/init/theme/theme_extensions.dart';
+import '../core/widget/dialog/dialog_factory.dart';
+import '../models/base_model.dart';
+>>>>>>> Stashed changes
 import '../models/holiday_types_model.dart';
 import '../models/holidays_model.dart';
 import '../service/permission_service.dart';
@@ -89,8 +95,13 @@ class PermissionViewModel extends BaseViewModel {
         address: holidayAddress.text.trim(),
       );
       if (!context.mounted) return;
+<<<<<<< Updated upstream
       context.navigationOf.pop();
       if (data['status']) {
+=======
+      Navigator.of(context).pop();
+      if (data.status!) {
+>>>>>>> Stashed changes
         holidayAddress.clear();
         holidayReason.clear();
         holidayEndDt.clear();
@@ -111,7 +122,7 @@ class PermissionViewModel extends BaseViewModel {
         StringConstants.instance.notEmptyText,
         backgroundColor: context.colorScheme.error,
       );
-      context.navigationOf.pop();
+      Navigator.of(context).pop();
     }
 
     notifyListeners();

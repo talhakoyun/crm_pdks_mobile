@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/extension/context_extension.dart';
+import '../../core/init/theme/theme_extensions.dart';
 
 class ProfileTextInput extends StatelessWidget {
   final double? heightCon, iconSize;
@@ -31,9 +31,7 @@ class ProfileTextInput extends StatelessWidget {
             width: 45,
             height: 45,
             margin: const EdgeInsets.only(left: 10),
-            padding: const EdgeInsets.only(
-              right: 5,
-            ),
+            padding: const EdgeInsets.only(right: 5),
             decoration: BoxDecoration(
               border: Border(
                 right: BorderSide(
@@ -49,7 +47,7 @@ class ProfileTextInput extends StatelessWidget {
               size: iconSize,
             ),
           ),
-          context.emptySizedWidthBoxLow2x,
+          SizedBox(width: MediaQuery.of(context).size.width * 0.02),
           Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Column(

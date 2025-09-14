@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/extension/context_extension.dart';
+import '../../core/init/theme/theme_extensions.dart';
 
 class CustomTextInput extends StatelessWidget {
   final TextEditingController? controller;
@@ -26,6 +26,55 @@ class CustomTextInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< Updated upstream
+=======
+    if (isModernStyle) {
+      return Container(
+        decoration: BoxDecoration(
+          color: context.colorScheme.surface.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+            color: context.colorScheme.surface.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: TextFormField(
+          autofocus: autofocus,
+          controller: controller,
+          focusNode: focusNode,
+          keyboardType: textInputType,
+          textInputAction: textInputAction,
+          onFieldSubmitted: onFieldSubmitted,
+          style: context.textTheme.bodyLarge!.copyWith(
+            color: context.colorScheme.surface,
+          ),
+          obscureText: obscureText ?? false,
+          maxLength: maxLength,
+          decoration: InputDecoration(
+            labelText: labelText,
+            labelStyle: context.textTheme.bodyMedium!.copyWith(
+              color: context.colorScheme.surface.withValues(alpha: 0.7),
+            ),
+            hintText: hintText,
+            hintStyle: context.textTheme.bodyMedium!.copyWith(
+              color: context.colorScheme.surface.withValues(alpha: 0.5),
+            ),
+            prefixIcon: prefixIcon,
+            suffixIcon: suffixIcon,
+            counterText: "",
+            border: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 16,
+            ),
+          ),
+        ),
+      );
+    }
+
+>>>>>>> Stashed changes
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(

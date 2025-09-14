@@ -1,8 +1,8 @@
+import 'package:crm_pdks_mobile/core/init/theme/app_constants.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/image_constants.dart';
-import '../extension/context_extension.dart';
-import '../init/size/size_extension.dart';
+import '../init/theme/theme_extensions.dart';
 
 class NotFoundNavigationWidget extends StatelessWidget {
   const NotFoundNavigationWidget({super.key});
@@ -17,7 +17,7 @@ class NotFoundNavigationWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image(
-                width: 70.width,
+                width: AppConstants.spacingXXL,
                 image: AssetImage(ImageConstants.instance.error),
               ),
               Text(

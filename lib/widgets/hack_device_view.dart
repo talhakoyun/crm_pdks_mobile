@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../core/constants/image_constants.dart';
 import '../core/constants/string_constants.dart';
-import '../core/extension/context_extension.dart';
-import '../core/init/size/size_extension.dart';
+import '../core/init/theme/theme_extensions.dart';
 
 class DeviceHackView extends StatelessWidget {
   const DeviceHackView({super.key});
@@ -13,6 +13,7 @@ class DeviceHackView extends StatelessWidget {
     return Scaffold(
       backgroundColor: context.colorScheme.primary,
       body: Center(
+<<<<<<< Updated upstream
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -28,6 +29,21 @@ class DeviceHackView extends StatelessWidget {
           )
         ],
       )),
+=======
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(ImageConstants.instance.alarm, width: 60.w),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+            Text(
+              StringConstants.instance.hackText,
+              style: Theme.of(context).primaryTextTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+>>>>>>> Stashed changes
     );
   }
 }

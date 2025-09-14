@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/extension/context_extension.dart';
+import '../../core/init/theme/theme_extensions.dart';
 
 const defaultValue = 56.0;
 
@@ -46,7 +46,8 @@ class Loader extends StatelessWidget {
             children: <Widget>[
               _overlayWidget(
                 isSafeAreaOverlay,
-                overlayColor ?? Color(0x99ffffff),
+                overlayColor ??
+                    context.colorScheme.surface.withValues(alpha: 0.6),
                 isAppbarOverlay ? 0.0 : overlayFromTop ?? defaultPaddingTop,
                 isBottomBarOverlay
                     ? 0.0
@@ -115,9 +116,9 @@ class Loader extends StatelessWidget {
           data:
               _themeData ??
               Theme.of(context).copyWith(
-                colorScheme: ColorScheme.fromSwatch().copyWith(
-                  secondary: context.colorScheme.primary,
-                ),
+                colorScheme: Theme.of(
+                  context,
+                ).colorScheme.copyWith(secondary: context.colorScheme.primary),
               ),
           child:
               _progressIndicator ??

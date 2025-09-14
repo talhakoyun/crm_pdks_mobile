@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../core/init/theme/theme_extensions.dart';
 
 class QrScannerView extends StatefulWidget {
   final Function(String) onQrScanned;
@@ -19,17 +20,17 @@ class _QrScannerViewState extends State<QrScannerView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('QR Kod Okut'),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
+        backgroundColor: context.colorScheme.surface,
+        foregroundColor: context.colorScheme.onSurface,
         actions: [
           IconButton(
-            color: Colors.white,
+            color: context.colorScheme.onSurface,
             icon: const Icon(Icons.flash_on),
             iconSize: 32.0,
             onPressed: () => cameraController.toggleTorch(),
           ),
           IconButton(
-            color: Colors.white,
+            color: context.colorScheme.onSurface,
             icon: const Icon(Icons.camera_rear),
             iconSize: 32.0,
             onPressed: () => cameraController.switchCamera(),
@@ -61,7 +62,10 @@ class _QrScannerViewState extends State<QrScannerView> {
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(
+                  color: context.colorScheme.onSurface,
+                  width: 2,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
@@ -75,14 +79,13 @@ class _QrScannerViewState extends State<QrScannerView> {
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.7),
+                color: context.colorScheme.surface.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
+              child: Text(
                 'QR kodu çerçeve içine alın',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
+                style: context.textTheme.bodyLarge!.copyWith(
+                  color: context.colorScheme.surface,
                   fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
