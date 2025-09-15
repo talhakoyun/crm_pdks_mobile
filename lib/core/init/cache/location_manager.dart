@@ -16,41 +16,87 @@ class LocationManager extends ChangeNotifier {
     LocationPermission permission;
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!context.mounted) return;
+    
     if (!serviceEnabled) {
       DialogFactory.create(
         context: context,
         type: DialogType.locationPermission,
         parameters: {'isEnabled': true, 'isMock': false},
       );
+      return null;
     }
+    
     permission = await Geolocator.checkPermission();
+    
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
+      if (!context.mounted) return;
+      if (permission == LocationPermission.denied) {
+        DialogFactory.create(
+          context: context,
+          type: DialogType.locationPermission,
+          parameters: {'isEnabled': false, 'isMock': false},
+        );
+        return null;
+      }
     }
+    
     if (!context.mounted) return;
+    
     if (permission == LocationPermission.deniedForever) {
       DialogFactory.create(
         context: context,
         type: DialogType.locationPermission,
         parameters: {'isEnabled': false, 'isMock': false},
       );
+      return null;
     }
+    
     return await getCurrentLocation(context);
   }
 
   getCurrentLocation(BuildContext context) async {
     try {
-      _getPositionSubscription = Geolocator.getPositionStream().listen((
-        Position position,
-      ) async {
-        if (!context.mounted) return;
-        currentPosition = position;
-        isMockLocation = position.isMocked;
-        mockedCheck(context);
-        notifyListeners();
-      });
+      _getPositionSubscription?.cancel(); 
+      _getPositionSubscription = Geolocator.getPositionStream(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.best,
+          distanceFilter: 10,
+        ),
+      ).listen(
+        (Position position) async {
+          if (!context.mounted) return;
+          currentPosition = position;
+          isMockLocation = position.isMocked;
+          mockedCheck(context);
+          notifyListeners();
+        },
+        onError: (error) {
+          debugPrint('Location stream error: $error');
+          if (context.mounted) {
+            if (error.toString().contains('denied')) {
+              DialogFactory.create(
+                context: context,
+                type: DialogType.locationPermission,
+                parameters: {'isEnabled': false, 'isMock': false},
+              );
+            } else {
+              Fluttertoast.showToast(
+                msg: "Konum alınamadı: ${error.toString()}",
+                toastLength: Toast.LENGTH_LONG,
+              );
+            }
+          }
+        },
+      );
     } catch (e) {
-      Fluttertoast.showToast(msg: "Konumunuzu açın");
+      debugPrint('getCurrentLocation error: $e');
+      if (context.mounted) {
+        Fluttertoast.showToast(
+          msg: "Konum servisi başlatılamadı",
+          toastLength: Toast.LENGTH_SHORT,
+        );
+      }
     }
 
     return currentPosition;
@@ -67,6 +113,7 @@ class LocationManager extends ChangeNotifier {
   }
 
   void disp() {
-    _getPositionSubscription!.cancel();
+    _getPositionSubscription?.cancel();
+    _getPositionSubscription = null;
   }
 }

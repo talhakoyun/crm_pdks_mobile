@@ -4,6 +4,7 @@ import '../../service/in_and_out_service.dart';
 import '../../viewModel/auth_view_model.dart';
 import 'device_constants.dart';
 import '../init/cache/locale_manager.dart';
+import '../init/cache/app_cache_manager.dart';
 import '../init/navigation/navigation_service.dart';
 import '../init/network/connectivity/network_connectivity.dart';
 import '../init/cache/location_manager.dart';
@@ -49,6 +50,7 @@ class ServiceLocator {
 
   void registerCoreServices() {
     registerSingleton<LocaleManager>(LocaleManager.instance);
+    registerSingleton<AppCacheManager>(AppCacheManager.instance);
     registerSingleton<NavigationService>(NavigationService.instance);
     registerSingleton<DeviceInfoManager>(DeviceInfoManager.instance);
     registerSingleton<NetworkConnectivity>(NetworkConnectivity());

@@ -13,16 +13,6 @@ import 'core/init/cache/locale_manager.dart';
 import 'core/translations/translation_manager.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  ServiceLocator.instance.registerCoreServices();
-  await ServiceLocator.instance.get<DeviceInfoManager>().initialize();
-  await LocaleManager.prefrencesInit();
-  await Future.wait([EasyLocalization.ensureInitialized()]);
-  HttpOverrides.global = MyHttpOverrides();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
   await SentryFlutter.init(
     (options) {
       options
@@ -32,7 +22,16 @@ void main() async {
         ..tracesSampleRate = 1.0
         ..environment = kDebugMode ? "development" : "production";
     },
-    appRunner: () {
+    appRunner: () async {
+      ServiceLocator.instance.registerCoreServices();
+      await ServiceLocator.instance.get<DeviceInfoManager>().initialize();
+      await LocaleManager.prefrencesInit();
+      await Future.wait([EasyLocalization.ensureInitialized()]);
+      HttpOverrides.global = MyHttpOverrides();
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
       runApp(TranslationManager(child: const App()));
     },
   );

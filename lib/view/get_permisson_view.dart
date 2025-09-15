@@ -236,11 +236,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
   }
 
   void _handleBack(BuildContext context, PermissionViewModel permissionVM) {
-    permissionVM.holidayAddress.clear();
-    permissionVM.holidayReason.clear();
-    permissionVM.holidayEndDt.clear();
-    permissionVM.holidayStartDt.clear();
-    permissionVM.holidayType.clear();
+    permissionVM.clearForm();
     context.navigationOf.pop();
   }
 
@@ -268,13 +264,20 @@ class _GetPermissionViewState extends State<GetPermissionView>
   }
 
   Widget _buildModernHolidayType(PermissionViewModel permissionVM) {
+    bool hasError = permissionVM.showValidationErrors && permissionVM.isFieldEmpty("", isType: true, type: type);
+    
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: context.colorScheme.surface.withValues(alpha: 0.3),
+          color: hasError 
+              ? context.colorScheme.error
+              : context.colorScheme.surface.withValues(alpha: 0.3),
+          width: hasError ? 2 : 1,
         ),
-        color: context.colorScheme.surface.withValues(alpha: 0.05),
+        color: hasError 
+            ? context.colorScheme.error.withValues(alpha: 0.05)
+            : context.colorScheme.surface.withValues(alpha: 0.05),
       ),
       child: InkWell(
         onTap: permissionVM.typeItems.isNotEmpty
@@ -283,60 +286,85 @@ class _GetPermissionViewState extends State<GetPermissionView>
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: context.colorScheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.category_outlined,
-                  size: 20,
-                  color: context.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      StringConstants.instance.permissionLeaveType,
-                      style: context.textTheme.bodySmall!.copyWith(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: (hasError 
+                          ? context.colorScheme.error
+                          : context.colorScheme.primary).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      permissionVM.holidayType.text.isEmpty
-                          ? (permissionVM.typeItems.isEmpty
-                                ? StringConstants.instance.permissionLoading
-                                : StringConstants.instance.permissionSelectType)
-                          : permissionVM.holidayType.text,
-                      style: context.textTheme.bodyLarge!.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: permissionVM.holidayType.text.isEmpty
-                            ? Colors.grey[500]
-                            : context.colorScheme.onTertiary,
-                      ),
+                    child: Icon(
+                      Icons.category_outlined,
+                      size: 20,
+                      color: hasError 
+                          ? context.colorScheme.error
+                          : context.colorScheme.primary,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          StringConstants.instance.permissionLeaveType,
+                          style: context.textTheme.bodySmall!.copyWith(
+                            color: hasError 
+                                ? context.colorScheme.error 
+                                : Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          permissionVM.holidayType.text.isEmpty
+                              ? (permissionVM.typeItems.isEmpty
+                                    ? StringConstants.instance.permissionLoading
+                                    : StringConstants.instance.permissionSelectType)
+                              : permissionVM.holidayType.text,
+                          style: context.textTheme.bodyLarge!.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: permissionVM.holidayType.text.isEmpty
+                                ? (hasError 
+                                    ? context.colorScheme.error
+                                    : Colors.grey[500])
+                                : context.colorScheme.onTertiary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (permissionVM.typeItems.isEmpty)
+                    const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  else
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      color: hasError 
+                          ? context.colorScheme.error
+                          : context.colorScheme.primary,
+                    ),
+                ],
               ),
-              if (permissionVM.typeItems.isEmpty)
-                const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              else
-                Icon(
-                  Icons.keyboard_arrow_down,
-                  color: context.colorScheme.primary,
+              if (hasError) ...[
+                const SizedBox(height: 8),
+                Text(
+                  StringConstants.instance.permissionSelectType,
+                  style: context.textTheme.bodySmall!.copyWith(
+                    color: context.colorScheme.error,
+                    fontSize: 12,
+                  ),
                 ),
+              ],
             ],
           ),
         ),
@@ -366,6 +394,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
                     value: permissionVM.holidayStartDt.text,
                     icon: Icons.play_arrow,
                     onTap: () => _showStartDatePicker(context, permissionVM),
+                    permissionVM: permissionVM,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -389,6 +418,7 @@ class _GetPermissionViewState extends State<GetPermissionView>
                     value: permissionVM.holidayEndDt.text,
                     icon: Icons.stop,
                     onTap: () => _showEndDatePicker(context, permissionVM),
+                    permissionVM: permissionVM,
                   ),
                 ),
               ],
@@ -404,7 +434,10 @@ class _GetPermissionViewState extends State<GetPermissionView>
     required String value,
     required IconData icon,
     required VoidCallback onTap,
+    required PermissionViewModel permissionVM,
   }) {
+    bool hasError = permissionVM.showValidationErrors && permissionVM.isFieldEmpty(value);
+    
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -414,7 +447,10 @@ class _GetPermissionViewState extends State<GetPermissionView>
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: context.colorScheme.surface.withValues(alpha: 0.3),
+            color: hasError 
+                ? context.colorScheme.error 
+                : context.colorScheme.surface.withValues(alpha: 0.3),
+            width: hasError ? 2 : 1,
           ),
         ),
         child: Column(
@@ -422,13 +458,21 @@ class _GetPermissionViewState extends State<GetPermissionView>
           children: [
             Row(
               children: [
-                Icon(icon, size: 14, color: context.colorScheme.primary),
+                Icon(
+                  icon, 
+                  size: 14, 
+                  color: hasError 
+                      ? context.colorScheme.error 
+                      : context.colorScheme.primary,
+                ),
                 const SizedBox(width: 6),
                 Flexible(
                   child: Text(
                     label,
                     style: context.textTheme.bodySmall!.copyWith(
-                      color: Colors.grey[600],
+                      color: hasError 
+                          ? context.colorScheme.error 
+                          : Colors.grey[600],
                       fontWeight: FontWeight.w500,
                       fontSize: 10,
                     ),
@@ -446,7 +490,9 @@ class _GetPermissionViewState extends State<GetPermissionView>
                 fontWeight: FontWeight.w500,
                 fontSize: 11,
                 color: value.isEmpty
-                    ? Colors.grey[500]
+                    ? (hasError 
+                        ? context.colorScheme.error 
+                        : Colors.grey[500])
                     : context.colorScheme.onTertiary,
               ),
               maxLines: 2,
@@ -459,21 +505,31 @@ class _GetPermissionViewState extends State<GetPermissionView>
   }
 
   Widget _buildModernPermissionReason(PermissionViewModel permissionVM) {
+    bool hasError = permissionVM.showValidationErrors && permissionVM.isFieldEmpty(permissionVM.holidayReason.text);
+    
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: context.colorScheme.surface.withValues(alpha: 0.3),
+          color: hasError 
+              ? context.colorScheme.error 
+              : context.colorScheme.surface.withValues(alpha: 0.3),
+          width: hasError ? 2 : 1,
         ),
-        color: Colors.grey[50],
+        color: hasError 
+            ? context.colorScheme.error.withValues(alpha: 0.05)
+            : Colors.grey[50],
       ),
       child: TextField(
         controller: permissionVM.holidayReason,
         maxLines: 3,
+        onChanged: (value) => permissionVM.onTextChanged(value),
         decoration: InputDecoration(
           hintText: StringConstants.instance.permissionLeaveReason,
           hintStyle: context.textTheme.bodyMedium!.copyWith(
-            color: Colors.grey[500],
+            color: hasError 
+                ? context.colorScheme.error 
+                : Colors.grey[500],
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(16),
@@ -481,8 +537,17 @@ class _GetPermissionViewState extends State<GetPermissionView>
             padding: const EdgeInsets.all(16),
             child: Icon(
               Icons.description_outlined,
-              color: context.colorScheme.primary,
+              color: hasError 
+                  ? context.colorScheme.error 
+                  : context.colorScheme.primary,
             ),
+          ),
+          errorText: hasError 
+              ? StringConstants.instance.messageRequired 
+              : null,
+          errorStyle: context.textTheme.bodySmall!.copyWith(
+            color: context.colorScheme.error,
+            fontSize: 12,
           ),
         ),
         style: context.textTheme.bodyMedium!.copyWith(
@@ -493,21 +558,31 @@ class _GetPermissionViewState extends State<GetPermissionView>
   }
 
   Widget _buildModernPermissionAddress(PermissionViewModel permissionVM) {
+    bool hasError = permissionVM.showValidationErrors && permissionVM.isFieldEmpty(permissionVM.holidayAddress.text);
+    
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: context.colorScheme.surface.withValues(alpha: 0.3),
+          color: hasError 
+              ? context.colorScheme.error 
+              : context.colorScheme.surface.withValues(alpha: 0.3),
+          width: hasError ? 2 : 1,
         ),
-        color: Colors.grey[50],
+        color: hasError 
+            ? context.colorScheme.error.withValues(alpha: 0.05)
+            : Colors.grey[50],
       ),
       child: TextField(
         controller: permissionVM.holidayAddress,
         maxLines: 3,
+        onChanged: (value) => permissionVM.onTextChanged(value),
         decoration: InputDecoration(
           hintText: StringConstants.instance.permissionLeaveAddress,
           hintStyle: context.textTheme.bodyMedium!.copyWith(
-            color: Colors.grey[500],
+            color: hasError 
+                ? context.colorScheme.error 
+                : Colors.grey[500],
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(16),
@@ -515,8 +590,17 @@ class _GetPermissionViewState extends State<GetPermissionView>
             padding: const EdgeInsets.all(16),
             child: Icon(
               Icons.location_on_outlined,
-              color: context.colorScheme.primary,
+              color: hasError 
+                  ? context.colorScheme.error 
+                  : context.colorScheme.primary,
             ),
+          ),
+          errorText: hasError 
+              ? StringConstants.instance.messageRequired 
+              : null,
+          errorStyle: context.textTheme.bodySmall!.copyWith(
+            color: context.colorScheme.error,
+            fontSize: 12,
           ),
         ),
         style: context.textTheme.bodyMedium!.copyWith(
@@ -551,6 +635,16 @@ class _GetPermissionViewState extends State<GetPermissionView>
       ),
       child: ElevatedButton(
         onPressed: () {
+          if (!permissionVM.validateForm(type)) {
+            permissionVM.setShowValidationErrors(true);
+            Scrollable.ensureVisible(
+              context,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            );
+            return;
+          }
+          
           permissionVM.getPermission(
             type: type,
             startDt: startDt,

@@ -40,7 +40,8 @@ class ApplicationConstants {
         return InAndOutViewModel(locationManager: locationManager);
       },
       update: (context, locationManager, previous) {
-        if (previous != null && previous.locationManager == locationManager) {
+        if (previous != null) {
+          previous.updateLocationManager(locationManager);
           return previous;
         }
         return InAndOutViewModel(locationManager: locationManager);

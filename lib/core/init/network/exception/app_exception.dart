@@ -14,7 +14,9 @@ class FetchDataException extends AppException {
 }
 
 class BadRequestException extends AppException {
-  BadRequestException([super.msg]);
+  final Map<String, dynamic>? data;
+
+  BadRequestException([super.msg, this.data]);
 }
 
 class UnauthorisedException extends AppException {

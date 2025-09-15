@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../../viewModel/auth_view_model.dart';
 import '../../constants/device_constants.dart';
@@ -347,6 +348,10 @@ class LocationPermissionDialogBuilder extends BaseDialogBuilder {
 
   @override
   Color? getBarrierColor(BuildContext context) => context.colorScheme.primary;
+    @override
+  Color? getBackgroundColor(BuildContext context) =>
+      context.colorScheme.onError;
+
 
   @override
   ShapeBorder getShape() => const RoundedRectangleBorder(
@@ -396,25 +401,73 @@ class LocationPermissionDialogBuilder extends BaseDialogBuilder {
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
-      DialogActionsRow(
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              if (Platform.isIOS) {
-                exit(0);
-              } else {
-                SystemNavigator.pop();
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: context.colorScheme.primary,
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Ana buton (Tamam/Kapat)
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  if (Platform.isIOS) {
+                    exit(0);
+                  } else {
+                    SystemNavigator.pop();
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isMock 
+                      ? context.colorScheme.error
+                      : context.colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                ),
+                child: Text(
+                  StringConstants.instance.okey,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
-            child: Text(
-              StringConstants.instance.okey,
-              style: context.primaryTextTheme.bodyLarge,
-            ),
-          ),
-        ],
+            if (!isMock && !isEnabled) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Geolocator.openAppSettings();
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: context.colorScheme.primary),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    "Ayarlara Git",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: context.colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     ];
   }
@@ -654,7 +707,7 @@ class LogoutConfirmationDialogBuilder extends BaseDialogBuilder {
 
   @override
   Widget buildContent(BuildContext context) {
-    return Text(StringConstants.instance.permissionConfirmLogout);
+    return Text("${StringConstants.instance.exitTitle} \n ${StringConstants.instance.exitInfo}");
   }
 
   @override

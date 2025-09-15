@@ -23,14 +23,14 @@ class DialogTitleWidget extends StatelessWidget {
         const SizedBox(height: 20),
         Text(
           title,
-          style: context.primaryTextTheme.titleMedium,
+          style: context.textTheme.titleMedium,
           textAlign: TextAlign.center,
         ),
         if (message != null) ...[
           const SizedBox(height: 20),
           Text(
             message!,
-            style: context.primaryTextTheme.titleSmall,
+            style: context.textTheme.titleSmall,
             textAlign: TextAlign.center,
           ),
         ],

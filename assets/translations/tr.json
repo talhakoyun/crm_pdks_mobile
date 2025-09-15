@@ -108,7 +108,8 @@
     "loginSuccess": "Bilgileriniz Onaylandı.",
     "review": "İncelenmek üzere gönderildi",
     "network": "İnternetiniz Kapalı.Şu anda işlem gerçekleştirilemiyor.",
-    "warning1": "İnternetinizi açınız !!"
+    "warning1": "İnternetinizi açınız !!",
+    "required": "Bu alan zorunludur"
   },
   "errors": {
     "qr": "Karekod Ayrıştırılamadı.",

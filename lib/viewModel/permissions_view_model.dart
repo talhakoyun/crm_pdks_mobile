@@ -23,10 +23,9 @@ class PermissionViewModel extends BaseViewModel {
   TextEditingController holidayEndDt = TextEditingController();
   List<HolidayTypeDataModel> typeItems = [];
   PermissionStatus? permissionStatus;
-
-  // Dependency injection ile service alımı
+  bool _showValidationErrors = false;
+  bool get showValidationErrors => _showValidationErrors;
   late final PermissionService _permissionServices;
-
   List<HolidayDataModel> permissionListItems = [];
   HolidayListModel? holidayList;
 
@@ -36,20 +35,62 @@ class PermissionViewModel extends BaseViewModel {
     permissionStatus = PermissionStatus.loading;
   }
 
-  // UI güncellemesi için setter metotları
   void setHolidayType(String title, int id) {
     holidayType.text = title;
+    _clearValidationErrors(); 
     notifyListeners();
   }
 
   void setHolidayStartDate(String date) {
     holidayStartDt.text = date;
+    _clearValidationErrors(); 
     notifyListeners();
   }
 
   void setHolidayEndDate(String date) {
     holidayEndDt.text = date;
+    _clearValidationErrors(); 
     notifyListeners();
+  }
+  
+  void setShowValidationErrors(bool show) {
+    _showValidationErrors = show;
+    notifyListeners();
+  }
+  
+  void _clearValidationErrors() {
+    _showValidationErrors = false;
+    notifyListeners();
+  }
+  
+  void clearForm() {
+    holidayAddress.clear();
+    holidayReason.clear();
+    holidayEndDt.clear();
+    holidayStartDt.clear();
+    holidayType.clear();
+    _clearValidationErrors();
+  }
+  
+  bool validateForm(int type) {
+    return type != 0 &&
+           holidayReason.text.trim().isNotEmpty &&
+           holidayAddress.text.trim().isNotEmpty &&
+           holidayStartDt.text.isNotEmpty &&
+           holidayEndDt.text.isNotEmpty;
+  }
+  
+  bool isFieldEmpty(String value, {bool isType = false, int type = 0}) {
+    if (isType) {
+      return type == 0;
+    }
+    return value.trim().isEmpty;
+  }
+  
+  void onTextChanged(String value) {
+    if (_showValidationErrors && value.trim().isNotEmpty) {
+      _clearValidationErrors();
+    }
   }
 
   @override
@@ -97,12 +138,17 @@ class PermissionViewModel extends BaseViewModel {
     required DateTime endDt,
     required BuildContext context,
   }) async {
+    if (!validateForm(type)) {
+      setShowValidationErrors(true);
+      CustomSnackBar(
+        context,
+        StringConstants.instance.notEmptyText,
+        backgroundColor: context.colorScheme.error,
+      );
+      return; 
+    }
     Loader.show(context);
-    if (type != 0 &&
-        holidayReason.text != "" &&
-        holidayAddress.text != "" &&
-        holidayEndDt.text != "" &&
-        holidayStartDt.text.isNotEmpty) {
+    try {
       BaseModel<Map<String, dynamic>> data = await _permissionServices
           .holidayCreate(
             type: type,
@@ -111,14 +157,11 @@ class PermissionViewModel extends BaseViewModel {
             reason: holidayReason.text.trim(),
             address: holidayAddress.text.trim(),
           );
+      
+      Loader.hide();
       if (!context.mounted) return;
-      context.navigationOf.pop();
       if (data.status!) {
-        holidayAddress.clear();
-        holidayReason.clear();
-        holidayEndDt.clear();
-        holidayStartDt.clear();
-        holidayType.clear();
+        clearForm();
         CustomSnackBar(context, StringConstants.instance.reviewText);
         navigation.navigateToPageClear(path: NavigationConstants.HOME);
       } else {
@@ -128,13 +171,15 @@ class PermissionViewModel extends BaseViewModel {
           backgroundColor: context.colorScheme.error,
         );
       }
-    } else {
-      CustomSnackBar(
-        context,
-        StringConstants.instance.notEmptyText,
-        backgroundColor: context.colorScheme.error,
-      );
-      context.navigationOf.pop();
+    } catch (e) {
+      Loader.hide();
+      if (context.mounted) {
+        CustomSnackBar(
+          context,
+          StringConstants.instance.unExpectedError,
+          backgroundColor: context.colorScheme.error,
+        );
+      }
     }
 
     notifyListeners();

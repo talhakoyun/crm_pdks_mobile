@@ -111,6 +111,7 @@ class StringConstants {
   String get reviewText => "messages.review".tr();
   String get networkMsg => "messages.network".tr();
   String get warningMessage1 => "messages.warning1".tr();
+  String get messageRequired => "messages.required".tr();
 
   // Errors
   String get qrErrorMessage => "errors.qr".tr();

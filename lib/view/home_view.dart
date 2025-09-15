@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -24,60 +23,96 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> with BaseSingleton, SizeSingleton {
+class _HomeViewState extends State<HomeView>
+    with BaseSingleton, SizeSingleton, AutomaticKeepAliveClientMixin {
   LocationManager locationManager = LocationManager();
   late InAndOutViewModel inAndOutViewModel;
   Position? currentPosition;
   bool? isMockLocation;
   StreamController<bool> isOutSide = StreamController<bool>.broadcast();
+  bool _isInitialized = false;
+
+  @override
+  bool get wantKeepAlive => true; 
 
   @override
   void initState() {
     super.initState();
-    inAndOutViewModel = InAndOutViewModel(locationManager: locationManager);
-    // inAndOutViewModel.pushSignalService();
+    if (!_isInitialized) {
+      inAndOutViewModel = InAndOutViewModel(locationManager: locationManager);
+      _isInitialized = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _initializeLocationAsync();
+      });
+    }
+  }
+
+  Future<void> _initializeLocationAsync() async {
+    if (mounted) {
+      await locationManager.determinePosition(context);
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
-    locationManager.disp();
+    isOutSide.close();
+    if (_isInitialized) {
+      locationManager.disp();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+    
     return PopScope(
       canPop: false,
       child: (inAndOutViewModel.authVM.event == SignStatus.logined)
           ? Scaffold(
               key: inAndOutViewModel.scaffoldKey,
               backgroundColor: context.colorScheme.onTertiaryContainer,
-              body: ChangeNotifierProvider<LocationManager>(
-                create: (BuildContext context) => locationManager,
-                child: Consumer<LocationManager>(
-                  builder: (context, locationValue, _) {
-                    if (!Platform.isIOS) {
-                      inAndOutViewModel.buildMethod(context);
-                    }
-                    if (locationValue.currentPosition == null) {
-                      locationValue.determinePosition(context);
-                    }
+              body: _buildOptimizedBody(),
+            )
+          : _buildLoadingOrErrorState(),
+    );
+  }
 
-                    return SafeArea(
-                      child: _buildMainContent(context, locationValue),
-                    );
-                  },
-                ),
-              ),
-            )
-          : !(inAndOutViewModel.networkConnectivity.internet)
-          ? errorPageView(
-              context: context,
-              imagePath: imgCons.warning,
-              title: strCons.unExpectedError,
-              subtitle: "",
-            )
-          : const Scaffold(body: Center(child: CircularProgressIndicator())),
+  Widget _buildOptimizedBody() {
+    return ChangeNotifierProvider<LocationManager>.value(
+      value: locationManager,
+      child: Consumer<LocationManager>(
+        builder: (context, locationValue, child) {
+          // Lokasyon alışını optimize et
+          if (locationValue.currentPosition == null && mounted) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                locationValue.determinePosition(context);
+              }
+            });
+          }
+
+          return SafeArea(
+            child: _buildMainContent(context, locationValue),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildLoadingOrErrorState() {
+    if (!inAndOutViewModel.networkConnectivity.internet) {
+      return Scaffold(
+        body: errorPageView(
+          context: context,
+          imagePath: imgCons.warning,
+          title: strCons.unExpectedError,
+          subtitle: "",
+        ),
+      );
+    }
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 

@@ -102,22 +102,24 @@ class NetworkApiServices extends BaseApiServices {
       case 201:
         return responseJson;
       case 302:
-        throw BadRequestException(responseJson['message'] ?? 'Bad Request');
+        throw BadRequestException(responseJson['message'] ?? 'Bad Request', responseJson);
       case 400:
-        throw BadRequestException(responseJson['message'] ?? 'Bad Request');
+        throw BadRequestException(responseJson['message'] ?? 'Bad Request', responseJson);
       case 401:
         throw UnauthorisedException(responseJson['message'] ?? 'Unauthorized');
       case 403:
-        throw BadRequestException(responseJson['message'] ?? 'Forbidden');
+        throw BadRequestException(responseJson['message'] ?? 'Forbidden', responseJson);
       case 404:
-        throw BadRequestException(responseJson['message'] ?? 'Not Found');
+        throw BadRequestException(responseJson['message'] ?? 'Not Found', responseJson);
       case 422:
         throw BadRequestException(
           responseJson['message'] ?? 'Unprocessable Entity',
+          responseJson,
         );
       case 500:
         throw BadRequestException(
           responseJson['message'] ?? 'Internal Server Error',
+          responseJson,
         );
       default:
         throw FetchDataException(

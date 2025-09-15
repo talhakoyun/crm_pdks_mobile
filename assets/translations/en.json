@@ -108,7 +108,8 @@
     "loginSuccess": "Your information has been confirmed.",
     "review": "Sent for review",
     "network": "Your internet is off. Transaction cannot be performed at the moment.",
-    "warning1": "Turn on your internet!!"
+    "warning1": "Turn on your internet!!",
+    "required": "This field is required."
   },
   "errors": {
     "qr": "QR Code could not be parsed.",

@@ -116,10 +116,19 @@ class AuthViewModel extends BaseViewModel {
   }
 
   void _disposeControllers() {
-    emailController?.dispose();
-    passController?.dispose();
-    nameController?.dispose();
-    passConfirmController?.dispose();
+    try {
+      emailController?.dispose();
+      emailController = null;
+      passController?.dispose();
+      passController = null;
+      nameController?.dispose();
+      nameController = null;
+      passConfirmController?.dispose();
+      passConfirmController = null;
+    } catch (e) {
+      // Controller dispose hatalarını yakala
+      debugPrint('Controller dispose hatası: $e');
+    }
   }
 
   void togglePasswordVisibility({String? fieldType}) {
@@ -458,39 +467,60 @@ class AuthViewModel extends BaseViewModel {
     var utoken = _storageService.getStringValue(PreferencesKeys.TOKEN);
 
     if (utoken.isNotEmpty) {
-      final profileResult = await _authService.profile();
-      if (profileResult.isSuccess && profileResult.hasData) {
-        user = _mapUserModelToUserData(profileResult.data?.first);
-        if (isSplash == null || isSplash == false) {
-          if (context != null && context.mounted) {
-            Fluttertoast.showToast(
-              msg: StringConstants.instance.successMessage,
-              backgroundColor: const Color(0xffFF981A),
-            );
+      try {
+        final profileResult = await _authService.profile();
+        if (profileResult.isSuccess && profileResult.hasData) {
+          user = _mapUserModelToUserData(profileResult.data?.first);
+          if (isSplash == null || isSplash == false) {
+            if (context != null && context.mounted) {
+              Fluttertoast.showToast(
+                msg: StringConstants.instance.successMessage,
+                backgroundColor: const Color(0xffFF981A),
+                toastLength: Toast.LENGTH_SHORT, 
+              );
+            }
+          }
+          await _saveUserData(user!);
+        } else {
+          debugPrint('Profile fetch error: ${profileResult.message}');
+          if (isSplash == null || isSplash == false) {
+            if (context != null && context.mounted) {
+              Fluttertoast.showToast(
+                msg: profileResult.message ?? StringConstants.instance.errorMessage,
+                backgroundColor: context.colorScheme.error,
+                toastLength: Toast.LENGTH_SHORT,
+              );
+            }
           }
         }
-        await _saveUserData(user!);
-      } else {
-        if (isSplash == null || isSplash == false) {
-          if (context != null && context.mounted) {
-            Fluttertoast.showToast(
-              msg:
-                  profileResult.message ??
-                  StringConstants.instance.errorMessage,
-              backgroundColor: context.colorScheme.error,
-            );
-          }
-        }
+        await profileGetDataShared();
+        notifyListeners();
+      } catch (e) {
+        debugPrint('Profile fetch exception: $e');
       }
-      await profileGetDataShared();
-      notifyListeners();
     }
+    
     if (context != null && !context.mounted) {
       return;
     }
+    
     await _handleAppVersionCheck(context);
-    if (isSplash == true) {
-      _navigateBasedOnUserStatus();
+    
+    if (isSplash == true && isAvalibleApp != null) {
+      final currentVersion = int.parse(version?.replaceAll(".", "") ?? "0");
+      bool shouldNavigateFromVersionCheck = false;
+      
+      if (Platform.isAndroid) {
+        final androidVersion = isAvalibleApp?.data?.android?.version ?? 0;
+        shouldNavigateFromVersionCheck = androidVersion <= currentVersion;
+      } else if (Platform.isIOS) {
+        final iosVersion = isAvalibleApp?.data?.ios?.version ?? 0;
+        shouldNavigateFromVersionCheck = iosVersion <= currentVersion;
+      }
+      
+      if (shouldNavigateFromVersionCheck) {
+        _navigateBasedOnUserStatus();
+      }
     }
   }
 
@@ -529,8 +559,6 @@ class AuthViewModel extends BaseViewModel {
 
     if (androidVersion > currentVersion) {
       _showUpdateDialog(context, isAvalibleApp.data.android!.link);
-    } else {
-      Timer(const Duration(seconds: 2), _navigateBasedOnUserStatus);
     }
   }
 
@@ -542,8 +570,6 @@ class AuthViewModel extends BaseViewModel {
 
     if (iosVersion > currentVersion) {
       _showUpdateDialog(context, isAvalibleApp.data.ios!.link);
-    } else {
-      Timer(const Duration(seconds: 3), _navigateBasedOnUserStatus);
     }
   }
 

@@ -65,12 +65,15 @@ class _LoginViewState extends State<LoginView>
 
   @override
   void dispose() {
+    // AuthViewModel'i önce dispose et
+    authVM.disp();
+    // Sonra animation controller'ları dispose et
     _fadeController.dispose();
     _slideController.dispose();
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
+    // En son parent dispose
     super.dispose();
-    authVM.disp();
   }
 
   @override

@@ -43,10 +43,10 @@ class InAndOutService {
       if (response['status']) {
         return BaseModel<Map<String, dynamic>>(
           status: true,
-          message: "İşlem başarılı",
+          message: strCons.successMessage,
           data: {
             "status": true,
-            "message": "İşlem başarılı",
+            "message": strCons.successMessage,
             "note": response['note'],
           },
         );
@@ -66,13 +66,13 @@ class InAndOutService {
       bool? noteValue;
 
       if (e is BadRequestException) {
-        try {
-          final errorResponse = json.decode(e.toString());
-          errorMessage = errorResponse['message'] ?? e.toString();
-          noteValue = errorResponse['note'];
-        } catch (_) {
-          errorMessage = e.toString();
+        errorMessage = e.toString();
+        if (e.data != null) {
+          noteValue = e.data!['note'];
+        } else {
+          noteValue = null;
         }
+        
       } else if (e is FetchDataException &&
           e.toString().contains('No Internet Connection')) {
         errorMessage = 'İnternet bağlantısı yok';
@@ -115,10 +115,10 @@ class InAndOutService {
       if (response['status']) {
         return BaseModel<Map<String, dynamic>>(
           status: true,
-          message: response['message'] ?? "İşlem başarılı",
+          message: response['message'] ?? strCons.successMessage,
           data: {
             "status": true,
-            "message": response['message'] ?? "İşlem başarılı",
+            "message": response['message'] ?? strCons.successMessage,
             "note": response['note'],
           },
         );
@@ -138,12 +138,13 @@ class InAndOutService {
       bool? noteValue;
 
       if (e is BadRequestException) {
-        try {
-          final errorResponse = json.decode(e.toString());
-          errorMessage = errorResponse['message'] ?? e.toString();
-          noteValue = errorResponse['note'];
-        } catch (_) {
-          errorMessage = e.toString();
+        errorMessage = e.toString();
+        
+        // BadRequestException'ın data field'ından note değerini al
+        if (e.data != null) {
+          noteValue = e.data!['note'];
+        } else {
+          noteValue = null;
         }
       } else if (e is FetchDataException &&
           e.toString().contains('No Internet Connection')) {

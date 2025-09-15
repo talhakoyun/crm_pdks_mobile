@@ -56,8 +56,12 @@ class InAndOutViewModel extends BaseViewModel {
   AuthViewModel get authVM => _authVM;
 
   void buildMethod(BuildContext context) {
-    context.watch<AuthViewModel>();
-    notifyListeners();
+    // Provider.of yerine listen: false kullanarak doğrudan erişim
+    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+    // Sadece gerektiğinde notify et
+    if (authViewModel.event != _authVM.event) {
+      notifyListeners();
+    }
   }
 
   void pressLogin(BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
@@ -388,6 +392,15 @@ class InAndOutViewModel extends BaseViewModel {
   @override
   void init() {}
 
+  void updateLocationManager(LocationManager newLocationManager) {
+    // Location manager referansını güncelle
+    // Bu metod provider tarafından çağrılır
+    // Sadece gerektiğinde notify eder
+    if (locationManager != newLocationManager) {
+      notifyListeners();
+    }
+  }
+
   void _showNoteDialog({
     required BuildContext context,
     required int type,
@@ -466,7 +479,7 @@ class InAndOutViewModel extends BaseViewModel {
       }
       if (!targetContext.mounted) return;
       if (data.status!) {
-        CustomSnackBar(targetContext, data.message ?? 'İşlem başarılı');
+        CustomSnackBar(targetContext, data.message ?? StringConstants.instance.successMessage);
       } else {
         CustomSnackBar(
           targetContext,
@@ -475,10 +488,7 @@ class InAndOutViewModel extends BaseViewModel {
         );
       }
     } catch (e) {
-      // Hata durumunda da loader'ı her durumda kapat
       Loader.hide();
-
-      // Context kontrolü sonrası hata mesajı
       if (context.mounted) {
         CustomSnackBar(
           context,

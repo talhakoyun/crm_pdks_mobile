@@ -113,8 +113,8 @@ class PermissionService {
       if (response['status']) {
         return BaseModel<Map<String, dynamic>>(
           status: true,
-          message: "İşlem başarılı",
-          data: {"status": true, "message": "İşlem başarılı"},
+          message: StringConstants.instance.successMessage,
+          data: {"status": true, "message": StringConstants.instance.successMessage},
         );
       } else {
         return BaseModel<Map<String, dynamic>>(
@@ -124,7 +124,6 @@ class PermissionService {
         );
       }
     } on BadRequestException catch (e) {
-      // 422 hata kodu BadRequestException olarak gelecek
       return BaseModel<Map<String, dynamic>>(
         status: false,
         message: e.msg ?? strCons.errorMessage,
