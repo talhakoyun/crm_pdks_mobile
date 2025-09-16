@@ -1,7 +1,7 @@
 name: crm_pdks_mobile
 description: "Mavi Host CRM Mobile"
 publish_to: "none"
-version: 1.0.2+3
+version: 1.0.3+4
 
 environment:
   sdk: ^3.8.1
