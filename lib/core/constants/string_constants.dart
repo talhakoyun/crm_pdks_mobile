@@ -20,6 +20,7 @@ class StringConstants {
   String get mission => "general.mission".tr();
   String get gender => "general.gender".tr();
   String get name => "general.name".tr();
+  String get surname => "general.surname".tr();
   String get send => "general.send".tr();
   String get shift => "general.shift".tr();
   String get okey => "general.ok".tr();
@@ -125,6 +126,9 @@ class StringConstants {
   String get emailValidMsg => "errors.emailValid".tr();
   String get passwordValidMsg => "errors.passwordValid".tr();
   String get registerNameErrorMsg => "errors.registerNameError".tr();
+  String get registerSurnameErrorMsg => "errors.registerSurnameError".tr();
+  String get phoneValidMsg => "errors.phoneValid".tr();
+  String get passwordMismatchMsg => "errors.passwordMismatch".tr();
   String get passwordChangeErrorMsg => "errors.passwordChangeError".tr();
 
   // Location
@@ -219,7 +223,7 @@ class StringConstants {
   }
 
   // API URLs - These remain as static strings
-  final String baseUrl = "https://crm.bilmos.com/api/";
+  final String baseUrl = "https://cinarceyizcrm.bilmos.com/api/";
   final String loginUrl = 'auth/login';
   final String changePassword = 'user/password/update';
   final String logout = 'auth/logout';

@@ -42,11 +42,15 @@ class AuthViewModel extends BaseViewModel {
   TextEditingController? emailController;
   TextEditingController? passController;
   TextEditingController? nameController;
+  TextEditingController? surnameController;
+  TextEditingController? phoneController;
   TextEditingController? passConfirmController;
   bool obscureText = true;
   bool currentObscureText = true;
   bool newObscureText = true;
   bool newConfirmObscureText = true;
+  bool registerObscureText = true;
+  bool registerConfirmObscureText = true;
   SignStatus event = SignStatus.loading;
   String? get userName => user?.username;
   String? get gender => user?.gender;
@@ -98,10 +102,27 @@ class AuthViewModel extends BaseViewModel {
   }
 
   void _initializeControllers() {
-    emailController = TextEditingController();
-    passController = TextEditingController();
-    nameController = TextEditingController();
-    passConfirmController = TextEditingController();
+    emailController = _initializeSafeController(emailController);
+    passController = _initializeSafeController(passController);
+    nameController = _initializeSafeController(nameController);
+    surnameController = _initializeSafeController(surnameController);
+    phoneController = _initializeSafeController(phoneController);
+    passConfirmController = _initializeSafeController(passConfirmController);
+  }
+
+  TextEditingController _initializeSafeController(
+    TextEditingController? controller,
+  ) {
+    if (controller == null) {
+      return TextEditingController();
+    }
+
+    try {
+      controller.text;
+      return controller;
+    } catch (e) {
+      return TextEditingController();
+    }
   }
 
   Future<void> _loadAppVersion() async {
@@ -112,22 +133,52 @@ class AuthViewModel extends BaseViewModel {
 
   @override
   void disp() {
+    _clearControllers();
+  }
+
+  void _clearControllers() {
+    final controllers = [
+      emailController,
+      passController,
+      nameController,
+      surnameController,
+      phoneController,
+      passConfirmController,
+    ];
+
+    for (final controller in controllers) {
+      try {
+        controller?.clear();
+      } catch (e) {
+        debugPrint('Controller clear hatası: $e');
+      }
+    }
+  }
+
+  void forceDispose() {
     _disposeControllers();
   }
 
   void _disposeControllers() {
-    try {
-      emailController?.dispose();
-      emailController = null;
-      passController?.dispose();
-      passController = null;
-      nameController?.dispose();
-      nameController = null;
-      passConfirmController?.dispose();
-      passConfirmController = null;
-    } catch (e) {
-      // Controller dispose hatalarını yakala
-      debugPrint('Controller dispose hatası: $e');
+    final controllersWithSetters = [
+      (emailController, (TextEditingController? c) => emailController = c),
+      (passController, (TextEditingController? c) => passController = c),
+      (nameController, (TextEditingController? c) => nameController = c),
+      (surnameController, (TextEditingController? c) => surnameController = c),
+      (phoneController, (TextEditingController? c) => phoneController = c),
+      (
+        passConfirmController,
+        (TextEditingController? c) => passConfirmController = c,
+      ),
+    ];
+
+    for (final (controller, setter) in controllersWithSetters) {
+      try {
+        controller?.dispose();
+        setter(null);
+      } catch (e) {
+        debugPrint('Controller dispose hatası: $e');
+      }
     }
   }
 
@@ -144,6 +195,11 @@ class AuthViewModel extends BaseViewModel {
         break;
       case 'newConfirm':
         newConfirmObscureText = !newConfirmObscureText;
+      case 'register':
+        registerObscureText = !registerObscureText;
+        break;
+      case 'registerConfirm':
+        registerConfirmObscureText = !registerConfirmObscureText;
         break;
     }
     notifyListeners();
@@ -362,9 +418,11 @@ class AuthViewModel extends BaseViewModel {
 
     Map dataRegister = {
       'name': nameController?.text.trim(),
+      'surname': surnameController?.text.trim(),
       'email': emailController?.text.trim(),
+      'phone': phoneController?.text.trim(),
       'password': passController?.text.trim(),
-      'password_confirm': passConfirmController?.text.trim(),
+      'password_confirmation': passConfirmController?.text.trim(),
     };
 
     await _register(context, dataRegister);
@@ -380,10 +438,19 @@ class AuthViewModel extends BaseViewModel {
       return false;
     }
 
-    if (nameController!.text.trim().length < 5) {
+    if (nameController!.text.trim().length < 2) {
       _showErrorDialog(
         context,
         StringConstants.instance.registerNameErrorMsg,
+        exitOnClose: false,
+      );
+      return false;
+    }
+
+    if (surnameController!.text.trim().length < 2) {
+      _showErrorDialog(
+        context,
+        StringConstants.instance.registerSurnameErrorMsg,
         exitOnClose: false,
       );
       return false;
@@ -398,10 +465,28 @@ class AuthViewModel extends BaseViewModel {
       return false;
     }
 
+    if (phoneController!.text.trim().length < 15) {
+      _showErrorDialog(
+        context,
+        StringConstants.instance.phoneValidMsg,
+        exitOnClose: false,
+      );
+      return false;
+    }
+
     if (!_isPasswordValid(passController!.text)) {
       _showErrorDialog(
         context,
         StringConstants.instance.passwordValidMsg,
+        exitOnClose: false,
+      );
+      return false;
+    }
+
+    if (passController!.text.trim() != passConfirmController!.text.trim()) {
+      _showErrorDialog(
+        context,
+        StringConstants.instance.passwordMismatchMsg,
         exitOnClose: false,
       );
       return false;
@@ -412,7 +497,9 @@ class AuthViewModel extends BaseViewModel {
 
   bool _areRegisterFieldsEmpty() {
     return nameController!.text.trim().isEmpty ||
+        surnameController!.text.trim().isEmpty ||
         emailController!.text.trim().isEmpty ||
+        phoneController!.text.trim().isEmpty ||
         passController!.text.trim().isEmpty ||
         passConfirmController!.text.trim().isEmpty;
   }
@@ -476,7 +563,7 @@ class AuthViewModel extends BaseViewModel {
               Fluttertoast.showToast(
                 msg: StringConstants.instance.successMessage,
                 backgroundColor: const Color(0xffFF981A),
-                toastLength: Toast.LENGTH_SHORT, 
+                toastLength: Toast.LENGTH_SHORT,
               );
             }
           }
@@ -486,7 +573,9 @@ class AuthViewModel extends BaseViewModel {
           if (isSplash == null || isSplash == false) {
             if (context != null && context.mounted) {
               Fluttertoast.showToast(
-                msg: profileResult.message ?? StringConstants.instance.errorMessage,
+                msg:
+                    profileResult.message ??
+                    StringConstants.instance.errorMessage,
                 backgroundColor: context.colorScheme.error,
                 toastLength: Toast.LENGTH_SHORT,
               );
@@ -499,17 +588,17 @@ class AuthViewModel extends BaseViewModel {
         debugPrint('Profile fetch exception: $e');
       }
     }
-    
+
     if (context != null && !context.mounted) {
       return;
     }
-    
+
     await _handleAppVersionCheck(context);
-    
+
     if (isSplash == true && isAvalibleApp != null) {
       final currentVersion = int.parse(version?.replaceAll(".", "") ?? "0");
       bool shouldNavigateFromVersionCheck = false;
-      
+
       if (Platform.isAndroid) {
         final androidVersion = isAvalibleApp?.data?.android?.version ?? 0;
         shouldNavigateFromVersionCheck = androidVersion <= currentVersion;
@@ -517,7 +606,7 @@ class AuthViewModel extends BaseViewModel {
         final iosVersion = isAvalibleApp?.data?.ios?.version ?? 0;
         shouldNavigateFromVersionCheck = iosVersion <= currentVersion;
       }
-      
+
       if (shouldNavigateFromVersionCheck) {
         _navigateBasedOnUserStatus();
       }
@@ -590,6 +679,10 @@ class AuthViewModel extends BaseViewModel {
     Timer(const Duration(seconds: 2), () {
       final storedToken = _storageService.getStringValue(PreferencesKeys.TOKEN);
 
+      debugPrint('🧭 NAVIGATE BASED ON USER STATUS');
+      debugPrint('🔑 Token exists: ${storedToken.isNotEmpty}');
+      debugPrint('📝 Register status: $registerStatus');
+
       if (storedToken.isNotEmpty) {
         navigation.navigateToPageClear(path: NavigationConstants.HOME);
       } else {
@@ -632,7 +725,12 @@ class AuthViewModel extends BaseViewModel {
 
   void clearCache() async {
     await _storageService.clearAll();
-    navigation.navigateToPageClear(path: NavigationConstants.LOGIN);
+    _clearControllers();
+    user = null;
+    _accessToken = null;
+    event = SignStatus.lyLogin;
+    notifyListeners();
+    navigation.navigateToPageClear(path: NavigationConstants.DEFAULT);
   }
 
   Future<void> profileSetDataShared(
@@ -707,7 +805,6 @@ class AuthViewModel extends BaseViewModel {
     await _saveUserData(userData);
   }
 
-  // Yeni eklenen metod
   Future<BaseModel> changePassword({
     required String currentPassword,
     required String newPassword,

@@ -11,7 +11,8 @@
     "finish": "Bitiş",
     "mission": "Görev",
     "gender": "Cinsiyet",
-    "name": "Ad - Soyad",
+    "name": "Ad",
+    "surname": "Soyad",
     "send": "Gönder",
     "shift": "Mesai",
     "ok": "Tamam",
@@ -122,7 +123,10 @@
     "loginError2": "Lütfen sizden istenilen bilgileri eksiksizce giriniz.",
     "emailValid": "Lütfen geçerli bir email adresi giriniz.",
     "passwordValid": "Şifre uzunluğu 6 karakterden az olamaz!",
-    "registerNameError": "Ad - Soyad alanı en az 5 karakterden oluşmalıdır.",
+    "registerNameError": "Ad alanı en az 2 karakterden oluşmalıdır.",
+    "registerSurnameError": "Soyad alanı en az 2 karakterden oluşmalıdır.",
+    "phoneValid": "Telefon numarası formatı: 0(5xx)xxx xx xx",
+    "passwordMismatch": "Şifreler eşleşmiyor. Lütfen tekrar kontrol edin.",
     "passwordChangeError": "Şifre değiştirme başarısız oldu. Lütfen bilgilerinizi kontrol edip tekrar deneyiniz."
   },
   "location": {

@@ -11,7 +11,8 @@
     "finish": "Finish",
     "mission": "Mission",
     "gender": "Gender",
-    "name": "Name - Surname",
+    "name": "Name",
+    "surname": "Surname",
     "send": "Send",
     "shift": "Shift",
     "ok": "OK",
@@ -122,7 +123,10 @@
     "loginError2": "Please enter the requested information completely.",
     "emailValid": "Please enter a valid email address.",
     "passwordValid": "Password length cannot be less than 6 characters!",
-    "registerNameError": "Name - Surname field must consist of at least 5 characters.",
+    "registerNameError": "Name field must consist of at least 2 characters.",
+    "registerSurnameError": "Surname field must consist of at least 2 characters.",
+    "phoneValid": "Phone number format: 0(5xx)xxx xx xx",
+    "passwordMismatch": "Passwords do not match. Please check again.",
     "passwordChangeError": "Password change failed. Please check your information and try again."
   },
   "location": {

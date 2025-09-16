@@ -65,14 +65,10 @@ class _LoginViewState extends State<LoginView>
 
   @override
   void dispose() {
-    // AuthViewModel'i önce dispose et
-    authVM.disp();
-    // Sonra animation controller'ları dispose et
     _fadeController.dispose();
     _slideController.dispose();
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
-    // En son parent dispose
     super.dispose();
   }
 
@@ -413,8 +409,10 @@ class _LoginViewState extends State<LoginView>
   }
 
   Widget buildRegisterText(BuildContext context, args) {
+    bool isRegisterVisible = args ?? false;
+    
     return Visibility(
-      visible: args ?? false,
+      visible: isRegisterVisible,
       child: Padding(
         padding: const EdgeInsets.only(top: 24),
         child: GestureDetector(

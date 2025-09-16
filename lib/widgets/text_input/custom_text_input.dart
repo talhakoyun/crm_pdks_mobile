@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/extension/context_extension.dart';
 
@@ -14,6 +15,7 @@ class CustomTextInput extends StatelessWidget {
   final Function(String)? onFieldSubmitted;
   final bool isModernStyle;
   final FocusNode? focusNode;
+  final List<TextInputFormatter>? inputFormatters;
 
   const CustomTextInput({
     super.key,
@@ -30,6 +32,7 @@ class CustomTextInput extends StatelessWidget {
     this.onFieldSubmitted,
     this.isModernStyle = false,
     this.focusNode,
+    this.inputFormatters,
   });
 
   @override
@@ -51,6 +54,7 @@ class CustomTextInput extends StatelessWidget {
           keyboardType: textInputType,
           textInputAction: textInputAction,
           onFieldSubmitted: onFieldSubmitted,
+          inputFormatters: inputFormatters,
           style: TextStyle(color: Colors.white, fontSize: 16),
           obscureText: obscureText ?? false,
           maxLength: maxLength,
@@ -94,6 +98,7 @@ class CustomTextInput extends StatelessWidget {
         keyboardType: textInputType,
         textInputAction: textInputAction,
         onFieldSubmitted: onFieldSubmitted,
+        inputFormatters: inputFormatters,
         style: context.textTheme.bodyLarge!.copyWith(
           color: context.colorScheme.surface,
         ),
