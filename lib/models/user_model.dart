@@ -17,6 +17,9 @@ class UserModel {
   final String? profilePhoto;
   final String? tokenType;
   final String? accessToken;
+  final String? refreshToken;
+  final int? expiresIn;
+  final int? refreshExpiresIn;
   final int? expiresAt;
   final String? createdAt;
 
@@ -36,6 +39,9 @@ class UserModel {
     this.profilePhoto,
     this.tokenType,
     this.accessToken,
+    this.refreshToken,
+    this.expiresIn,
+    this.refreshExpiresIn,
     this.expiresAt,
     this.createdAt,
   });
@@ -63,6 +69,9 @@ class UserModel {
       profilePhoto: json['profile_photo'],
       tokenType: json['token_type'],
       accessToken: json['access_token'],
+      refreshToken: json['refresh_token'],
+      expiresIn: json['expires_in'],
+      refreshExpiresIn: json['refresh_expires_in'],
       expiresAt: json['expires_at'],
       createdAt: json['created_at'],
     );
@@ -89,6 +98,9 @@ class UserModel {
     data['profile_photo'] = profilePhoto;
     data['token_type'] = tokenType;
     data['access_token'] = accessToken;
+    data['refresh_token'] = refreshToken;
+    data['expires_in'] = expiresIn;
+    data['refresh_expires_in'] = refreshExpiresIn;
     data['expires_at'] = expiresAt;
     data['created_at'] = createdAt;
     return data;

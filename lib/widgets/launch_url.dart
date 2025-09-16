@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/material.dart';
 
 import '../core/constants/string_constants.dart';
+
 import '../core/extension/context_extension.dart';
 
 class UrlLaunch {
@@ -48,7 +49,10 @@ class UrlLaunch {
                         borderRadius: BorderRadius.circular(80.0),
                       ),
                       color: Colors.green,
-                      child: const Text('Git', style: TextStyle(fontSize: 16)),
+                      child: Text(
+                        StringConstants.instance.launchUrlButtonText,
+                        style: TextStyle(fontSize: 16),
+                      ),
                     ),
                     MaterialButton(
                       onPressed: () async {

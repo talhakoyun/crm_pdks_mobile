@@ -1,147 +1,140 @@
-import 'dart:convert';
-
-import 'package:crm_pdks_mobile/models/holiday_types_model.dart';
-import 'package:http/http.dart' as http;
+import 'package:crm_pdks_mobile/core/init/network/exception/app_exception.dart';
 
 import '../core/constants/string_constants.dart';
+import '../core/enums/enums.dart';
 import '../core/init/cache/locale_manager.dart';
+import '../core/init/network/service/network_api_service.dart';
 import '../models/base_model.dart';
+import '../models/holiday_types_model.dart';
 import '../models/holidays_model.dart';
 
 class PermissionService {
   LocaleManager localeManager = LocaleManager.instance;
   StringConstants get strCons => StringConstants.instance;
+  final _apiServices = NetworkApiServices();
 
-  Future<HolidayListModel> holidayList() async {
-    var client = http.Client();
+  Future<BaseModel<List<HolidayDataModel>>> holidayList() async {
     try {
       String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
 
-      var response = await client
-          .get(
-            Uri.parse(strCons.baseUrl + strCons.permissionList),
-            headers: {
-              'Accept': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-          )
-          .timeout(const Duration(seconds: 10));
+      dynamic response = await _apiServices.getApiResponse(
+        strCons.baseUrl + strCons.permissionList,
+        token: token,
+      );
 
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          return holidaysModelFromJson(response.body);
-        } else {
-          return BaseModel(
-            status: false,
-            message: strCons.errorMessage,
-            data: null,
-          );
-        }
+      if (response['status']) {
+        return BaseModel.fromJsonList(
+          response,
+          (jsonList) => HolidayDataModel.fromJsonList(jsonList),
+        );
       } else {
-        return BaseModel(
+        return BaseModel<List<HolidayDataModel>>(
           status: false,
-          message: strCons.errorMessage,
+          message: response['message'] ?? strCons.errorMessage,
           data: null,
         );
       }
+    } on BadRequestException catch (e) {
+      // 422 hata kodu BadRequestException olarak gelecek
+      return BaseModel<List<HolidayDataModel>>(
+        status: false,
+        message: e.msg ?? strCons.errorMessage,
+        data: null,
+      );
     } catch (e) {
-      return BaseModel(
+      return BaseModel<List<HolidayDataModel>>(
         status: false,
         message: strCons.errorMessage,
         data: null,
       );
-    } finally {
-      client.close();
     }
   }
 
-  Future<HolidayTypeListModel> holidayTypeList() async {
-    var client = http.Client();
+  Future<BaseModel<List<HolidayTypeDataModel>>> holidayTypeList() async {
     try {
       String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
 
-      var response = await client
-          .get(
-            Uri.parse(strCons.baseUrl + strCons.holidayTypeList),
-            headers: {
-              'Accept': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-          )
-          .timeout(const Duration(seconds: 10));
+      dynamic response = await _apiServices.getApiResponse(
+        strCons.baseUrl + strCons.holidayTypeList,
+        token: token,
+      );
 
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          return holidayTypesModelFromJson(response.body);
-        } else {
-          return BaseModel(
-            status: false,
-            message: strCons.errorMessage,
-            data: null,
-          );
-        }
+      if (response['status']) {
+        return BaseModel.fromJsonList(
+          response,
+          (jsonList) => HolidayTypeDataModel.fromJsonList(jsonList),
+        );
       } else {
-        return BaseModel(
+        return BaseModel<List<HolidayTypeDataModel>>(
           status: false,
-          message: strCons.errorMessage,
+          message: response['message'] ?? strCons.errorMessage,
           data: null,
         );
       }
+    } on BadRequestException catch (e) {
+      // 422 hata kodu BadRequestException olarak gelecek
+      return BaseModel<List<HolidayTypeDataModel>>(
+        status: false,
+        message: e.msg ?? strCons.errorMessage,
+        data: null,
+      );
     } catch (e) {
-      return BaseModel(
+      return BaseModel<List<HolidayTypeDataModel>>(
         status: false,
         message: strCons.errorMessage,
         data: null,
       );
-    } finally {
-      client.close();
     }
   }
 
-  Future<Map<String, dynamic>> holidayCreate({
+  Future<BaseModel<Map<String, dynamic>>> holidayCreate({
     required int type,
     required DateTime startDt,
     required DateTime endDt,
     required String reason,
     required String address,
   }) async {
-    var client = http.Client();
     try {
       String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
-      Map bodyData = {
+      Map<String, String> bodyData = {
         "type": "$type",
         "start_date": "$startDt",
         "end_date": "$endDt",
         "reason": reason,
         "address": address,
       };
-      var response = await client
-          .post(
-            Uri.parse(strCons.baseUrl + strCons.permissionCreate),
-            headers: {
-              'Accept': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-            body: bodyData,
-          )
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          return {"status": true, "message": "işlem başarılı"};
-        } else {
-          return {"status": false, "message": data['message']};
-        }
+
+      dynamic response = await _apiServices.postApiResponse(
+        strCons.baseUrl + strCons.permissionCreate,
+        bodyData,
+        token,
+      );
+
+      if (response['status']) {
+        return BaseModel<Map<String, dynamic>>(
+          status: true,
+          message: StringConstants.instance.successMessage,
+          data: {"status": true, "message": StringConstants.instance.successMessage},
+        );
       } else {
-        var data = json.decode(response.body);
-        return {"status": data['status'], "message": data['message']};
+        return BaseModel<Map<String, dynamic>>(
+          status: false,
+          message: response['message'] ?? strCons.errorMessage,
+          data: {"status": false, "message": response['message']},
+        );
       }
+    } on BadRequestException catch (e) {
+      return BaseModel<Map<String, dynamic>>(
+        status: false,
+        message: e.msg ?? strCons.errorMessage,
+        data: {"status": false, "message": e.msg ?? strCons.errorMessage},
+      );
     } catch (e) {
-      return {"status": false, "message": strCons.errorMessage};
-    } finally {
-      client.close();
+      return BaseModel<Map<String, dynamic>>(
+        status: false,
+        message: strCons.errorMessage,
+        data: {"status": false, "message": strCons.errorMessage},
+      );
     }
   }
 }

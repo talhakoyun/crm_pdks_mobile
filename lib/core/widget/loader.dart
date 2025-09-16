@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, avoid_print
-
 import 'package:flutter/material.dart';
 
 import '../../core/extension/context_extension.dart';
@@ -42,25 +40,23 @@ class Loader extends StatelessWidget {
     }
     _overlayState = Overlay.of(context);
     if (_currentLoader == null) {
-      _currentLoader = OverlayEntry(builder: (context) {
-        return Stack(
-          children: <Widget>[
-            _overlayWidget(
+      _currentLoader = OverlayEntry(
+        builder: (context) {
+          return Stack(
+            children: <Widget>[
+              _overlayWidget(
                 isSafeAreaOverlay,
                 overlayColor ?? Color(0x99ffffff),
                 isAppbarOverlay ? 0.0 : overlayFromTop ?? defaultPaddingTop,
                 isBottomBarOverlay
                     ? 0.0
-                    : overlayFromBottom ?? defaultPaddingBottom),
-            Center(
-              child: Loader._(
-                progressIndicator,
-                themeData,
+                    : overlayFromBottom ?? defaultPaddingBottom,
               ),
-            ),
-          ],
-        );
-      });
+              Center(child: Loader._(progressIndicator, themeData)),
+            ],
+          );
+        },
+      );
       try {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_currentLoader != null) {
@@ -68,24 +64,32 @@ class Loader extends StatelessWidget {
           }
         });
       } catch (e) {
-        print(e.toString());
+        debugPrint(e.toString());
       }
     }
   }
 
-  static Widget _overlayWidget(bool isSafeArea, Color overlayColor,
-      double overlayFromTop, double overlayFromBottom) {
+  static Widget _overlayWidget(
+    bool isSafeArea,
+    Color overlayColor,
+    double overlayFromTop,
+    double overlayFromBottom,
+  ) {
     return isSafeArea
         ? Container(
             color: overlayColor,
-            margin:
-                EdgeInsets.only(top: overlayFromTop, bottom: overlayFromBottom),
+            margin: EdgeInsets.only(
+              top: overlayFromTop,
+              bottom: overlayFromBottom,
+            ),
           )
         : SafeArea(
             child: Container(
               color: overlayColor,
               margin: EdgeInsets.only(
-                  top: overlayFromTop, bottom: overlayFromBottom),
+                top: overlayFromTop,
+                bottom: overlayFromBottom,
+              ),
             ),
           );
   }
@@ -95,7 +99,7 @@ class Loader extends StatelessWidget {
       try {
         _currentLoader?.remove();
       } catch (e) {
-        print(e.toString());
+        debugPrint(e.toString());
       } finally {
         _currentLoader = null;
       }
@@ -104,23 +108,27 @@ class Loader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
+    return PopScope(
+      canPop: false,
       child: Center(
         child: Theme(
-            data: _themeData ??
-                Theme.of(context).copyWith(
-                    colorScheme: ColorScheme.fromSwatch()
-                        .copyWith(secondary: context.colorScheme.primary)),
-            child: _progressIndicator ??
-                CircularProgressIndicator(
-                  backgroundColor: context.colorScheme.primary,
-                  valueColor:
-                      AlwaysStoppedAnimation(context.colorScheme.onPrimary),
-                  color: context.colorScheme.error,
-                )),
+          data:
+              _themeData ??
+              Theme.of(context).copyWith(
+                colorScheme: ColorScheme.fromSwatch().copyWith(
+                  secondary: context.colorScheme.primary,
+                ),
+              ),
+          child:
+              _progressIndicator ??
+              CircularProgressIndicator(
+                backgroundColor: context.colorScheme.primary,
+                valueColor: AlwaysStoppedAnimation(
+                  context.colorScheme.onPrimary,
+                ),
+                color: context.colorScheme.error,
+              ),
+        ),
       ),
     );
   }

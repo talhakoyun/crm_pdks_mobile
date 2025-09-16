@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../core/base/base_singleton.dart';
-import '../core/constants/image_constants.dart';
 import '../core/constants/navigation_constants.dart';
+import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
-import '../core/init/size/size_extension.dart';
 import '../viewModel/permissions_view_model.dart';
 import '../widgets/error_widget.dart';
-import '../widgets/permission_listtile.dart';
+import '../widgets/permission_card.dart';
 
 class PermissionProceduresView extends StatefulWidget {
   const PermissionProceduresView({super.key});
@@ -40,90 +40,44 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
     return permissionVM.permissionStatus == PermissionStatus.loaded
         ? Scaffold(
             backgroundColor: context.colorScheme.onTertiaryContainer,
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              leading: IconButton(
-                onPressed: () {
-                  context.navigationOf.pop();
-                },
-                icon: Icon(
-                  Icons.arrow_back_ios_new_outlined,
-                  color: context.colorScheme.onTertiary,
-                ),
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: context.colorScheme.primary,
+              onPressed: () => permissionVM.navigation.navigateToPage(
+                path: NavigationConstants.GETPERM,
               ),
-              actions: [
-                GestureDetector(
-                  onTap: () => permissionVM.navigation.navigateToPage(
-                    path: NavigationConstants.GETPERM,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: Image.asset(
-                      ImageConstants.instance.logo,
-                      width: 24.5.scalablePixel,
-                    ),
-                  ),
-                ),
-              ],
-              title: Text(
-                strCons.leavelProsedureText,
-                style: context.textTheme.headlineMedium!.copyWith(
-                  color: context.colorScheme.onTertiary,
-                  fontWeight: FontWeight.w500,
-                ),
+              child: Icon(
+                Icons.add,
+                color: context.colorScheme.onError,
+                size: 35,
               ),
             ),
             body: permissionVM.permissionListItems.isNotEmpty
-                ? ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    padding: context.paddingLow,
-                    itemCount: permissionVM.permissionListItems.length,
-                    itemBuilder: (context, int index) => PermissionListTile(
-                      type: permissionVM.permissionListItems[index].type?.id,
-                      confirmText:
-                          permissionVM.permissionListItems[index].statusText ??
-                          strCons.unSpecified,
-                      endDate:
-                          permissionVM.permissionListItems[index].endDate ??
-                          strCons.unSpecified,
-                      startDate:
-                          permissionVM.permissionListItems[index].startDate ??
-                          strCons.unSpecified,
-                      typeText:
-                          permissionVM.permissionListItems[index].type?.title ??
-                          strCons.unSpecified,
-                      approvalStatus:
-                          permissionVM.permissionListItems[index].status ?? 0,
-                      address:
-                          permissionVM.permissionListItems[index].note ??
-                          strCons.unSpecified,
-                      reasonText:
-                          permissionVM.permissionListItems[index].note ??
-                          strCons.unSpecified,
-                      iconName:
-                          permissionVM
-                              .permissionListItems[index]
-                              .type
-                              ?.iconName ??
-                          '',
+                ? SafeArea(
+                    child: RefreshIndicator(
+                      backgroundColor: context.colorScheme.onError,
+                      onRefresh: () async {
+                        await permissionVM.fetchList(context);
+                      },
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
+                        ),
+                        padding: context.paddingNormal,
+                        itemCount: permissionVM.permissionListItems.length,
+                        itemBuilder: (context, int index) => PermissionCard(
+                          item: permissionVM.permissionListItems[index],
+                        ),
+                      ),
                     ),
                   )
-                : Center(
-                    child: Text(
-                      strCons.noLeaveText,
-                      style: context.textTheme.bodyLarge!.copyWith(
-                        color: context.colorScheme.error,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
+                : _buildEmptyState(context),
           )
         : permissionVM.permissionStatus == PermissionStatus.loadingFailed
         ? errorPageView(
             context: context,
             imagePath: imgCons.warning,
             title: strCons.unExpectedError,
-            subtitle: ' ',
+            subtitle: "",
           )
         : Scaffold(
             body: Center(
@@ -136,5 +90,44 @@ class _PermissionProceduresViewState extends State<PermissionProceduresView>
               ),
             ),
           );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(
+            imgCons.permission,
+            width: 80,
+            height: 80,
+            placeholderBuilder: (context) {
+              return Icon(
+                Icons.assignment_outlined,
+                size: 80,
+                color: context.colorScheme.onTertiary.withValues(alpha: 0.3),
+              );
+            },
+          ),
+          SizedBox(height: context.normalValue),
+          Text(
+            strCons.noLeaveText,
+            style: context.textTheme.headlineSmall!.copyWith(
+              color: context.colorScheme.onTertiary,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: context.normalValue),
+          Text(
+            strCons.permissionCreateRequest,
+            style: context.textTheme.bodyLarge!.copyWith(
+              color: context.colorScheme.onTertiary.withValues(alpha: 0.7),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 }

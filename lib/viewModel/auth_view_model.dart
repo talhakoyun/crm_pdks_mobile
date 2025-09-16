@@ -1,7 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:async';
-import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,22 +8,25 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../widgets/launch_url.dart';
 import '../core/base/view_model/base_view_model.dart';
 import '../core/constants/device_constants.dart';
-
 import '../core/constants/navigation_constants.dart';
 import '../core/constants/string_constants.dart';
+import '../core/constants/service_locator.dart';
+import '../core/enums/dialog_type.dart';
+import '../core/enums/preferences_keys.dart';
+import '../core/enums/sign_status.dart';
 import '../core/extension/context_extension.dart';
 import '../core/init/cache/locale_manager.dart';
 import '../core/init/network/connectivity/network_connectivity.dart';
-import '../core/widget/customize_dialog.dart';
+import '../core/init/network/exception/app_exception.dart';
+import '../core/widget/dialog/dialog_factory.dart';
 import '../core/widget/loader.dart';
-
 import '../models/base_model.dart';
 import '../models/logout_model.dart';
 import '../models/user_model.dart';
+import '../models/user_data.dart';
+import '../repository/user_data_repository.dart';
 import '../service/auth_service.dart';
-import '../widgets/dialog/snackbar.dart';
-
-enum SignStatus { loading, logined, loginFailed, lyLogin }
+import '../widgets/snackbar.dart';
 
 bool? registerStatus;
 
@@ -35,41 +35,61 @@ class AuthViewModel extends BaseViewModel {
   final DeviceInfoManager _deviceService;
   final NetworkConnectivity networkConnectivity;
   final LocaleManager _storageService;
-  static dynamic isAvalibleApp;
-  static dynamic user;
+  final UserDataRepository _userDataRepository;
+  dynamic isAvalibleApp;
+  UserData? user;
   String? version = "1.0.0";
   TextEditingController? emailController;
   TextEditingController? passController;
   TextEditingController? nameController;
+  TextEditingController? surnameController;
+  TextEditingController? phoneController;
   TextEditingController? passConfirmController;
   bool obscureText = true;
+  bool currentObscureText = true;
+  bool newObscureText = true;
+  bool newConfirmObscureText = true;
+  bool registerObscureText = true;
+  bool registerConfirmObscureText = true;
   SignStatus event = SignStatus.loading;
-  String? accessToken;
-  String? userName = "";
-  String? gender = "";
-  String? role = "";
-  String? compName = "";
-  String? compAddress = "";
-  String? startDate = "";
-  String? endDate = "";
-  String? startTDate = "";
-  String? endTDate = "";
-  String? phone = "";
-  String? email = "";
-  String? shiftName = "";
-  String? department = "";
-  bool? outside;
-  bool? zone;
+  String? get userName => user?.username;
+  String? get gender => user?.gender;
+  String? get role => user?.role;
+  String? get compName => user?.companyName;
+  String? get compAddress => user?.companyAddress;
+  String? get startDate => user?.startDate;
+  String? get endDate => user?.endDate;
+  String? get startTDate => user?.startTDate;
+  String? get endTDate => user?.endTDate;
+  String? get department => user?.department;
+  String? get phone => user?.phone;
+  String? get email => user?.email;
+  bool? get outside => user?.outside;
+
+  String? _accessToken;
+  String? get accessToken => _accessToken;
+  set accessToken(String? value) {
+    _accessToken = value;
+    notifyListeners();
+  }
 
   AuthViewModel({
     AuthService? authService,
     DeviceInfoManager? deviceService,
     NetworkConnectivity? networkConnectivity,
     LocaleManager? storageService,
-  }) : _authService = authService ?? AuthService(),
-       _deviceService = deviceService ?? DeviceInfoManager(),
-       networkConnectivity = networkConnectivity ?? NetworkConnectivity(),
-       _storageService = storageService ?? LocaleManager.instance {
+  }) : _authService = authService ?? ServiceLocator.instance.get<AuthService>(),
+       _deviceService =
+           deviceService ?? ServiceLocator.instance.get<DeviceInfoManager>(),
+       networkConnectivity =
+           networkConnectivity ??
+           ServiceLocator.instance.get<NetworkConnectivity>(),
+       _storageService =
+           storageService ?? ServiceLocator.instance.get<LocaleManager>(),
+       _userDataRepository = UserDataRepository(
+         storageService ?? ServiceLocator.instance.get<LocaleManager>(),
+       ),
+       super(localeManager: storageService, navigationService: null) {
     if (accessToken == null) {
       _loadUserDataFromStorage();
     }
@@ -82,10 +102,27 @@ class AuthViewModel extends BaseViewModel {
   }
 
   void _initializeControllers() {
-    emailController = TextEditingController();
-    passController = TextEditingController();
-    nameController = TextEditingController();
-    passConfirmController = TextEditingController();
+    emailController = _initializeSafeController(emailController);
+    passController = _initializeSafeController(passController);
+    nameController = _initializeSafeController(nameController);
+    surnameController = _initializeSafeController(surnameController);
+    phoneController = _initializeSafeController(phoneController);
+    passConfirmController = _initializeSafeController(passConfirmController);
+  }
+
+  TextEditingController _initializeSafeController(
+    TextEditingController? controller,
+  ) {
+    if (controller == null) {
+      return TextEditingController();
+    }
+
+    try {
+      controller.text;
+      return controller;
+    } catch (e) {
+      return TextEditingController();
+    }
   }
 
   Future<void> _loadAppVersion() async {
@@ -96,37 +133,82 @@ class AuthViewModel extends BaseViewModel {
 
   @override
   void disp() {
+    _clearControllers();
+  }
+
+  void _clearControllers() {
+    final controllers = [
+      emailController,
+      passController,
+      nameController,
+      surnameController,
+      phoneController,
+      passConfirmController,
+    ];
+
+    for (final controller in controllers) {
+      try {
+        controller?.clear();
+      } catch (e) {
+        debugPrint('Controller clear hatası: $e');
+      }
+    }
+  }
+
+  void forceDispose() {
     _disposeControllers();
   }
 
   void _disposeControllers() {
-    emailController?.dispose();
-    passController?.dispose();
-    nameController?.dispose();
-    passConfirmController?.dispose();
+    final controllersWithSetters = [
+      (emailController, (TextEditingController? c) => emailController = c),
+      (passController, (TextEditingController? c) => passController = c),
+      (nameController, (TextEditingController? c) => nameController = c),
+      (surnameController, (TextEditingController? c) => surnameController = c),
+      (phoneController, (TextEditingController? c) => phoneController = c),
+      (
+        passConfirmController,
+        (TextEditingController? c) => passConfirmController = c,
+      ),
+    ];
+
+    for (final (controller, setter) in controllersWithSetters) {
+      try {
+        controller?.dispose();
+        setter(null);
+      } catch (e) {
+        debugPrint('Controller dispose hatası: $e');
+      }
+    }
   }
 
-  void changeObsure() {
-    obscureText = !obscureText;
+  void togglePasswordVisibility({String? fieldType}) {
+    switch (fieldType) {
+      case 'main':
+        obscureText = !obscureText;
+        break;
+      case 'current':
+        currentObscureText = !currentObscureText;
+        break;
+      case 'new':
+        newObscureText = !newObscureText;
+        break;
+      case 'newConfirm':
+        newConfirmObscureText = !newConfirmObscureText;
+      case 'register':
+        registerObscureText = !registerObscureText;
+        break;
+      case 'registerConfirm':
+        registerConfirmObscureText = !registerConfirmObscureText;
+        break;
+    }
     notifyListeners();
   }
 
-  /// Centralized error logging
-  void _logError(String operation, dynamic error, [StackTrace? stackTrace]) {
-    dev.log(
-      'AuthViewModel Error in $operation: $error',
-      name: 'AuthViewModel',
-      error: error,
-      stackTrace: stackTrace,
-    );
-  }
-
-  /// Safe network connectivity check
   bool _isNetworkConnected() {
     try {
       return networkConnectivity.internet;
     } catch (e) {
-      _logError('Network Check', e);
       return false;
     }
   }
@@ -140,6 +222,9 @@ class AuthViewModel extends BaseViewModel {
       if (networkConnectivity.internet) {
         final isAvailableResult = await _authService.isAvalible();
         isAvalibleApp = isAvailableResult;
+        if (!context.mounted) {
+          return;
+        }
 
         if (isAvailableResult.isSuccess) {
           registerStatus = Platform.isAndroid
@@ -147,13 +232,18 @@ class AuthViewModel extends BaseViewModel {
               : isAvailableResult.data?.ios?.isRegister;
           getProfile(context, true);
         } else {
-          _showErrorDialog(
-            context,
-            isAvailableResult.message ?? StringConstants.instance.errorMessage,
-          );
+          final token = _storageService.getStringValue(PreferencesKeys.TOKEN);
+          if (token.isNotEmpty) {
+            _navigateBasedOnUserStatus();
+          } else {
+            _showErrorDialog(
+              context,
+              isAvailableResult.message ??
+                  StringConstants.instance.errorMessage,
+            );
+          }
         }
       } else {
-        // Offline durumda token varsa home'a git
         final token = _storageService.getStringValue(PreferencesKeys.TOKEN);
         if (token.isNotEmpty) {
           navigation.navigateToPageClear(path: NavigationConstants.HOME);
@@ -172,11 +262,10 @@ class AuthViewModel extends BaseViewModel {
     String message, {
     bool exitOnClose = true,
   }) {
-    CustomizeDialog.show(
+    DialogFactory.create(
       context: context,
       type: DialogType.error,
-      message: message,
-      exitOnClose: exitOnClose,
+      parameters: {'message': message, 'exitOnClose': exitOnClose},
     );
   }
 
@@ -185,11 +274,10 @@ class AuthViewModel extends BaseViewModel {
     String message, {
     required Function onConfirm,
   }) {
-    CustomizeDialog.show(
+    DialogFactory.create(
       context: context,
       type: DialogType.success,
-      message: message,
-      onConfirm: onConfirm,
+      parameters: {'message': message, 'onConfirm': onConfirm},
     );
   }
 
@@ -198,12 +286,19 @@ class AuthViewModel extends BaseViewModel {
       return;
     }
 
+    String deviceId;
+    try {
+      deviceId = await _deviceService.getDeviceIdSafe();
+    } catch (e) {
+      deviceId = 'unknown_device';
+    }
+
     Map bodyData = {
       'email': emailController?.text.trim(),
       'password': passController?.text.trim(),
-      'device_id': _deviceService.deviceId,
+      'device_id': deviceId,
     };
-
+    if (!context.mounted) return;
     await _login(context, bodyData);
   }
 
@@ -274,24 +369,32 @@ class AuthViewModel extends BaseViewModel {
         );
         return;
       }
-
       final result = await _authService.login(body: bodyData);
-
+      if (!context.mounted) return;
       if (result.isSuccess && result.hasData) {
         await _handleSuccessfulLogin(context, result);
       } else {
         final errorMessage =
             result.message ?? StringConstants.instance.errorMessage;
-        _logError('Login Failed', errorMessage);
         _showErrorDialog(context, errorMessage, exitOnClose: false);
       }
-    } catch (e, stackTrace) {
-      _logError('Login Exception', e, stackTrace);
-      _showErrorDialog(
-        context,
-        '${StringConstants.instance.errorMessage} ${StringConstants.instance.errorMessageContinue}',
-        exitOnClose: false,
-      );
+    } on AppException catch (e) {
+      if (!context.mounted) return;
+      String errorMessage = e.msg ?? StringConstants.instance.errorMessage;
+      _showErrorDialog(context, errorMessage, exitOnClose: false);
+    } catch (e) {
+      if (!context.mounted) return;
+      String errorMessage = StringConstants.instance.errorMessage;
+      if (e is String) {
+        errorMessage = e;
+      } else if (e is Exception) {
+        errorMessage = e.toString();
+      } else if (e is Map && e.containsKey('message')) {
+        errorMessage = e['message'].toString();
+      } else if (e is Map<String, dynamic> && e.containsKey('message')) {
+        errorMessage = e['message'].toString();
+      }
+      _showErrorDialog(context, errorMessage, exitOnClose: false);
     } finally {
       Loader.hide();
     }
@@ -301,15 +404,11 @@ class AuthViewModel extends BaseViewModel {
     BuildContext context,
     BaseModel<List<UserModel>> data,
   ) async {
-    await setDataShared(data);
-    event = SignStatus.logined; // Event'i önce set et
-
-    // Login başarılı olduktan sonra profile bilgileri zaten data'da mevcut
-    // Tekrar API çağrısı yapmaya gerek yok
-    await _handleAppVersionCheck(context);
-
-    navigation.navigateToPageClear(path: NavigationConstants.HOME);
+    await _saveUserDataFromModel(data);
+    event = SignStatus.logined;
+    if (!context.mounted) return;
     CustomSnackBar(context, StringConstants.instance.loginSuccessMsg);
+    navigation.navigateToPageClear(path: NavigationConstants.HOME);
   }
 
   Future<void> registerInputCheck(BuildContext context) async {
@@ -319,9 +418,11 @@ class AuthViewModel extends BaseViewModel {
 
     Map dataRegister = {
       'name': nameController?.text.trim(),
+      'surname': surnameController?.text.trim(),
       'email': emailController?.text.trim(),
+      'phone': phoneController?.text.trim(),
       'password': passController?.text.trim(),
-      'password_confirm': passConfirmController?.text.trim(),
+      'password_confirmation': passConfirmController?.text.trim(),
     };
 
     await _register(context, dataRegister);
@@ -337,10 +438,19 @@ class AuthViewModel extends BaseViewModel {
       return false;
     }
 
-    if (nameController!.text.trim().length < 5) {
+    if (nameController!.text.trim().length < 2) {
       _showErrorDialog(
         context,
         StringConstants.instance.registerNameErrorMsg,
+        exitOnClose: false,
+      );
+      return false;
+    }
+
+    if (surnameController!.text.trim().length < 2) {
+      _showErrorDialog(
+        context,
+        StringConstants.instance.registerSurnameErrorMsg,
         exitOnClose: false,
       );
       return false;
@@ -355,10 +465,28 @@ class AuthViewModel extends BaseViewModel {
       return false;
     }
 
+    if (phoneController!.text.trim().length < 15) {
+      _showErrorDialog(
+        context,
+        StringConstants.instance.phoneValidMsg,
+        exitOnClose: false,
+      );
+      return false;
+    }
+
     if (!_isPasswordValid(passController!.text)) {
       _showErrorDialog(
         context,
         StringConstants.instance.passwordValidMsg,
+        exitOnClose: false,
+      );
+      return false;
+    }
+
+    if (passController!.text.trim() != passConfirmController!.text.trim()) {
+      _showErrorDialog(
+        context,
+        StringConstants.instance.passwordMismatchMsg,
         exitOnClose: false,
       );
       return false;
@@ -369,7 +497,9 @@ class AuthViewModel extends BaseViewModel {
 
   bool _areRegisterFieldsEmpty() {
     return nameController!.text.trim().isEmpty ||
+        surnameController!.text.trim().isEmpty ||
         emailController!.text.trim().isEmpty ||
+        phoneController!.text.trim().isEmpty ||
         passController!.text.trim().isEmpty ||
         passConfirmController!.text.trim().isEmpty;
   }
@@ -388,7 +518,7 @@ class AuthViewModel extends BaseViewModel {
       }
 
       final result = await _authService.register(body: dataRegister);
-
+      if (!context.mounted) return;
       if (result.isSuccess) {
         final message =
             result.message ?? StringConstants.instance.successMessage;
@@ -400,11 +530,9 @@ class AuthViewModel extends BaseViewModel {
       } else {
         final errorMessage =
             result.message ?? StringConstants.instance.errorMessage;
-        _logError('Registration Failed', errorMessage);
         _showErrorDialog(context, errorMessage, exitOnClose: false);
       }
-    } catch (e, stackTrace) {
-      _logError('Registration Exception', e, stackTrace);
+    } catch (e) {
       _showErrorDialog(
         context,
         '${StringConstants.instance.errorMessage} ${StringConstants.instance.errorMessageContinue}',
@@ -424,48 +552,91 @@ class AuthViewModel extends BaseViewModel {
 
   Future getProfile([BuildContext? context, bool? isSplash]) async {
     var utoken = _storageService.getStringValue(PreferencesKeys.TOKEN);
+
     if (utoken.isNotEmpty) {
-      final profileResult = await _authService.profile();
-      if (profileResult.isSuccess && profileResult.hasData) {
-        user = profileResult.data;
-        if (isSplash == null || isSplash == false) {
-          Fluttertoast.showToast(
-            msg: StringConstants.instance.successMessage,
-            backgroundColor: const Color(0xffFF981A),
-          );
+      try {
+        final profileResult = await _authService.profile();
+        if (profileResult.isSuccess && profileResult.hasData) {
+          user = _mapUserModelToUserData(profileResult.data?.first);
+          if (isSplash == null || isSplash == false) {
+            if (context != null && context.mounted) {
+              Fluttertoast.showToast(
+                msg: StringConstants.instance.successMessage,
+                backgroundColor: const Color(0xffFF981A),
+                toastLength: Toast.LENGTH_SHORT,
+              );
+            }
+          }
+          await _saveUserData(user!);
+        } else {
+          debugPrint('Profile fetch error: ${profileResult.message}');
+          if (isSplash == null || isSplash == false) {
+            if (context != null && context.mounted) {
+              Fluttertoast.showToast(
+                msg:
+                    profileResult.message ??
+                    StringConstants.instance.errorMessage,
+                backgroundColor: context.colorScheme.error,
+                toastLength: Toast.LENGTH_SHORT,
+              );
+            }
+          }
         }
-        await profileSetDataShared(profileResult);
-      } else {
-        if (isSplash == null || isSplash == false) {
-          Fluttertoast.showToast(
-            msg: profileResult.message ?? StringConstants.instance.errorMessage,
-            backgroundColor: context!.colorScheme.error,
-          );
-        }
+        await profileGetDataShared();
+        notifyListeners();
+      } catch (e) {
+        debugPrint('Profile fetch exception: $e');
       }
-      await profileGetDataShared();
-      notifyListeners();
     }
+
+    if (context != null && !context.mounted) {
+      return;
+    }
+
     await _handleAppVersionCheck(context);
+
+    if (isSplash == true && isAvalibleApp != null) {
+      final currentVersion = int.parse(version?.replaceAll(".", "") ?? "0");
+      bool shouldNavigateFromVersionCheck = false;
+
+      if (Platform.isAndroid) {
+        final androidVersion = isAvalibleApp?.data?.android?.version ?? 0;
+        shouldNavigateFromVersionCheck = androidVersion <= currentVersion;
+      } else if (Platform.isIOS) {
+        final iosVersion = isAvalibleApp?.data?.ios?.version ?? 0;
+        shouldNavigateFromVersionCheck = iosVersion <= currentVersion;
+      }
+
+      if (shouldNavigateFromVersionCheck) {
+        _navigateBasedOnUserStatus();
+      }
+    }
   }
 
   Future<void> _handleAppVersionCheck(BuildContext? context) async {
     if (isAvalibleApp == null) {
-      _navigateBasedOnUserStatus();
-      return;
+      try {
+        final isAvailableResult = await _authService.isAvalible();
+        isAvalibleApp = isAvailableResult;
+
+        if (!isAvailableResult.isSuccess) {
+          return;
+        }
+      } catch (e) {
+        return;
+      }
     }
 
     try {
       final currentVersion = int.parse(version?.replaceAll(".", "") ?? "0");
-
+      if (!context!.mounted) return;
       if (Platform.isAndroid) {
         await _handleAndroidVersionCheck(context, currentVersion);
       } else if (Platform.isIOS) {
         await _handleIOSVersionCheck(context, currentVersion);
       }
-    } catch (e, stackTrace) {
-      _logError('Version Check', e, stackTrace);
-      _navigateBasedOnUserStatus();
+    } catch (e) {
+      //test
     }
   }
 
@@ -477,8 +648,6 @@ class AuthViewModel extends BaseViewModel {
 
     if (androidVersion > currentVersion) {
       _showUpdateDialog(context, isAvalibleApp.data.android!.link);
-    } else {
-      Timer(const Duration(seconds: 2), _navigateBasedOnUserStatus);
     }
   }
 
@@ -490,25 +659,31 @@ class AuthViewModel extends BaseViewModel {
 
     if (iosVersion > currentVersion) {
       _showUpdateDialog(context, isAvalibleApp.data.ios!.link);
-    } else {
-      Timer(const Duration(seconds: 3), _navigateBasedOnUserStatus);
     }
   }
 
   void _showUpdateDialog(BuildContext? context, String updateUrl) {
     if (context == null) return;
 
-    CustomizeDialog.show(
+    DialogFactory.create(
       context: context,
       type: DialogType.update,
-      message: StringConstants.instance.appMessage,
-      onConfirm: () => UrlLaunch.openUrl(context, updateUrl),
+      parameters: {
+        'message': StringConstants.instance.appMessage,
+        'onConfirm': () => UrlLaunch.openUrl(context, updateUrl),
+      },
     );
   }
 
   void _navigateBasedOnUserStatus() {
     Timer(const Duration(seconds: 2), () {
-      if (user != null) {
+      final storedToken = _storageService.getStringValue(PreferencesKeys.TOKEN);
+
+      debugPrint('🧭 NAVIGATE BASED ON USER STATUS');
+      debugPrint('🔑 Token exists: ${storedToken.isNotEmpty}');
+      debugPrint('📝 Register status: $registerStatus');
+
+      if (storedToken.isNotEmpty) {
         navigation.navigateToPageClear(path: NavigationConstants.HOME);
       } else {
         navigation.navigateToPageClear(
@@ -533,7 +708,7 @@ class AuthViewModel extends BaseViewModel {
 
     try {
       var result = await _authService.logout(token);
-
+      if (!context.mounted) return;
       if (result is LogoutModelError) {
         _showErrorDialog(context, result.message!, exitOnClose: false);
       } else {
@@ -542,7 +717,7 @@ class AuthViewModel extends BaseViewModel {
     } catch (e) {
       _showErrorDialog(
         context,
-        "Çıkış işlemi sırasında bir hata oluştu: $e",
+        "Çıkış işlemi sırasında bir hata oluştu",
         exitOnClose: false,
       );
     }
@@ -550,285 +725,113 @@ class AuthViewModel extends BaseViewModel {
 
   void clearCache() async {
     await _storageService.clearAll();
-    navigation.navigateToPageClear(path: NavigationConstants.LOGIN);
+    _clearControllers();
+    user = null;
+    _accessToken = null;
+    event = SignStatus.lyLogin;
+    notifyListeners();
+    navigation.navigateToPageClear(path: NavigationConstants.DEFAULT);
   }
 
   Future<void> profileSetDataShared(
     BaseModel<List<UserModel>> profileModel,
   ) async {
-    await _storeUserData(profileModel.data);
-
-    // Company data varsa kaydet
-    if (profileModel.data!.first.company != null) {
-      await _storeCompanyData(profileModel.data!.first.company);
-    }
-
-    // Department data varsa kaydet
-    if (profileModel.data!.first.department != null) {
-      await _storeDepartmentData(profileModel.data!.first.department);
-    }
-
-    // Settings data varsa kaydet
-    if (profileModel.data!.first.settings != null) {
-      await _storeSettingsData(profileModel.data!.first.settings);
-    }
-
+    final userData = _mapUserModelToUserData(profileModel.data?.first);
+    await _saveUserData(userData);
     await profileGetDataShared();
-  }
-
-  Future<void> _storeUserData(dynamic userData) async {
-    // userData bir List<UserModel>, ilk elemanını al
-    final user = userData is List ? userData.first : userData;
-
-    // UserModel'deki field'lara göre kaydet
-    await _storageService.setStringValue(
-      PreferencesKeys.ID,
-      user.id?.toString() ?? "",
-    );
-    await _storageService.setStringValue(
-      PreferencesKeys.USERNAME,
-      user.name ?? "",
-    );
-    await _storageService.setStringValue(
-      PreferencesKeys.GENDER,
-      user.gender ?? "",
-    );
-    await _storageService.setStringValue(
-      PreferencesKeys.PHONE,
-      user.phone ?? "",
-    );
-    await _storageService.setStringValue(
-      PreferencesKeys.EMAIL,
-      user.email ?? "",
-    );
-    await _storageService.setStringValue(
-      PreferencesKeys.ROLE,
-      user.role?.name ?? "",
-    );
-
-    // Shift bilgilerini kaydet
-    if (user.shift != null) {
-      await _storageService.setStringValue(
-        PreferencesKeys.SHIFTNAME,
-        "Default Shift", // API'de shift name yok, default değer
-      );
-      await _storageService.setStringValue(
-        PreferencesKeys.STARTDATE,
-        user.shift!.start ?? "belirtilmedi",
-      );
-      await _storageService.setStringValue(
-        PreferencesKeys.ENDDATE,
-        user.shift!.end ?? "belirtilmedi",
-      );
-      if (user.shift!.tolerance != null) {
-        await _storageService.setStringValue(
-          PreferencesKeys.STARTTDATE,
-          user.shift!.tolerance!.start ?? "00:00",
-        );
-        await _storageService.setStringValue(
-          PreferencesKeys.ENDTDATE,
-          user.shift!.tolerance!.end ?? "00:00",
-        );
-      }
-    }
-  }
-
-  Future<void> _storeCompanyData(dynamic companyData) async {
-    if (companyData == null) return;
-
-    await _storageService.setStringValue(
-      PreferencesKeys.COMPID,
-      companyData.id?.toString() ?? "",
-    );
-    await _storageService.setStringValue(
-      PreferencesKeys.COMPNAME,
-      companyData.name ?? "",
-    );
-    await _storageService.setStringValue(
-      PreferencesKeys.COMPADDRESS,
-      companyData.address ?? "",
-    );
-  }
-
-  Future<void> _storeDepartmentData(dynamic departmentData) async {
-    if (departmentData == null) return;
-
-    await _storageService.setStringValue(
-      PreferencesKeys.DEPARTMENTID,
-      departmentData.id?.toString() ?? "",
-    );
-    await _storageService.setStringValue(
-      PreferencesKeys.DEPARTMENT,
-      departmentData.name ?? "",
-    );
-  }
-
-  Future<void> _storeSettingsData(dynamic settingsData) async {
-    if (settingsData == null) return;
-
-    await _storageService.setBoolValue(
-      PreferencesKeys.OUTSIDE,
-      settingsData.outside ?? false,
-    );
-    // Zone için default değer - model'de olmadığı için
-    await _storageService.setBoolValue(PreferencesKeys.ZONE, false);
   }
 
   Future<void> setDataShared(BaseModel<List<UserModel>> loginModel) async {
     if (loginModel.data != null &&
         loginModel.data!.isNotEmpty &&
         loginModel.data!.first.accessToken != null) {
-      // User değişkenini set et
-      user = loginModel.data;
-
-      final userModel = loginModel.data!.first;
-
-      // Token'ı kaydet
-      await _storageService.setStringValue(
-        PreferencesKeys.TOKEN,
-        userModel.accessToken ?? "",
-      );
-
-      // Kullanıcı bilgilerini kaydet
-      await _storageService.setStringValue(
-        PreferencesKeys.USERNAME,
-        userModel.name ?? "",
-      );
-      await _storageService.setStringValue(
-        PreferencesKeys.GENDER,
-        userModel.gender ?? "",
-      );
-      await _storageService.setStringValue(
-        PreferencesKeys.ID,
-        userModel.id?.toString() ?? "",
-      );
-      await _storageService.setStringValue(
-        PreferencesKeys.PHONE,
-        userModel.phone ?? "",
-      );
-      await _storageService.setStringValue(
-        PreferencesKeys.EMAIL,
-        userModel.email ?? "",
-      );
-      await _storageService.setStringValue(
-        PreferencesKeys.ROLE,
-        userModel.role?.name ?? "",
-      );
-
-      // Company bilgilerini kaydet
-      if (userModel.company != null) {
-        await _storageService.setStringValue(
-          PreferencesKeys.COMPID,
-          userModel.company!.id?.toString() ?? "",
-        );
-        await _storageService.setStringValue(
-          PreferencesKeys.COMPNAME,
-          userModel.company!.name ?? "",
-        );
-        await _storageService.setStringValue(
-          PreferencesKeys.COMPADDRESS,
-          userModel.company!.address ?? "",
-        );
-      }
-
-      // Department bilgilerini kaydet
-      if (userModel.department != null) {
-        await _storageService.setStringValue(
-          PreferencesKeys.DEPARTMENTID,
-          userModel.department!.id?.toString() ?? "",
-        );
-        await _storageService.setStringValue(
-          PreferencesKeys.DEPARTMENT,
-          userModel.department!.name ?? "",
-        );
-      }
-
-      // Shift bilgilerini kaydet
-      if (userModel.shift != null) {
-        await _storageService.setStringValue(
-          PreferencesKeys.SHIFTNAME,
-          "Default Shift",
-        );
-        await _storageService.setStringValue(
-          PreferencesKeys.STARTDATE,
-          userModel.shift!.start ?? "belirtilmedi",
-        );
-        await _storageService.setStringValue(
-          PreferencesKeys.ENDDATE,
-          userModel.shift!.end ?? "belirtilmedi",
-        );
-
-        if (userModel.shift!.tolerance != null) {
-          await _storageService.setStringValue(
-            PreferencesKeys.STARTTDATE,
-            userModel.shift!.tolerance!.start ?? "00:00",
-          );
-          await _storageService.setStringValue(
-            PreferencesKeys.ENDTDATE,
-            userModel.shift!.tolerance!.end ?? "00:00",
-          );
-        }
-      }
-
-      // Settings bilgilerini kaydet
-      if (userModel.settings != null) {
-        await _storageService.setBoolValue(
-          PreferencesKeys.OUTSIDE,
-          userModel.settings!.outside ?? false,
-        );
-      }
-      await _storageService.setBoolValue(PreferencesKeys.ZONE, false);
-
-      dev.log('Login data saved to storage', name: 'AuthViewModel');
-
-      // Verileri memory'e yükle
+      final userData = _mapUserModelToUserData(loginModel.data?.first);
+      await _saveUserData(userData);
       await profileGetDataShared();
     }
   }
 
   Future<void> profileGetDataShared() async {
-    userName = _storageService.getStringValue(PreferencesKeys.USERNAME);
-    gender = _storageService.getStringValue(PreferencesKeys.GENDER);
-    accessToken = _storageService.getStringValue(PreferencesKeys.TOKEN);
-    shiftName = _storageService.getStringValue(PreferencesKeys.SHIFTNAME);
-    role = _storageService.getStringValue(PreferencesKeys.ROLE);
-    compName = _storageService.getStringValue(PreferencesKeys.COMPNAME);
-    compAddress = _storageService.getStringValue(PreferencesKeys.COMPADDRESS);
-    startDate = _storageService.getStringValue(PreferencesKeys.STARTDATE);
-    endDate = _storageService.getStringValue(PreferencesKeys.ENDDATE);
-    startTDate = _storageService.getStringValue(PreferencesKeys.STARTTDATE);
-    endTDate = _storageService.getStringValue(PreferencesKeys.ENDTDATE);
-    department = _storageService.getStringValue(PreferencesKeys.DEPARTMENT);
-    email = _storageService.getStringValue(PreferencesKeys.EMAIL);
-    phone = _storageService.getStringValue(PreferencesKeys.PHONE);
-    outside = _storageService.getBoolValue(PreferencesKeys.OUTSIDE);
-    zone = _storageService.getBoolValue(PreferencesKeys.ZONE);
+    user = await _userDataRepository.getUserData();
     notifyListeners();
   }
 
   _loadUserDataFromStorage() {
-    // Önce mevcut durumu koru, gereksiz loading'e set etme
     profileGetDataShared();
-
-    // Token kontrolü daha güvenli hale getir
     final storedToken = _storageService.getStringValue(PreferencesKeys.TOKEN);
-
     if (storedToken.isNotEmpty) {
-      accessToken = storedToken;
+      _accessToken = storedToken;
       event = SignStatus.logined;
-      dev.log(
-        'Token loaded from storage, user logged in',
-        name: 'AuthViewModel',
-      );
     } else {
-      accessToken = null;
+      _accessToken = null;
       event = SignStatus.lyLogin;
-      dev.log(
-        'No token found in storage, user not logged in',
-        name: 'AuthViewModel',
+    }
+    notifyListeners();
+  }
+
+  UserData _mapUserModelToUserData(UserModel? userModel) {
+    if (userModel == null) return UserData();
+
+    return UserData(
+      id: userModel.id?.toString(),
+      username: userModel.name,
+      gender: userModel.gender,
+      phone: userModel.phone,
+      email: userModel.email,
+      role: userModel.role?.name,
+      accessToken: userModel.accessToken,
+      refreshToken: userModel.refreshToken,
+      companyName: userModel.company?.name,
+      companyAddress: userModel.company?.address,
+      startDate: userModel.shift?.start,
+      endDate: userModel.shift?.end,
+      startTDate: userModel.shift?.tolerance?.start,
+      endTDate: userModel.shift?.tolerance?.end,
+      department: userModel.department?.name,
+      outside: userModel.settings?.outside,
+    );
+  }
+
+  Future<void> _saveUserData(UserData userData) async {
+    try {
+      await _userDataRepository.saveUserData(userData);
+    } catch (e) {
+      debugPrint('Error saving user data: $e');
+    }
+  }
+
+  Future<void> _saveUserDataFromModel(BaseModel<List<UserModel>> model) async {
+    final userData = _mapUserModelToUserData(model.data?.first);
+    await _saveUserData(userData);
+  }
+
+  Future<BaseModel> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String newPasswordConfirmation,
+  }) async {
+    if (!_isNetworkConnected()) {
+      return BaseModel(
+        status: false,
+        message: StringConstants.instance.networkMsg,
+        data: null,
       );
     }
 
-    notifyListeners();
+    try {
+      final result = await _authService.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+        newPasswordConfirmation: newPasswordConfirmation,
+      );
+
+      return result;
+    } catch (e) {
+      return BaseModel(
+        status: false,
+        message: StringConstants.instance.errorMessage,
+        data: null,
+      );
+    }
   }
 }

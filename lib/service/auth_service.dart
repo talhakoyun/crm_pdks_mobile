@@ -1,150 +1,197 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
-
 import '../core/constants/string_constants.dart';
+import '../core/enums/enums.dart';
 import '../core/init/cache/locale_manager.dart';
+import '../core/init/network/exception/app_exception.dart';
 import '../core/init/network/service/network_api_service.dart';
-
 import '../models/base_model.dart';
 import '../models/is_available_model.dart';
 import '../models/logout_model.dart';
 import '../models/register_model.dart';
 import '../models/user_model.dart';
+import '../core/constants/service_locator.dart';
 
 class AuthService {
   StringConstants get strCons => StringConstants.instance;
-  final _apiServices = NetworkApiServices();
+  final NetworkApiServices _apiServices = ServiceLocator.instance
+      .get<NetworkApiServices>();
   LocaleManager localeManager = LocaleManager.instance;
 
-  Future<BaseModel<List<UserModel>>> login({required Map body}) async {
-    var client = http.Client();
+  Future<String?> refreshAccessToken({required String refreshToken}) async {
     try {
-      var response = await client
-          .post(
-            Uri.parse(strCons.baseUrl + strCons.loginUrl),
-            body: body,
-            headers: {'Accept': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          return BaseModel.fromJsonList(
-            data,
-            (jsonList) => UserModel.fromJsonList(jsonList),
-          );
-        } else {
-          return BaseModel(status: false, message: data['message'], data: null);
-        }
+      dynamic response = await _apiServices.postApiResponse(
+        strCons.baseUrl + strCons.refreshToken,
+        null,
+        refreshToken,
+      );
+
+      if (response['status']) {
+        final userModel = UserModel.fromJson(response['data']);
+        await localeManager.setStringValue(
+          PreferencesKeys.TOKEN,
+          userModel.accessToken ?? "",
+        );
+        await localeManager.setStringValue(
+          PreferencesKeys.REFRESH_TOKEN,
+          userModel.refreshToken ?? "",
+        );
+        return userModel.accessToken;
       } else {
-        var data = json.decode(response.body);
-        return BaseModel(status: false, message: data['message'], data: null);
+        return null;
       }
     } catch (e) {
+      return null;
+    }
+  }
+
+  Future<BaseModel<List<UserModel>>> login({required Map body}) async {
+    try {
+      dynamic response = await _apiServices.postApiResponse(
+        strCons.baseUrl + strCons.loginUrl,
+        body,
+        null,
+        refreshTokenOn401: false,
+      );
+      if (response['status']) {
+        return BaseModel.fromJsonList(
+          response,
+          (jsonList) => UserModel.fromJsonList(jsonList),
+        );
+      } else {
+        return BaseModel(
+          status: false,
+          message: response['message'] ?? strCons.errorMessage,
+          data: null,
+        );
+      }
+    } on BadRequestException catch (e) {
+      String errorMessage = e.msg ?? strCons.errorMessage;
+      try {
+        var errorJson = jsonDecode(e.msg ?? '{}');
+        if (errorJson is Map && errorJson.containsKey('message')) {
+          errorMessage = errorJson['message'].toString();
+        }
+      } catch (e) {
+        // JSON değilse, olduğu gibi kullan
+      }
+
+      return BaseModel(status: false, message: errorMessage, data: null);
+    } on UnauthorisedException catch (e) {
+      String errorMessage = e.msg ?? strCons.errorMessage;
+      try {
+        var errorJson = jsonDecode(e.msg ?? '{}');
+        if (errorJson is Map && errorJson.containsKey('message')) {
+          errorMessage = errorJson['message'].toString();
+        }
+      } catch (e) {
+        // JSON değilse, olduğu gibi kullan
+      }
+
+      return BaseModel(status: false, message: errorMessage, data: null);
+    } catch (e) {
+      if (e is AppException) {
+        String errorMessage = e.msg ?? strCons.errorMessage;
+        try {
+          var errorJson = jsonDecode(e.msg ?? '{}');
+          if (errorJson is Map && errorJson.containsKey('message')) {
+            errorMessage = errorJson['message'].toString();
+          }
+        } catch (e) {
+          // JSON değilse, olduğu gibi kullan
+        }
+
+        return BaseModel(status: false, message: errorMessage, data: null);
+      }
+
       return BaseModel(
         status: false,
         message: strCons.errorMessage,
         data: null,
       );
-    } finally {
-      client.close();
     }
   }
 
   Future<RegisterModel> register({required Map body}) async {
-    var client = http.Client();
     try {
-      var response = await client
-          .post(
-            Uri.parse(strCons.baseUrl + strCons.register),
-            body: body,
-            headers: {'Accept': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          return registerModelFromJson(response.body);
-        } else {
-          return BaseModel(status: false, message: data['message'], data: null);
-        }
+      dynamic response = await _apiServices.postApiResponse(
+        strCons.baseUrl + strCons.register,
+        body,
+        null,
+      );
+
+      if (response['status']) {
+        return registerModelFromJson(json.encode(response));
       } else {
-        var data = json.decode(response.body);
-        return BaseModel(status: false, message: data['message'], data: null);
+        return BaseModel(
+          status: false,
+          message: response['message'],
+          data: null,
+        );
       }
+    } on BadRequestException catch (e) {
+      return BaseModel(
+        status: false,
+        message: e.msg ?? strCons.errorMessage,
+        data: null,
+      );
     } catch (e) {
       return BaseModel(
         status: false,
         message: strCons.errorMessage,
         data: null,
       );
-    } finally {
-      client.close();
     }
   }
 
   Future<BaseModel<List<UserModel>>> profile() async {
-    var client = http.Client();
-    String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
     try {
-      var response = await client
-          .get(
-            Uri.parse(strCons.baseUrl + strCons.profile),
-            headers: {
-              'Accept': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-          )
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          // API response'u tek user objesi dönüyor, liste değil
-          if (data['data'] is Map) {
-            // Tek bir user objesi geliyorsa onu listeye çevir
-            final userModel = UserModel.fromJson(data['data']);
-            return BaseModel<List<UserModel>>(
-              status: true,
-              message: data['message'],
-              data: [userModel],
-            );
-          } else if (data['data'] is List) {
-            // Liste geliyorsa normal işle
-            return BaseModel.fromJsonList(
-              data,
-              (jsonList) => UserModel.fromJsonList(jsonList),
-            );
-          } else {
-            return BaseModel(
-              status: false,
-              message: 'Beklenmeyen data formatı',
-              data: null,
-            );
-          }
+      String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
+
+      dynamic response = await _apiServices.getApiResponse(
+        strCons.baseUrl + strCons.profile,
+        token: token,
+      );
+
+      if (response['status']) {
+        if (response['data'] is Map) {
+          final userModel = UserModel.fromJson(response['data']);
+          return BaseModel<List<UserModel>>(
+            status: true,
+            message: response['message'],
+            data: [userModel],
+          );
+        } else if (response['data'] is List) {
+          return BaseModel.fromJsonList(
+            response,
+            (jsonList) => UserModel.fromJsonList(jsonList),
+          );
         } else {
           return BaseModel(
             status: false,
-            message: strCons.errorMessage,
+            message: 'Beklenmeyen data formatı',
             data: null,
           );
         }
       } else {
-        var data = json.decode(response.body);
         return BaseModel(
           status: false,
-          message: data['message'] ?? strCons.errorMessage,
+          message: response['message'] ?? strCons.errorMessage,
           data: null,
         );
       }
+    } on BadRequestException catch (e) {
+      return BaseModel(
+        status: false,
+        message: e.msg ?? strCons.errorMessage,
+        data: null,
+      );
     } catch (e) {
       return BaseModel(
         status: false,
         message: strCons.errorMessage,
         data: null,
       );
-    } finally {
-      client.close();
     }
   }
 
@@ -155,9 +202,12 @@ class AuthService {
         {},
         token!,
       );
-      return BaseModel.fromJson(
-        response,
-        (data) => data, // data kısmı önemli değil, sadece status ve message
+      return BaseModel.fromJson(response, (data) => data);
+    } on BadRequestException catch (e) {
+      return BaseModel(
+        status: false,
+        message: e.msg ?? strCons.errorMessage,
+        data: null,
       );
     } catch (e) {
       return BaseModel(
@@ -169,28 +219,70 @@ class AuthService {
   }
 
   Future<IsAvailableModel> isAvalible() async {
-    var client = http.Client();
     try {
-      var response = await client
-          .get(
-            Uri.parse(strCons.baseUrl + strCons.isAvalible),
-            headers: {'Accept': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['status']) {
-          return BaseModel.fromJson(
-            data,
-            (dataJson) => AvailabilityModel.fromJson(dataJson),
-          );
-        } else {
-          return BaseModel(
-            status: false,
-            message: strCons.errorMessage,
-            data: null,
-          );
+      dynamic response = await _apiServices.getApiResponse(
+        strCons.baseUrl + strCons.isAvalible,
+      );
+
+      if (response['status']) {
+        return BaseModel.fromJson(
+          response,
+          (dataJson) => AvailabilityModel.fromJson(dataJson),
+        );
+      } else {
+        return BaseModel(
+          status: false,
+          message: response['message'] ?? strCons.errorMessage,
+          data: null,
+        );
+      }
+    } on BadRequestException catch (e) {
+      return BaseModel(
+        status: false,
+        message: e.msg ?? strCons.errorMessage,
+        data: null,
+      );
+    } catch (e) {
+      return BaseModel(
+        status: false,
+        message: strCons.errorMessage,
+        data: null,
+      );
+    }
+  }
+
+  Future<BaseModel> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String newPasswordConfirmation,
+  }) async {
+    try {
+      String? token = localeManager.getStringValue(PreferencesKeys.TOKEN);
+
+      Map<String, dynamic> body = {
+        'current_password': currentPassword,
+        'new_password': newPassword,
+        'new_password_confirmation': newPasswordConfirmation,
+      };
+
+      dynamic response = await _apiServices.postApiResponse(
+        strCons.baseUrl + strCons.changePassword,
+        body,
+        token,
+      );
+
+      if (response is Map && response['status'] == true) {
+        return BaseModel(
+          status: true,
+          message: response['message'] ?? 'Şifre başarıyla değiştirildi',
+          data: response['data'],
+        );
+      } else if (response is Map) {
+        String errorMessage = strCons.errorMessage;
+        if (response['message'] != null) {
+          errorMessage = response['message'];
         }
+        return BaseModel(status: false, message: errorMessage, data: null);
       } else {
         return BaseModel(
           status: false,
@@ -198,14 +290,18 @@ class AuthService {
           data: null,
         );
       }
+    } on BadRequestException catch (e) {
+      return BaseModel(
+        status: false,
+        message: e.msg ?? strCons.errorMessage,
+        data: null,
+      );
     } catch (e) {
       return BaseModel(
         status: false,
         message: strCons.errorMessage,
         data: null,
       );
-    } finally {
-      client.close();
     }
   }
 }

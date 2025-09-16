@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../enums/enums.dart';
 import '../init/size/size_setting.dart';
 import '../widget/page_animation/slider_route.dart';
 import '../widget/space_sized_height_box.dart';
@@ -42,6 +43,7 @@ extension PaddingExtension on BuildContext {
 }
 
 extension SizedBoxExtension on BuildContext {
+  Widget get emptySizedWidthBoxLow => const SpaceSizedWidthBox(width: 0.01);
   Widget get emptySizedWidthBoxLow2x => const SpaceSizedWidthBox(width: 0.02);
   Widget get emptySizedWidthBoxLow3x => const SpaceSizedWidthBox(width: 0.03);
 
@@ -81,7 +83,8 @@ extension NavigationExtension on BuildContext {
     Object? extra,
     SlideType type = SlideType.DEFAULT,
   }) async {
-    return navigationOf
-        .push<T>(type.route(page, RouteSettings(arguments: extra)));
+    return navigationOf.push<T>(
+      type.route(page, RouteSettings(arguments: extra)),
+    );
   }
 }

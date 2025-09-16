@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../enums/enums.dart';
 
 @immutable
 final class TranslationManager extends EasyLocalization {
@@ -21,14 +22,4 @@ final class TranslationManager extends EasyLocalization {
     required BuildContext context,
     required Locales value,
   }) => context.setLocale(value.locale);
-}
-
-enum Locales {
-  tr(Locale('tr', 'TR')),
-
-  en(Locale('en', 'US'));
-
-  final Locale locale;
-
-  const Locales(this.locale);
 }

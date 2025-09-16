@@ -20,6 +20,7 @@ class StringConstants {
   String get mission => "general.mission".tr();
   String get gender => "general.gender".tr();
   String get name => "general.name".tr();
+  String get surname => "general.surname".tr();
   String get send => "general.send".tr();
   String get shift => "general.shift".tr();
   String get okey => "general.ok".tr();
@@ -65,11 +66,14 @@ class StringConstants {
   String get leavelProsedureText => "menu.leavelProcedure".tr();
 
   // Time
-  String get inTime => "time.in".tr();
-  String get outTime => "time.out".tr();
-  String get checkInTime => "time.checkIn".tr();
-  String get checkOutTime => "time.checkOut".tr();
-  String get monthlyData => "time.monthly".tr();
+  String get inAndOutTitle => "time.in-and-out".tr();
+  String get totalRecord => "time.totalRecord".tr();
+  String get thisMonth => "time.thisMonth".tr();
+  String get entryTime => "time.entryTime".tr();
+  String get exitTime => "time.exitTime".tr();
+  String get recordNotFound => "time.recordNotFound".tr();
+  String get refresh => "time.refresh".tr();
+  String get tryAgain => "time.tryAgain".tr();
 
   // Leave
   String get leaveText => "leave.type".tr();
@@ -108,6 +112,7 @@ class StringConstants {
   String get reviewText => "messages.review".tr();
   String get networkMsg => "messages.network".tr();
   String get warningMessage1 => "messages.warning1".tr();
+  String get messageRequired => "messages.required".tr();
 
   // Errors
   String get qrErrorMessage => "errors.qr".tr();
@@ -121,6 +126,10 @@ class StringConstants {
   String get emailValidMsg => "errors.emailValid".tr();
   String get passwordValidMsg => "errors.passwordValid".tr();
   String get registerNameErrorMsg => "errors.registerNameError".tr();
+  String get registerSurnameErrorMsg => "errors.registerSurnameError".tr();
+  String get phoneValidMsg => "errors.phoneValid".tr();
+  String get passwordMismatchMsg => "errors.passwordMismatch".tr();
+  String get passwordChangeErrorMsg => "errors.passwordChangeError".tr();
 
   // Location
   String get isEnableLocationAlertText => "location.isEnableAlert".tr();
@@ -136,6 +145,65 @@ class StringConstants {
   String get dialogAlertDescription => "dialog.alertDescription".tr();
   String get nonAppRedirect => "dialog.nonAppRedirect".tr();
   String get enterTheAdress => "dialog.enterTheAddress".tr();
+  String get qrTypeSelectionText => "dialog.qrTypeSelection".tr();
+  String get qrEntryActionText => "dialog.qrEntryAction".tr();
+  String get qrExitActionText => "dialog.qrExitAction".tr();
+  String get dialogErrorTitle => "dialog.error".tr();
+  String get dialogSuccessTitle => "dialog.success".tr();
+  String get dialogCloseText => "dialog.close".tr();
+  String get dialogUpdateText => "dialog.update".tr();
+
+  // Home
+  String get homeWelcome => "home.welcome".tr();
+  String get homeDepartment => "home.department".tr();
+  String get homeLogin => "home.login".tr();
+  String get homeQrCode => "home.qrCode".tr();
+  String get homeLogout => "home.logout".tr();
+  String get homeNoInternet => "home.noInternet".tr();
+  String get homeCheckInternet => "home.checkInternet".tr();
+  String get homeDailyDashboard => "home.dailyDashboard".tr();
+  String get homeCurrentTime => "home.currentTime".tr();
+  String get homeRemainingTime => "home.remainingTime".tr();
+
+  // Permission
+  String get permissionCreateRequest => "permission.createRequest".tr();
+  String get permissionScanQr => "permission.scanQr".tr();
+  String get permissionQrFrame => "permission.qrFrame".tr();
+  String get permissionLeaveRequest => "permission.leaveRequest".tr();
+  String get permissionFillInfo => "permission.fillInfo".tr();
+  String get permissionLeaveType => "permission.leaveType".tr();
+  String get permissionLoading => "permission.loading".tr();
+  String get permissionSelectType => "permission.selectType".tr();
+  String get permissionStartDate => "permission.startDate".tr();
+  String get permissionEndDate => "permission.endDate".tr();
+  String get permissionSelectDate => "permission.selectDate".tr();
+  String get permissionLeaveReason => "permission.leaveReason".tr();
+  String get permissionLeaveAddress => "permission.leaveAddress".tr();
+  String get permissionSelectLeaveType => "permission.selectLeaveType".tr();
+  String get permissionEndDateTime => "permission.endDateTime".tr();
+  String get permissionChangePassword => "permission.changePassword".tr();
+  String get permissionPasswordMismatch => "permission.passwordMismatch".tr();
+  String get permissionPasswordLength => "permission.passwordLength".tr();
+  String get permissionPasswordSuccess => "permission.passwordSuccess".tr();
+  String get permissionPasswordFailed => "permission.passwordFailed".tr();
+  String get permissionConfirmLogout => "permission.confirmLogout".tr();
+  String get permissionCancel => "permission.cancel".tr();
+  String get permissionChange => "permission.change".tr();
+  String get permissionCurrentPassword => "permission.currentPassword".tr();
+  String get permissionNewPassword => "permission.newPassword".tr();
+  String get permissionConfirmNewPassword =>
+      "permission.confirmNewPassword".tr();
+  String get permissionDateRange => "permission.dateRange".tr();
+  String get permissionReason => "permission.reason".tr();
+  String get permissionAddress => "permission.address".tr();
+  String get permissionStartDateTime => "permission.startDateTime".tr();
+  String get permissionLogout => "permission.logout".tr();
+  String get launchUrlButtonText => "launchUrl.buttonText".tr();
+  String get bottomNavigationHome => "bottomNavigation.home".tr();
+  String get bottomNavigationInAndOut => "bottomNavigation.inAndOut".tr();
+  String get bottomNavigationPermissions => "bottomNavigation.permissions".tr();
+  String get bottomNavigationProfile => "bottomNavigation.profile".tr();
+  String get notFoundPageNotFound => "notFound.pageNotFound".tr();
 
   // URLs - These should remain as static values
   String get mapUrl =>
@@ -155,8 +223,9 @@ class StringConstants {
   }
 
   // API URLs - These remain as static strings
-  final String baseUrl = "https://crm.mavihost.com.tr/api/";
+  final String baseUrl = "https://cinarceyizcrm.bilmos.com/api/";
   final String loginUrl = 'auth/login';
+  final String changePassword = 'user/password/update';
   final String logout = 'auth/logout';
   final String profile = "user/profile";
   final String permissionList = "holidays/list";

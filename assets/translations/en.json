@@ -11,7 +11,8 @@
     "finish": "Finish",
     "mission": "Mission",
     "gender": "Gender",
-    "name": "Name - Surname",
+    "name": "Name",
+    "surname": "Surname",
     "send": "Send",
     "shift": "Shift",
     "ok": "OK",
@@ -44,7 +45,7 @@
     "loading": "Your profile is being updated..."
   },
   "company": {
-    "text": "MaviHost",
+    "text": "Bilmos Bilişim",
     "splashFooter": " developed by",
     "outSide": "Out of Institution"
   },
@@ -57,11 +58,14 @@
     "leavelProcedure": "My Leaves"
   },
   "time": {
-    "in": "Entry Time",
-    "out": "Exit Time",
-    "checkIn": "Check In Time",
-    "checkOut": "Check Out Time",
-    "monthly": "My Monthly Data"
+    "in-and-out": "Entry-Exit Records",
+    "totalRecord": "Total Records",
+    "thisMonth": "This Month",
+    "entryTime": "Entry Time",
+    "exitTime": "Exit Time",
+    "recordNotFound": "No Records Found",
+    "refresh": "Refresh",
+    "tryAgain": "Try Again"
   },
   "leave": {
     "type": "Leave Type",
@@ -98,13 +102,15 @@
     "confirm2": "Confirm"
   },
   "messages": {
+    "error": "Error",
     "success": "Transaction Successful",
     "success2": "Your Transaction is Successful",
     "outSuccess": "Check out transaction successful",
     "loginSuccess": "Your information has been confirmed.",
     "review": "Sent for review",
     "network": "Your internet is off. Transaction cannot be performed at the moment.",
-    "warning1": "Turn on your internet!!"
+    "warning1": "Turn on your internet!!",
+    "required": "This field is required."
   },
   "errors": {
     "qr": "QR Code could not be parsed.",
@@ -117,7 +123,11 @@
     "loginError2": "Please enter the requested information completely.",
     "emailValid": "Please enter a valid email address.",
     "passwordValid": "Password length cannot be less than 6 characters!",
-    "registerNameError": "Name - Surname field must consist of at least 5 characters."
+    "registerNameError": "Name field must consist of at least 2 characters.",
+    "registerSurnameError": "Surname field must consist of at least 2 characters.",
+    "phoneValid": "Phone number format: 0(5xx)xxx xx xx",
+    "passwordMismatch": "Passwords do not match. Please check again.",
+    "passwordChangeError": "Password change failed. Please check your information and try again."
   },
   "location": {
     "isEnableAlert": "Phone Location Appears to be Off\nPlease Turn On Your Location",
@@ -131,6 +141,70 @@
   "dialog": {
     "alertDescription": "Description field is required and must consist of at least 5 characters.",
     "nonAppRedirect": "Non-App Redirect!",
-    "enterTheAddress": "Are you sure you want to enter the address?"
+    "enterTheAddress": "Are you sure you want to enter the address?",
+    "qrTypeSelection": "Select the action you want to perform",
+    "qrEntryAction": "Check In",
+    "qrExitAction": "Check Out",
+    "error": "Error",
+    "success": "Success",
+    "close": "Close",
+    "update": "Update"
+  },
+  "home": {
+    "welcome": "Welcome!",
+    "department": "Department",
+    "login": "Check In",
+    "qrCode": "QR Code",
+    "logout": "Check Out",
+    "noInternet": "No internet connection",
+    "checkInternet": "Please check your internet connection",
+    "dailyDashboard": "Daily Dashboard",
+    "currentTime": "Current Time",
+    "remainingTime": "Remaining Time"
+  },
+  "permission": {
+    "createRequest": "Click the + button to create a leave request",
+    "scanQr": "Scan QR Code",
+    "qrFrame": "Place the QR code in the frame",
+    "leaveRequest": "Leave Request",
+    "fillInfo": "Please fill in your leave information completely",
+    "leaveType": "Leave Type",
+    "loading": "Loading...",
+    "selectType": "Select leave type",
+    "startDate": "Start",
+    "endDate": "End",
+    "selectDate": "Select date",
+    "leaveReason": "Please explain your leave reason in detail...",
+    "leaveAddress": "Please enter the address where you can be reached during leave...",
+    "selectLeaveType": "Select Leave Type",
+    "endDateTime": "End Date",
+    "changePassword": "Change Password",
+    "passwordMismatch": "New passwords do not match",
+    "passwordLength": "New password must be at least 6 characters",
+    "passwordSuccess": "Password changed successfully",
+    "passwordFailed": "Password change failed",
+    "confirmLogout": "Are you sure you want to log out?",
+    "cancel": "Cancel",
+    "change": "Change",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "dateRange": "Date Range",
+    "reason": "Reason",
+    "address": "Address",
+    "startDateTime": "Start Date",
+    "logout": "Log Out"
+  },
+  "launchUrl": {
+    "buttonText": "Go"
+  },
+  "bottomNavigation": {
+    "home": "Home",
+    "inAndOut": "Entry/Exit",
+    "permissions": "Leaves",
+    "profile": "Profile"
+  },
+  "notFound": {
+    "pageNotFound": "The page you are looking for could not be found"
   }
 }

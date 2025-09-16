@@ -1,24 +1,41 @@
-// ignore_for_file: prefer_typing_uninitialized_variables
-
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../init/network/exception/app_exception.dart';
 import '../../../init/network/service/base_service.dart';
 
+typedef RefreshTokenFunction = Future<String?> Function();
+
 class NetworkApiServices extends BaseApiServices {
-  var jsonResponse;
+  dynamic jsonResponse;
+  final RefreshTokenFunction? _refreshTokenFunction;
+
+  NetworkApiServices({RefreshTokenFunction? refreshTokenFunction})
+    : _refreshTokenFunction = refreshTokenFunction;
 
   @override
-  Future getApiResponse(String url) async {
+  Future getApiResponse(String url, {String? token}) async {
     var client = http.Client();
     try {
-      final response = await client.get(Uri.parse(url));
+      final response = await client.get(
+        Uri.parse(url),
+        headers: (token != null)
+            ? {'Accept': 'application/json', 'Authorization': 'Bearer $token'}
+            : {'Accept': 'application/json'},
+      );
+
+      if (response.statusCode == 401 && _refreshTokenFunction != null) {
+        final newToken = await _refreshTokenFunction();
+        if (newToken != null) {
+          return await getApiResponse(url, token: newToken);
+        } else {
+          throw UnauthorisedException('Token refresh failed');
+        }
+      }
+
       jsonResponse = returnResponse(response);
-      debugPrint(response.body.toString());
     } on SocketException {
       throw FetchDataException('No Internet Connection');
     } finally {
@@ -29,8 +46,13 @@ class NetworkApiServices extends BaseApiServices {
   }
 
   @override
-  Future postApiResponse(String url, var data, String? token) async {
-    var jsonResponse;
+  Future postApiResponse(
+    String url,
+    var data,
+    String? token, {
+    bool refreshTokenOn401 = true,
+  }) async {
+    dynamic jsonResponse;
     var client = http.Client();
     try {
       http.Response response = await client
@@ -40,13 +62,28 @@ class NetworkApiServices extends BaseApiServices {
             headers: (token != null)
                 ? {
                     'Accept': 'application/json',
-                    'Authorization': 'Bearer ${token}',
+                    'Authorization': 'Bearer $token',
                   }
-                : {
-                    'Accept': 'application/json',
-                  },
+                : {'Accept': 'application/json'},
           )
           .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 401 &&
+          _refreshTokenFunction != null &&
+          refreshTokenOn401) {
+        final newToken = await _refreshTokenFunction();
+        if (newToken != null) {
+          return await postApiResponse(
+            url,
+            data,
+            newToken,
+            refreshTokenOn401: refreshTokenOn401,
+          );
+        } else {
+          throw UnauthorisedException('Token refresh failed');
+        }
+      }
+
       jsonResponse = returnResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet Connection');
@@ -59,22 +96,36 @@ class NetworkApiServices extends BaseApiServices {
 
   dynamic returnResponse(http.Response response) {
     var responseJson = jsonDecode(response.body);
+
     switch (response.statusCode) {
       case 200:
+      case 201:
         return responseJson;
       case 302:
-        throw BadRequestException("response.body.toString()");
+        throw BadRequestException(responseJson['message'] ?? 'Bad Request', responseJson);
       case 400:
-        throw BadRequestException(responseJson['message']);
+        throw BadRequestException(responseJson['message'] ?? 'Bad Request', responseJson);
       case 401:
-        throw BadRequestException(responseJson['message']);
+        throw UnauthorisedException(responseJson['message'] ?? 'Unauthorized');
+      case 403:
+        throw BadRequestException(responseJson['message'] ?? 'Forbidden', responseJson);
       case 404:
-        throw BadRequestException(response.body.toString());
+        throw BadRequestException(responseJson['message'] ?? 'Not Found', responseJson);
+      case 422:
+        throw BadRequestException(
+          responseJson['message'] ?? 'Unprocessable Entity',
+          responseJson,
+        );
       case 500:
-        throw BadRequestException(response.body.toString());
+        throw BadRequestException(
+          responseJson['message'] ?? 'Internal Server Error',
+          responseJson,
+        );
       default:
         throw FetchDataException(
-            "Error accourded while communicating with server with status code ${response.statusCode}");
+          responseJson['message'] ??
+              "Error occurred while communicating with server with status code ${response.statusCode}",
+        );
     }
   }
 }

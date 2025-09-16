@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:easy_localization/easy_localization.dart';
+
 import 'core/base/base_singleton.dart';
 import 'core/init/size/size_widget.dart';
 import 'core/init/theme/theme.dart';
@@ -14,7 +16,7 @@ class App extends StatelessWidget with BaseSingleton {
       child: Sizer(
         builder: (context, orientation, deviceType) {
           return MaterialApp(
-            debugShowCheckedModeBanner: false,
+            debugShowCheckedModeBanner: kDebugMode ? true : false,
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,

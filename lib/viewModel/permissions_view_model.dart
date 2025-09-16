@@ -1,20 +1,18 @@
-// ignore_for_file: unused_local_variable, use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 
 import '../core/base/view_model/base_view_model.dart';
-
 import '../core/constants/navigation_constants.dart';
 import '../core/constants/string_constants.dart';
+import '../core/constants/service_locator.dart';
+import '../core/enums/enums.dart';
 import '../core/extension/context_extension.dart';
-import '../core/widget/customize_dialog.dart';
-import '../models/holidays_model.dart';
+import '../core/widget/dialog/dialog_factory.dart';
+import '../models/base_model.dart';
 import '../models/holiday_types_model.dart';
+import '../models/holidays_model.dart';
 import '../service/permission_service.dart';
-import '../widgets/dialog/custom_loader.dart';
-import '../widgets/dialog/snackbar.dart';
-
-enum PermissionStatus { loading, loaded, loadingFailed }
+import '../core/widget/loader.dart';
+import '../widgets/snackbar.dart';
 
 class PermissionViewModel extends BaseViewModel {
   Map? permissionData;
@@ -25,12 +23,74 @@ class PermissionViewModel extends BaseViewModel {
   TextEditingController holidayEndDt = TextEditingController();
   List<HolidayTypeDataModel> typeItems = [];
   PermissionStatus? permissionStatus;
-  final permissionServices = PermissionService();
-
+  bool _showValidationErrors = false;
+  bool get showValidationErrors => _showValidationErrors;
+  late final PermissionService _permissionServices;
   List<HolidayDataModel> permissionListItems = [];
   HolidayListModel? holidayList;
-  PermissionViewModel() {
+
+  PermissionViewModel({PermissionService? permissionService}) : super() {
+    _permissionServices =
+        permissionService ?? ServiceLocator.instance.get<PermissionService>();
     permissionStatus = PermissionStatus.loading;
+  }
+
+  void setHolidayType(String title, int id) {
+    holidayType.text = title;
+    _clearValidationErrors(); 
+    notifyListeners();
+  }
+
+  void setHolidayStartDate(String date) {
+    holidayStartDt.text = date;
+    _clearValidationErrors(); 
+    notifyListeners();
+  }
+
+  void setHolidayEndDate(String date) {
+    holidayEndDt.text = date;
+    _clearValidationErrors(); 
+    notifyListeners();
+  }
+  
+  void setShowValidationErrors(bool show) {
+    _showValidationErrors = show;
+    notifyListeners();
+  }
+  
+  void _clearValidationErrors() {
+    _showValidationErrors = false;
+    notifyListeners();
+  }
+  
+  void clearForm() {
+    holidayAddress.clear();
+    holidayReason.clear();
+    holidayEndDt.clear();
+    holidayStartDt.clear();
+    holidayType.clear();
+    _clearValidationErrors();
+  }
+  
+  bool validateForm(int type) {
+    return type != 0 &&
+           holidayReason.text.trim().isNotEmpty &&
+           holidayAddress.text.trim().isNotEmpty &&
+           holidayStartDt.text.isNotEmpty &&
+           holidayEndDt.text.isNotEmpty;
+  }
+  
+  bool isFieldEmpty(String value, {bool isType = false, int type = 0}) {
+    if (isType) {
+      return type == 0;
+    }
+    return value.trim().isEmpty;
+  }
+  
+  void onTextChanged(String value) {
+    if (_showValidationErrors && value.trim().isNotEmpty) {
+      _clearValidationErrors();
+    }
   }
 
   @override
@@ -43,8 +103,7 @@ class PermissionViewModel extends BaseViewModel {
 
   Future<void> fetchHolidayTypes() async {
     try {
-      final response = await permissionServices.holidayTypeList();
-      debugPrint('Holiday types response: ${response.status}');
+      final response = await _permissionServices.holidayTypeList();
       if (response.status!) {
         typeItems = response.data!;
         notifyListeners();
@@ -54,16 +113,17 @@ class PermissionViewModel extends BaseViewModel {
     }
   }
 
-  void fetchList(BuildContext context) async {
+  Future<void> fetchList(BuildContext context) async {
     permissionStatus = PermissionStatus.loading;
-    HolidayListModel holidayListModel = await permissionServices.holidayList();
+    HolidayListModel holidayListModel = await _permissionServices.holidayList();
     if (holidayListModel.status!) {
       permissionListItems = holidayListModel.data!;
       permissionStatus = PermissionStatus.loaded;
       notifyListeners();
     } else {
       permissionStatus = PermissionStatus.loadingFailed;
-      CustomSnackBar customSnackBar = CustomSnackBar(
+      if (!context.mounted) return;
+      CustomSnackBar(
         context,
         holidayListModel.message!,
         backgroundColor: context.colorScheme.error,
@@ -78,55 +138,58 @@ class PermissionViewModel extends BaseViewModel {
     required DateTime endDt,
     required BuildContext context,
   }) async {
-    CustomLoader.showAlertDialog(context);
-    if (type != 0 &&
-        holidayReason.text != "" &&
-        holidayAddress.text != "" &&
-        holidayEndDt.text != "" &&
-        holidayStartDt.text.isNotEmpty) {
-      var data = await permissionServices.holidayCreate(
-        type: type,
-        startDt: startDt,
-        endDt: endDt,
-        reason: holidayReason.text.trim(),
-        address: holidayAddress.text.trim(),
-      );
-      context.navigationOf.pop();
-      if (data['status']) {
-        holidayAddress.clear();
-        holidayReason.clear();
-        holidayEndDt.clear();
-        holidayStartDt.clear();
-        holidayType.clear();
-        CustomSnackBar customSnackBar = CustomSnackBar(
-          context,
-          StringConstants.instance.reviewText,
-        );
-        navigation.navigateToPageClear(path: NavigationConstants.HOME);
-      } else {
-        CustomSnackBar customSnackBar = CustomSnackBar(
-          context,
-          data['message'],
-          backgroundColor: context.colorScheme.error,
-        );
-      }
-    } else {
-      CustomSnackBar customSnackBar = CustomSnackBar(
+    if (!validateForm(type)) {
+      setShowValidationErrors(true);
+      CustomSnackBar(
         context,
         StringConstants.instance.notEmptyText,
         backgroundColor: context.colorScheme.error,
       );
-      context.navigationOf.pop();
+      return; 
+    }
+    Loader.show(context);
+    try {
+      BaseModel<Map<String, dynamic>> data = await _permissionServices
+          .holidayCreate(
+            type: type,
+            startDt: startDt,
+            endDt: endDt,
+            reason: holidayReason.text.trim(),
+            address: holidayAddress.text.trim(),
+          );
+      
+      Loader.hide();
+      if (!context.mounted) return;
+      if (data.status!) {
+        clearForm();
+        CustomSnackBar(context, StringConstants.instance.reviewText);
+        navigation.navigateToPageClear(path: NavigationConstants.HOME);
+      } else {
+        CustomSnackBar(
+          context,
+          data.message!,
+          backgroundColor: context.colorScheme.error,
+        );
+      }
+    } catch (e) {
+      Loader.hide();
+      if (context.mounted) {
+        CustomSnackBar(
+          context,
+          StringConstants.instance.unExpectedError,
+          backgroundColor: context.colorScheme.error,
+        );
+      }
     }
 
     notifyListeners();
   }
 
   errorDialog(BuildContext context, String message) {
-    CustomizeDialog.show(
+    DialogFactory.create(
       context: context,
       type: DialogType.error,
-      message: message,
+      parameters: {'message': message},
     );
   }
 }

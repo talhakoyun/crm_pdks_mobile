@@ -1,4 +1,4 @@
-package com.example.crm_pdks_mobile
+package com.bilmos.cinarcrm
 
 
 import android.content.Context
@@ -17,7 +17,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity: FlutterActivity() {
-  private val CHANNEL = "samples.mavihost/mockTime"
+  private val CHANNEL = "samples.bilmos/mockTime"
 
   override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)

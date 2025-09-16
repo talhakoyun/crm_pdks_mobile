@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../enums/enums.dart';
+
 class SizerUtil {
   static late BoxConstraints boxConstraints;
   static late Orientation orientation;
@@ -10,7 +12,9 @@ class SizerUtil {
   static late double height;
   static late double width;
   static void setScreenSize(
-      BoxConstraints constraints, Orientation currentOrientation) {
+    BoxConstraints constraints,
+    Orientation currentOrientation,
+  ) {
     boxConstraints = constraints;
     orientation = currentOrientation;
     if (orientation == Orientation.portrait) {
@@ -44,9 +48,7 @@ class SizerUtil {
     return width < 600
         ? smallSize
         : width >= 600 && width <= 1024
-            ? mediumSize
-            : largeSize;
+        ? mediumSize
+        : largeSize;
   }
 }
-
-enum DeviceType { mobile, tablet, web, mac, windows, linux, fuchsia }

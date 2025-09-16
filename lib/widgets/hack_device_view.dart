@@ -13,21 +13,19 @@ class DeviceHackView extends StatelessWidget {
     return Scaffold(
       backgroundColor: context.colorScheme.primary,
       body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            ImageConstants.instance.alarm,
-            width: 55.width,
-          ),
-          context.emptySizedHeightBoxNormal,
-          Text(
-            StringConstants.instance.hackText,
-            style: context.primaryTextTheme.bodyLarge,
-            textAlign: TextAlign.center,
-          )
-        ],
-      )),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(ImageConstants.instance.alarm, width: 60.width),
+            context.emptySizedHeightBoxNormal,
+            Text(
+              StringConstants.instance.hackText,
+              style: context.primaryTextTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -11,7 +11,8 @@
     "finish": "Bitiş",
     "mission": "Görev",
     "gender": "Cinsiyet",
-    "name": "Ad - Soyad",
+    "name": "Ad",
+    "surname": "Soyad",
     "send": "Gönder",
     "shift": "Mesai",
     "ok": "Tamam",
@@ -44,7 +45,7 @@
     "loading": "Profiliniz güncelleniyor..."
   },
   "company": {
-    "text": "MaviHost",
+    "text": "Bilmos Bilişim",
     "splashFooter": " tarafından geliştirilmiştir",
     "outSide": "Kurum Dışı"
   },
@@ -57,11 +58,14 @@
     "leavelProcedure": "İzinlerim"
   },
   "time": {
-    "in": "Giriş Saati",
-    "out": "Çıkış Saati",
-    "checkIn": "Giriş Saati",
-    "checkOut": "Çıkış Saati",
-    "monthly": "Aylık Verilerim"
+    "in-and-out":"Giriş-Çıkış Kayıtları",
+    "totalRecord": "Toplam Kayıt",
+    "thisMonth": "Bu Ay",
+    "entryTime": "Giriş Saati",
+    "exitTime": "Çıkış Saati",
+    "recordNotFound": "Kayıt Bulunamadı",
+    "refresh": "Yenile",
+    "tryAgain": "Tekrar Dene"
   },
   "leave": {
     "type": "İzin Tipi",
@@ -98,13 +102,15 @@
     "confirm2": "Onayla"
   },
   "messages": {
+    "error": "Hata",
     "success": "İşlem Başarılı",
     "success2": "İşleminiz Başarılı",
     "outSuccess": "Çıkış işlemi başarılı",
     "loginSuccess": "Bilgileriniz Onaylandı.",
     "review": "İncelenmek üzere gönderildi",
     "network": "İnternetiniz Kapalı.Şu anda işlem gerçekleştirilemiyor.",
-    "warning1": "İnternetinizi açınız !!"
+    "warning1": "İnternetinizi açınız !!",
+    "required": "Bu alan zorunludur"
   },
   "errors": {
     "qr": "Karekod Ayrıştırılamadı.",
@@ -117,7 +123,11 @@
     "loginError2": "Lütfen sizden istenilen bilgileri eksiksizce giriniz.",
     "emailValid": "Lütfen geçerli bir email adresi giriniz.",
     "passwordValid": "Şifre uzunluğu 6 karakterden az olamaz!",
-    "registerNameError": "Ad - Soyad alanı en az 5 karakterden oluşmalıdır."
+    "registerNameError": "Ad alanı en az 2 karakterden oluşmalıdır.",
+    "registerSurnameError": "Soyad alanı en az 2 karakterden oluşmalıdır.",
+    "phoneValid": "Telefon numarası formatı: 0(5xx)xxx xx xx",
+    "passwordMismatch": "Şifreler eşleşmiyor. Lütfen tekrar kontrol edin.",
+    "passwordChangeError": "Şifre değiştirme başarısız oldu. Lütfen bilgilerinizi kontrol edip tekrar deneyiniz."
   },
   "location": {
     "isEnableAlert": "Telefonun Konumu Kapalı Görünüyor\nLütfen Konumunuzu Açın",
@@ -131,6 +141,70 @@
   "dialog": {
     "alertDescription": "Açıklama alanı zorunludur ve minimum 5 karakterden oluşmalıdır.",
     "nonAppRedirect": "Uygulama Dışı Yönlendirme!",
-    "enterTheAddress": "Adresine girmek istediğinize emin misiniz?"
+    "enterTheAddress": "Adresine girmek istediğinize emin misiniz?",
+    "qrTypeSelection": "Yapmak istediğiniz işlemi seçin",
+    "qrEntryAction": "Giriş Yap",
+    "qrExitAction": "Çıkış Yap",
+    "error": "Hata",
+    "success": "Başarılı",
+    "close": "Kapat",
+    "update": "Güncelle"
+  },
+  "home": {
+    "welcome": "Hoş Geldin!",
+    "department": "Departman",
+    "login": "Giriş Yap",
+    "qrCode": "QR Kod",
+    "logout": "Çıkış Yap",
+    "noInternet": "İnternet bağlantısı yok",
+    "checkInternet": "Lütfen internet bağlantınızı kontrol edin",
+    "dailyDashboard": "Günlük Dashboard",
+    "currentTime": "Şu An",
+    "remainingTime": "Kalan Süre"
+  },
+  "permission": {
+    "createRequest": "İzin talebi oluşturmak için + butonuna tıklayın",
+    "scanQr": "QR Kod Okut",
+    "qrFrame": "QR kodu çerçeve içine alın",
+    "leaveRequest": "İzin Talebi",
+    "fillInfo": "Lütfen izin bilgilerinizi eksiksiz doldurun",
+    "leaveType": "İzin Türü",
+    "loading": "Yükleniyor...",
+    "selectType": "İzin türünü seçin",
+    "startDate": "Başlangıç",
+    "endDate": "Bitiş",
+    "selectDate": "Tarih seçin",
+    "leaveReason": "İzin sebebinizi detaylı bir şekilde açıklayın...",
+    "leaveAddress": "İzin süresince ulaşılabileceğiniz adres bilgilerini girin...",
+    "selectLeaveType": "İzin Türü Seçin",
+    "endDateTime": "Bitiş Tarihi",
+    "changePassword": "Şifre Değiştir",
+    "passwordMismatch": "Yeni şifreler eşleşmiyor",
+    "passwordLength": "Yeni şifre en az 6 karakter olmalıdır",
+    "passwordSuccess": "Şifre başarıyla değiştirildi",
+    "passwordFailed": "Şifre değiştirme işlemi başarısız oldu",
+    "confirmLogout": "Çıkış yapmak istediğinize emin misiniz?",
+    "cancel": "İptal",
+    "change": "Değiştir",
+    "currentPassword": "Mevcut Şifre",
+    "newPassword": "Yeni Şifre",
+    "confirmNewPassword": "Yeni Şifre (Tekrar)",
+    "dateRange": "Tarih Aralığı",
+    "reason": "Açıklama",
+    "address": "İletişim Adresi",
+    "startDateTime": "Başlangıç Tarihi",
+    "logout": "Çıkış Yap"
+  },
+  "launchUrl": {
+    "buttonText": "Git"
+  },
+  "bottomNavigation": {
+    "home": "Ana Sayfa",
+    "inAndOut": "Giriş/Çıkış",
+    "permissions": "İzinler",
+    "profile": "Profil"
+  },
+  "notFound": {
+    "pageNotFound": "Aradığınız sayfa bulunamıyor"
   }
 }
