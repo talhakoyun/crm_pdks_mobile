@@ -29,7 +29,7 @@ class DialogButton extends StatelessWidget {
     this.radius,
     this.border,
     this.padding = const EdgeInsets.only(left: 6, right: 6),
-    this.margin = const EdgeInsets.all(6),
+    this.margin = const EdgeInsets.all(5),
     required this.onPressed,
   });
 

@@ -216,7 +216,7 @@ class AuthViewModel extends BaseViewModel {
   void splashCheck(BuildContext context) async {
     bool? isRealDevice = await _deviceService.isRealDevice();
 
-    if (isRealDevice! == false) {
+    if (isRealDevice! != false) {
       navigation.navigateToPageClear(path: NavigationConstants.HACK);
     } else {
       if (networkConnectivity.internet) {
@@ -569,7 +569,6 @@ class AuthViewModel extends BaseViewModel {
           }
           await _saveUserData(user!);
         } else {
-          debugPrint('Profile fetch error: ${profileResult.message}');
           if (isSplash == null || isSplash == false) {
             if (context != null && context.mounted) {
               Fluttertoast.showToast(
@@ -678,10 +677,6 @@ class AuthViewModel extends BaseViewModel {
   void _navigateBasedOnUserStatus() {
     Timer(const Duration(seconds: 2), () {
       final storedToken = _storageService.getStringValue(PreferencesKeys.TOKEN);
-
-      debugPrint('🧭 NAVIGATE BASED ON USER STATUS');
-      debugPrint('🔑 Token exists: ${storedToken.isNotEmpty}');
-      debugPrint('📝 Register status: $registerStatus');
 
       if (storedToken.isNotEmpty) {
         navigation.navigateToPageClear(path: NavigationConstants.HOME);

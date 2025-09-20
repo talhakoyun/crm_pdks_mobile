@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -161,7 +160,7 @@ class UpdateDialogBuilder extends BaseDialogBuilder {
 
 class InAndOutDialogBuilder extends BaseDialogBuilder {
   final String content;
-  final String iconPath;
+  final IconData iconPath;
   final Color color;
   final VoidCallback onPressed;
 
@@ -185,16 +184,12 @@ class InAndOutDialogBuilder extends BaseDialogBuilder {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 15.width,
-          height: 15.width,
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(7.5),
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
           ),
-          child: Padding(
-            padding: context.paddingLow,
-            child: SvgPicture.asset(iconPath),
-          ),
+          child: Icon(iconPath, color: color, size: 24),
         ),
         context.emptySizedHeightBoxLow2x,
         Text(content, style: context.textTheme.bodyMedium),
@@ -348,10 +343,9 @@ class LocationPermissionDialogBuilder extends BaseDialogBuilder {
 
   @override
   Color? getBarrierColor(BuildContext context) => context.colorScheme.primary;
-    @override
+  @override
   Color? getBackgroundColor(BuildContext context) =>
       context.colorScheme.onError;
-
 
   @override
   ShapeBorder getShape() => const RoundedRectangleBorder(
@@ -407,7 +401,6 @@ class LocationPermissionDialogBuilder extends BaseDialogBuilder {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Ana buton (Tamam/Kapat)
             SizedBox(
               width: double.infinity,
               height: 48,
@@ -421,7 +414,7 @@ class LocationPermissionDialogBuilder extends BaseDialogBuilder {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isMock 
+                  backgroundColor: isMock
                       ? context.colorScheme.error
                       : context.colorScheme.primary,
                   foregroundColor: Colors.white,
@@ -456,7 +449,7 @@ class LocationPermissionDialogBuilder extends BaseDialogBuilder {
                     ),
                   ),
                   child: Text(
-                    "Ayarlara Git",
+                    StringConstants.instance.settingsButtonText,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -707,7 +700,9 @@ class LogoutConfirmationDialogBuilder extends BaseDialogBuilder {
 
   @override
   Widget buildContent(BuildContext context) {
-    return Text("${StringConstants.instance.exitTitle} \n ${StringConstants.instance.exitInfo}");
+    return Text(
+      "${StringConstants.instance.exitTitle} \n ${StringConstants.instance.exitInfo}",
+    );
   }
 
   @override

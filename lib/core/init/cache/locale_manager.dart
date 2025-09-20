@@ -61,7 +61,6 @@ class LocaleManager {
       final value = _preferences?.getString(key.toString()) ?? '';
       return value;
     } catch (e) {
-      debugPrint('❌ LocaleManager: Error getting ${key.toString()}: $e');
       return '';
     }
   }
@@ -103,7 +102,6 @@ class LocaleManager {
       final value = _preferences?.getString(key.toString()) ?? '0';
       return int.parse(value);
     } catch (e) {
-      debugPrint('❌ LocaleManager: Error getting ${key.toString()}: $e');
       return 0;
     }
   }

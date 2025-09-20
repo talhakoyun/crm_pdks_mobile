@@ -63,9 +63,6 @@ PODS:
     - OneSignalXCFramework/OneSignalOutcomes
   - package_info_plus (0.4.5):
     - Flutter
-  - path_provider_foundation (0.0.1):
-    - Flutter
-    - FlutterMacOS
   - platform_device_id_plus (0.0.1):
     - Flutter
   - Sentry/HybridSDK (8.52.1)
@@ -88,7 +85,6 @@ DEPENDENCIES:
   - mobile_scanner (from `.symlinks/plugins/mobile_scanner/darwin`)
   - onesignal_flutter (from `.symlinks/plugins/onesignal_flutter/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
-  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - platform_device_id_plus (from `.symlinks/plugins/platform_device_id_plus/ios`)
   - sentry_flutter (from `.symlinks/plugins/sentry_flutter/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
@@ -116,8 +112,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/onesignal_flutter/ios"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
-  path_provider_foundation:
-    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   platform_device_id_plus:
     :path: ".symlinks/plugins/platform_device_id_plus/ios"
   sentry_flutter:
@@ -137,7 +131,6 @@ SPEC CHECKSUMS:
   onesignal_flutter: f69ff09eeaf41cea4b7a841de5a61e79e7fd9a5a
   OneSignalXCFramework: 7112f3e89563e41ebc23fe807788f11985ac541c
   package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   platform_device_id_plus: e0cf120b0c703aedbe5d3bda2a16652ef1f80d48
   Sentry: 2cbbe3592f30050c60e916c63c7f5a2fa584005e
   sentry_flutter: feb376a4d8fd37387898b94e00da2060eeab2a41

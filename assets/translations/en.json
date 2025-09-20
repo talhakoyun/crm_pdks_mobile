@@ -81,11 +81,11 @@
     "noInAndOut": "You do not have any shift transactions yet."
   },
   "late": {
-    "text": "You are late!!",
+    "text": "You're late!!",
     "description": "Could you explain the reason for being late.."
   },
   "early": {
-    "text": "You are leaving early!!",
+    "text": "You're leaving early!!",
     "description": "Could you explain the reason for leaving early.."
   },
   "status": {
@@ -99,7 +99,8 @@
     "approve": "Approve",
     "cancel_btn": "Cancel",
     "confirm": "Confirm",
-    "confirm2": "Confirm"
+    "confirm2": "Confirm",
+    "settings": "Go to Settings"
   },
   "messages": {
     "error": "Error",

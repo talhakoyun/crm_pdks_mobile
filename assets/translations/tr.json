@@ -85,7 +85,7 @@
     "description": "Geç kalma sebebinizi açıklar mısınız.."
   },
   "early": {
-    "text": "Erken Çıkıyorsunuz !!",
+    "text": "Erken Çıkıyorsunuz!!",
     "description": "Erken Çıkma Sebebinizi Açıklar mısınız .."
   },
   "status": {
@@ -99,7 +99,8 @@
     "approve": "Onayla",
     "cancel_btn": "İptal",
     "confirm": "Onayla",
-    "confirm2": "Onayla"
+    "confirm2": "Onayla",
+    "settings": "Ayarlara Git"
   },
   "messages": {
     "error": "Hata",

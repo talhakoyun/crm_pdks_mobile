@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../core/base/view_model/base_view_model.dart';
 import '../core/constants/device_constants.dart';
-import '../core/constants/image_constants.dart';
 import '../core/constants/string_constants.dart';
 import '../core/constants/service_locator.dart';
 import '../core/enums/enums.dart';
@@ -73,7 +72,7 @@ class InAndOutViewModel extends BaseViewModel {
         type: DialogType.inAndOut,
         parameters: {
           'content': StringConstants.instance.inText,
-          'iconPath': ImageConstants.instance.start,
+          'iconPath': Icons.login,
           'color': context.colorScheme.tertiaryContainer,
           'onPressed': () async {
             Navigator.pop(context);
@@ -118,7 +117,7 @@ class InAndOutViewModel extends BaseViewModel {
         type: DialogType.inAndOut,
         parameters: {
           'content': StringConstants.instance.outText,
-          'iconPath': ImageConstants.instance.stop,
+          'iconPath': Icons.logout,
           'color': context.colorScheme.primaryContainer,
           'onPressed': () async {
             Navigator.pop(context);
@@ -479,7 +478,10 @@ class InAndOutViewModel extends BaseViewModel {
       }
       if (!targetContext.mounted) return;
       if (data.status!) {
-        CustomSnackBar(targetContext, data.message ?? StringConstants.instance.successMessage);
+        CustomSnackBar(
+          targetContext,
+          data.message ?? StringConstants.instance.successMessage,
+        );
       } else {
         CustomSnackBar(
           targetContext,

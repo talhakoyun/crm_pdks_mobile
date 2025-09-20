@@ -33,7 +33,7 @@ class _HomeViewState extends State<HomeView>
   bool _isInitialized = false;
 
   @override
-  bool get wantKeepAlive => true; 
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -65,7 +65,7 @@ class _HomeViewState extends State<HomeView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    
+
     return PopScope(
       canPop: false,
       child: (inAndOutViewModel.authVM.event == SignStatus.logined)
@@ -83,7 +83,6 @@ class _HomeViewState extends State<HomeView>
       value: locationManager,
       child: Consumer<LocationManager>(
         builder: (context, locationValue, child) {
-          // Lokasyon alışını optimize et
           if (locationValue.currentPosition == null && mounted) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
@@ -92,9 +91,7 @@ class _HomeViewState extends State<HomeView>
             });
           }
 
-          return SafeArea(
-            child: _buildMainContent(context, locationValue),
-          );
+          return SafeArea(child: _buildMainContent(context, locationValue));
         },
       ),
     );
@@ -111,9 +108,7 @@ class _HomeViewState extends State<HomeView>
         ),
       );
     }
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
-    );
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 
   Widget _buildMainContent(
@@ -661,7 +656,7 @@ class _HomeViewState extends State<HomeView>
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
+                    horizontal: 6,
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
@@ -672,9 +667,7 @@ class _HomeViewState extends State<HomeView>
                   ),
                   child: Text(
                     todayStatus,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                    style: context.textTheme.bodySmall?.copyWith(
                       color: todayStatus == strCons.earlyText
                           ? Colors.green
                           : Colors.red,

@@ -152,6 +152,7 @@ class StringConstants {
   String get dialogSuccessTitle => "dialog.success".tr();
   String get dialogCloseText => "dialog.close".tr();
   String get dialogUpdateText => "dialog.update".tr();
+  String get settingsButtonText => "buttons.settings".tr();
 
   // Home
   String get homeWelcome => "home.welcome".tr();
