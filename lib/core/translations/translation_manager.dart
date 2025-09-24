@@ -8,6 +8,7 @@ final class TranslationManager extends EasyLocalization {
     : super(
         supportedLocales: _supportedItems,
         path: _translationPath,
+        fallbackLocale: Locales.en.locale,
         useOnlyLangCode: true,
       );
 

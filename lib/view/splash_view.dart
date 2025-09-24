@@ -64,13 +64,26 @@ class _SplashViewState extends State<SplashView>
   }
 
   void _startAnimations() {
-    _fadeController.forward();
-    Future.delayed(const Duration(milliseconds: 500), () {
-      _pulseController.repeat(reverse: true);
-    });
-    Future.delayed(const Duration(milliseconds: 800), () {
-      _rotationController.repeat();
-    });
+    // Dispose edilip edilmediğini kontrol ederek animasyonları başlat
+    if (mounted) {
+      _fadeController.forward();
+
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted &&
+            !_pulseController.isDismissed &&
+            !_pulseController.isAnimating) {
+          _pulseController.repeat(reverse: true);
+        }
+      });
+
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (mounted &&
+            !_rotationController.isDismissed &&
+            !_rotationController.isAnimating) {
+          _rotationController.repeat();
+        }
+      });
+    }
   }
 
   @override
